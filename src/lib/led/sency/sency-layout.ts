@@ -1,3 +1,4 @@
+import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -56,7 +57,7 @@ export const SENCY_ASSETS = {
   talent: "/images/led/sency-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/sency-tagline.png",
+  tagline: ledStaticImage("/images/led/sency-tagline.png"),
   text: "/images/led/sency-text.png",
   qrFrame: "/images/led/sency-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/sency` (see `npm run led:sency-qr`). */
@@ -84,12 +85,12 @@ export const SENCY_LAYOUT_LIVE = {
   talent: { left: 500, top: 60, width: 876, height: 876 },
   tagline: { left: 1203, top: 46, width: 659, height: 321 },
   participantName: participantNameSlot({
-    left: 1203,
-    top: 381,
-    width: 659,
-    height: 64,
-    fontSize: 34,
-    rotate: 0,
+    left: 1190,
+    top: 113,
+    width: 402,
+    height: 56,
+    fontSize: 80,
+    rotate: -6,
   }),
   qrFrame: { left: 1302, top: 391, width: 479, height: 465 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },

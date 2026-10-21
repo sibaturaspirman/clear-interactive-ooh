@@ -1,3 +1,4 @@
+import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -56,7 +57,7 @@ export const DUKUH_ATAS_ASSETS = {
   talent: "/images/led/dukuh-atas-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/dukuh-atas-tagline.png",
+  tagline: ledStaticImage("/images/led/dukuh-atas-tagline.png"),
   text: "/images/led/dukuh-atas-text.png",
   qrFrame: "/images/led/dukuh-atas-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/dukuh-atas` (see `npm run led:dukuh-atas-qr`). */
@@ -88,12 +89,12 @@ export const DUKUH_ATAS_LAYOUT_LIVE = {
   talent: { left: 1411, top: 0, width: 300, height: 300 },
   tagline: { left: 1903, top: 17, width: 538, height: 262 },
   participantName: participantNameSlot({
-    left: 1903,
-    top: 233,
-    width: 538,
+    left: 1895,
+    top: 58,
+    width: 308,
     height: 46,
-    fontSize: 22,
-    rotate: 0,
+    fontSize: 70,
+    rotate: -6,
   }),
   qrFrame: { left: 2644, top: 16, width: 280, height: 271 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },

@@ -11,7 +11,8 @@
     "led:gbk-qr": "node scripts/generate-gbk-qr.mjs",
     "led:sency-qr": "node scripts/generate-sency-qr.mjs",
     "led:ratu-plaza-qr": "node scripts/generate-ratu-plaza-qr.mjs",
-    "led:dukuh-atas-qr": "node scripts/generate-dukuh-atas-qr.mjs"
+    "led:dukuh-atas-qr": "node scripts/generate-dukuh-atas-qr.mjs",
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "@fal-ai/client": "^1.10.1",

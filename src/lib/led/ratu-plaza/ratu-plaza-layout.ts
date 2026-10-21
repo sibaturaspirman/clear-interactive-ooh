@@ -1,3 +1,4 @@
+import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -56,7 +57,7 @@ export const RATU_PLAZA_ASSETS = {
   talent: "/images/led/ratu-plaza-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/ratu-plaza-tagline.png",
+  tagline: ledStaticImage("/images/led/ratu-plaza-tagline.png"),
   text: "/images/led/ratu-plaza-text.png",
   qrFrame: "/images/led/ratu-plaza-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/ratu-plaza` (see `npm run led:ratu-plaza-qr`). */
@@ -84,12 +85,12 @@ export const RATU_PLAZA_LAYOUT_LIVE = {
   talent: { left: 930, top: 67, width: 1100, height: 1100 },
   tagline: { left: 2011, top: 294, width: 1192, height: 582 },
   participantName: participantNameSlot({
-    left: 2011,
-    top: 896,
-    width: 1192,
-    height: 90,
-    fontSize: 48,
-    rotate: 0,
+    left: 1995,
+    top: 453,
+    width: 692,
+    height: 56,
+    fontSize: 120,
+    rotate: -6,
   }),
   qrFrame: { left: 3251, top: 228, width: 734, height: 712 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },

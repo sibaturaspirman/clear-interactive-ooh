@@ -1,3 +1,4 @@
+import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -56,7 +57,7 @@ export const BEI_ASSETS = {
   talent: "/images/led/bei-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/bei-tagline.png",
+  tagline: ledStaticImage("/images/led/bei-tagline.png"),
   text: "/images/led/bei-text.png",
   qrFrame: "/images/led/bei-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
@@ -84,12 +85,12 @@ export const BEI_LAYOUT_LIVE = {
   talent: { left: 960, top: 20, width: 1511, height: 1511 },
   tagline: { left: 2351, top: 71, width: 1162, height: 569 },
   participantName: participantNameSlot({
-    left: 2351,
-    top: 664,
-    width: 1162,
-    height: 100,
-    fontSize: 56,
-    rotate: 0,
+    left: 2341,
+    top: 235,
+    width: 692,
+    height: 56,
+    fontSize: 120,
+    rotate: -6,
   }),
   qrFrame: { left: 2594, top: 668, width: 820, height: 795 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },

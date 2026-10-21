@@ -1,3 +1,4 @@
+import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -56,7 +57,7 @@ export const GBK_ASSETS = {
   talent: "/images/led/gbk-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/gbk-tagline.png",
+  tagline: ledStaticImage("/images/led/gbk-tagline.png"),
   text: "/images/led/gbk-text.png",
   qrFrame: "/images/led/gbk-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/gbk` (see `npm run led:gbk-qr`). */
@@ -84,9 +85,9 @@ export const GBK_LAYOUT_LIVE = {
   talent: { left: 409, top: 76, width: 760, height: 760 },
   tagline: { left: 1028, top: 54, width: 595, height: 290 },
   participantName: participantNameSlot({
-    left: 1050,
-    top: 95,
-    width: 460,
+    left: 1020,
+    top: 99,
+    width: 402,
     height: 56,
     fontSize: 80,
     rotate: -6,
