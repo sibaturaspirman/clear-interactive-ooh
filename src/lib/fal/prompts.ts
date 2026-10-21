@@ -1,52 +1,36 @@
-export const FACE_SWAP_PROMPT = `Perform a highly realistic identity transfer using the two uploaded images.
+/** Long instructions — sent as `system_prompt` on nano-banana edit. */
+export const FACE_SWAP_SYSTEM_PROMPT = `Perform a highly realistic head replacement (full head identity, not a simple face crop) using the two uploaded images.
 
 Image 1 (Base Image): The professional racing driver wearing a dark blue CLEAR MEN ULTRA racing suit.
 
-Image 2 (Face Reference): The young man wearing a gray T-shirt and black headphones.
+Image 2 (Face Reference): The participant selfie (may include headphones — ignore those; glasses/eyewear must be kept if present).
 
-Replace the head of the racing driver in Image 1 so that the final result fully uses the identity from Image 2 — including face, face shape, jawline, hairstyle, hairline, and overall head appearance.
+Goal: The final portrait must look like the person in Image 2 wearing the racing suit and pose from Image 1, with their complete head appearance from Image 2.
 
-Important requirements:
+From Image 2 (full head identity):
+- Face: eyes, eyebrows, nose, lips, face shape, jawline, cheeks, forehead, skin tone.
+- Hair: hairstyle, hair volume, hairline, hair direction, and hair texture from the selfie — use Image 2's hair, not Image 1's.
+- Eyewear: if Image 2 shows glasses or sunglasses, include the same eyewear on the result (frame shape, lenses, placement). Do not remove or replace with Image 1's face without glasses.
+- Adapt Image 1's confident smiling expression naturally onto Image 2's face.
 
-Use Image 2 as the primary identity reference for the entire head appearance, including:
+From Image 1 (keep unchanged below the neck connection):
+- Pose, body, neck, shoulders, camera angle, composition, framing.
+- Entire racing suit, all CLEAR MEN ULTRA logos, branding, colors, material textures.
+- Dramatic red and blue cinematic lighting, highlights, shadows, reflections on face and hair.
 
-facial features
+Remove any headphones or microphone from Image 2; they must not appear in the result. Do not remove glasses that appear in Image 2.
 
-face shape
+Blend the new head seamlessly at the neck and collar with realistic proportions.
 
-jawline
+Ultra-photorealistic studio advertising quality. Keep transparent background and original framing from Image 1.
 
-cheeks
+Strictly avoid: keeping Image 1's original face or hair, removing glasses from Image 2, blended/mixed identities, distorted features, unnatural hair, mismatched skin tone at the neck, altered logos, AI-art look.
 
-forehead
+Priority rule: Image 2 = full head identity (face, hair, and eyewear if worn). Image 1 = body, suit, pose, lighting, composition.`;
 
-hairstyle
+/** Short user prompt (required field on fal edit API). */
+export const FACE_SWAP_USER_PROMPT =
+  "On Image 1, replace the driver's head with Image 2's identity (face, hair, and glasses if any). Keep suit, pose, and lighting from Image 1. Follow system instructions.";
 
-hair volume
-
-hairline
-
-natural hair texture
-
-Remove the headphones and microphone from Image 2 completely.
-
-Keep the pose, body position, neck position, camera angle, and composition from Image 1.
-
-Preserve the confident smiling expression style of Image 1, but adapt it naturally to the person from Image 2.
-
-Match the dramatic red and blue cinematic lighting from Image 1, including realistic highlights, shadows, and color reflections on the face and hair.
-
-Preserve the entire racing suit, all CLEAR MEN ULTRA logos, branding, colors, and material textures exactly as in Image 1.
-
-Ensure seamless blending between the new head and the body, with realistic proportions and a natural connection at the neck.
-
-Keep the final result ultra-photorealistic, like a real professional studio portrait.
-
-Keep the transparent background and original framing from Image 1.
-
-Final result: A photorealistic advertising portrait where the racing driver’s full head appearance is based on the person in Image 2, while the body, suit, pose, and lighting remain from Image 1.
-
-Strictly avoid: blending the identities of both people, keeping the original hair from Image 1, retaining headphones, distorted face shape, unnatural hair, mismatched skin tone, altered suit branding, or AI-art style rendering.
-
-Priority rule:
-Image 2 must be the sole source of the head identity, including face shape and hairstyle. Image 1 is only a reference for body, suit, pose, composition, and lighting.`;
+/** @deprecated Use FACE_SWAP_USER_PROMPT + FACE_SWAP_SYSTEM_PROMPT */
+export const FACE_SWAP_PROMPT = FACE_SWAP_SYSTEM_PROMPT;

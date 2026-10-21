@@ -24,14 +24,23 @@ function TextField({
   value,
   placeholder,
   onChange,
+  type = "text",
+  inputMode,
+  autoComplete,
 }: {
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  type?: "text" | "tel";
+  inputMode?: "text" | "numeric" | "tel";
+  autoComplete?: string;
 }) {
   return (
     <input
-      className="microsite-input w-full bg-transparent text-sm outline-none placeholder:text-white/40"
+      className="microsite-input w-full bg-transparent outline-none placeholder:text-white/40"
+      type={type}
+      inputMode={inputMode}
+      autoComplete={autoComplete}
       value={value}
       placeholder={placeholder}
       onChange={(event) => onChange(event.target.value)}
@@ -53,6 +62,7 @@ export function PersonalInfoStep({
           <TextField
             value={form.fullName}
             placeholder="Enter your full name"
+            autoComplete="name"
             onChange={(fullName) => onChange({ fullName })}
           />
         </div>
@@ -64,6 +74,9 @@ export function PersonalInfoStep({
           <span className="text-sm">+62</span>
           <span className="h-4 w-px bg-white/60" aria-hidden />
           <TextField
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
             value={form.phone}
             placeholder="Enter your phone number"
             onChange={(phone) => onChange({ phone })}

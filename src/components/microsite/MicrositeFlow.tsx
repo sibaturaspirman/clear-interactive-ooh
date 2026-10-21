@@ -82,6 +82,7 @@ export function MicrositeFlow({
       fullName: form.fullName.trim(),
       phone: form.phone.trim(),
       photo: file,
+      testBypass,
     });
 
     setSubmitting(false);
