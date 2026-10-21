@@ -1,6 +1,6 @@
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
-/** BEI LED canvas — matches `bei-bg.jpg`. */
+/** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (4096×1170). */
 export const RATU_PLAZA_CANVAS = LED_CANVAS_BY_CODE["ratu-plaza"];
 
 export const RATU_PLAZA_STATIC_DURATION_MS = 5000;
@@ -48,41 +48,41 @@ export function ratuPlazaLiveTalentZoomMs(playMs: number): number {
 }
 
 export const RATU_PLAZA_ASSETS = {
-  background: "/images/led/bei-bg.jpg",
-  clear: "/images/led/bei-clear.png",
-  packGroup: "/images/led/bei-clear-pack-group.png",
-  pack: "/images/led/bei-clear-pack.png",
-  talent: "/images/led/bei-talent.png",
+  background: "/images/led/ratu-plaza-bg.jpg",
+  clear: "/images/led/ratu-plaza-clear.png",
+  packGroup: "/images/led/ratu-plaza-clear-pack-group.png",
+  pack: "/images/led/ratu-plaza-clear-pack.png",
+  talent: "/images/led/ratu-plaza-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/bei-tagline.png",
-  text: "/images/led/bei-text.png",
-  qrFrame: "/images/led/bei-qr-frame.png",
-  /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
-  qrCode: "/images/led/bei-qr.png",
+  tagline: "/images/led/ratu-plaza-tagline.png",
+  text: "/images/led/ratu-plaza-text.png",
+  qrFrame: "/images/led/ratu-plaza-qr-frame.png",
+  /** Pre-rendered QR → `{origin}/microsite/ratu-plaza` (see `npm run led:ratu-plaza-qr`). */
+  qrCode: "/images/led/ratu-plaza-qr.png",
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */
 export const RATU_PLAZA_LAYOUT_SHARED = {
-  clear: { left: 184, top: 94, width: 704, height: 261 },
+  clear: { left: 110, top: 67, width: 558, height: 207 },
 } as const;
 
 /** Figma BEI 1 (13:127) — intro static, no QR. */
 export const RATU_PLAZA_LAYOUT_STATIC = {
   clear: RATU_PLAZA_LAYOUT_SHARED.clear,
-  pack: { left: 184, top: 47, width: 1176, height: 1473 },
-  talent: { left: 1444, top: 106, width: 2396, height: 1430 },
-  text: { left: 881, top: 1117, width: 2563, height: 419 },
+  pack: { left: 110, top: -29, width: 980, height: 1228 },
+  talent: { left: 1444, top: 106, width: 2197, height: 1141 },
+  text: { left: 875, top: 729, width: 2812, height: 355 },
 } as const;
 
 /** Figma BEI 2 (13:150) — idle QR + queue playback (talent from API). */
 export const RATU_PLAZA_LAYOUT_LIVE = {
   clear: RATU_PLAZA_LAYOUT_SHARED.clear,
   /** Live only — relayout via `/led/bei?debug=live` (bukan intro `RATU_PLAZA_LAYOUT_STATIC.pack`). */
-  packGroup: { left: 0, top: 384, width: 1065, height: 1124 },
-  talent: { left: 960, top: 20, width: 1511, height: 1511 },
-  tagline: { left: 2351, top: 71, width: 1162, height: 569 },
-  qrFrame: { left: 2594, top: 668, width: 820, height: 795 },
+  packGroup: { left: 0, top: 273, width: 856, height: 903 },
+  talent: { left: 930, top: 67, width: 1100, height: 1100 },
+  tagline: { left: 2011, top: 294, width: 1192, height: 582 },
+  qrFrame: { left: 3251, top: 228, width: 734, height: 712 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;
 
