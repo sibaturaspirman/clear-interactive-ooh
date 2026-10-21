@@ -1,7 +1,7 @@
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
-/** BEI LED canvas — matches `bei-bg.jpg`. */
-export const SENCY_CANVAS = LED_CANVAS_BY_CODE["sency"];
+/** Sency LED canvas — matches `sency-bg.jpg` (1920×922). */
+export const SENCY_CANVAS = LED_CANVAS_BY_CODE.sency;
 
 export const SENCY_STATIC_DURATION_MS = 5000;
 /** Live filler when API queue is empty — same hold as intro static. */
@@ -48,41 +48,41 @@ export function sencyLiveTalentZoomMs(playMs: number): number {
 }
 
 export const SENCY_ASSETS = {
-  background: "/images/led/bei-bg.jpg",
-  clear: "/images/led/bei-clear.png",
-  packGroup: "/images/led/bei-clear-pack-group.png",
-  pack: "/images/led/bei-clear-pack.png",
-  talent: "/images/led/bei-talent.png",
+  background: "/images/led/sency-bg.jpg",
+  clear: "/images/led/sency-clear.png",
+  packGroup: "/images/led/sency-clear-pack-group.png",
+  pack: "/images/led/sency-clear-pack.png",
+  talent: "/images/led/sency-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/bei-tagline.png",
-  text: "/images/led/bei-text.png",
-  qrFrame: "/images/led/bei-qr-frame.png",
-  /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
-  qrCode: "/images/led/bei-qr.png",
+  tagline: "/images/led/sency-tagline.png",
+  text: "/images/led/sency-text.png",
+  qrFrame: "/images/led/sency-qr-frame.png",
+  /** Pre-rendered QR → `{origin}/microsite/sency` (see `npm run led:sency-qr`). */
+  qrCode: "/images/led/sency-qr.png",
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */
 export const SENCY_LAYOUT_SHARED = {
-  clear: { left: 184, top: 94, width: 704, height: 261 },
+  clear: { left: 47, top: 44, width: 437, height: 157 },
 } as const;
 
 /** Figma BEI 1 (13:127) — intro static, no QR. */
 export const SENCY_LAYOUT_STATIC = {
   clear: SENCY_LAYOUT_SHARED.clear,
-  pack: { left: 184, top: 47, width: 1176, height: 1473 },
-  talent: { left: 1444, top: 106, width: 2396, height: 1430 },
-  text: { left: 881, top: 1117, width: 2563, height: 419 },
+  pack: { left: 13, top: 238, width: 347, height: 672 },
+  talent: { left: 395, top: 48, width: 1525, height: 874 },
+  text: { left: 345, top: 727, width: 1312, height: 137 },
 } as const;
 
 /** Figma BEI 2 (13:150) — idle QR + queue playback (talent from API). */
 export const SENCY_LAYOUT_LIVE = {
   clear: SENCY_LAYOUT_SHARED.clear,
   /** Live only — relayout via `/led/bei?debug=live` (bukan intro `SENCY_LAYOUT_STATIC.pack`). */
-  packGroup: { left: 0, top: 384, width: 1065, height: 1124 },
-  talent: { left: 960, top: 20, width: 1511, height: 1511 },
-  tagline: { left: 2351, top: 71, width: 1162, height: 569 },
-  qrFrame: { left: 2594, top: 668, width: 820, height: 795 },
+  packGroup: { left: 2, top: 233, width: 576, height: 689 },
+  talent: { left: 500, top: 60, width: 876, height: 876 },
+  tagline: { left: 1203, top: 46, width: 659, height: 321 },
+  qrFrame: { left: 1302, top: 391, width: 479, height: 465 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;
 

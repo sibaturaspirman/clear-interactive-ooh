@@ -32,6 +32,33 @@ Open [http://localhost:3000](http://localhost:3000) for the location index.
 
 Location codes: `bei`, `dukuh-atas`, `gbk`, `ratu-plaza`, `sency`.
 
+## Production (Vercel)
+
+BEI
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/bei
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/bei
+
+Dukuh Atas
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/dukuh-atas
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/dukuh-atas
+
+GBK
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/gbk
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/gbk
+
+Ratu Plaza
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/ratu-plaza
+
+Sency
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/sency
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/sency
+
 ## LED canvas sizes
 
 Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are defined in [`src/lib/led/location-specs.ts`](./src/lib/led/location-specs.ts). Each site uses its own asset prefix (e.g. `bei-*` for BEI).
