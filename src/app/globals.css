@@ -119,11 +119,11 @@ body {
 }
 
 .microsite-countdown-number {
-  font-size: 96px;
+  font-size: clamp(8rem, 38vw, 10.5rem);
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  text-shadow: 0 4px 24px rgb(0 0 0 / 45%);
+  text-shadow: 0 4px 32px rgb(0 0 0 / 55%);
   animation: microsite-countdown-pop 0.35s ease-out;
 }
 
