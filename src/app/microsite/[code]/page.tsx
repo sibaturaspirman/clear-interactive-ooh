@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 
 import { MicrositeFlow } from "@/components/microsite/MicrositeFlow";
-import { getLocationByCode, getLocations } from "@/lib/locations";
+import {
+  getLocationByCode,
+  getLocationStaticParams,
+} from "@/lib/locations";
 
 export const instant = false;
 
@@ -10,12 +13,7 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  try {
-    const locations = await getLocations();
-    return locations.map((location) => ({ code: location.code }));
-  } catch {
-    return [];
-  }
+  return getLocationStaticParams();
 }
 
 export async function generateMetadata({ params }: PageProps) {

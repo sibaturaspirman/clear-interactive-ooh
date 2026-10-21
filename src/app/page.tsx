@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getLocations } from "@/lib/locations";
 import { ledPath, micrositePath } from "@/lib/paths";
 
+export const instant = false;
+
 export default async function Home() {
   const locations = await getLocations();
 

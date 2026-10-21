@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 
 import { LedPlayer } from "@/components/led/LedPlayer";
 import { getServerEnv } from "@/lib/env";
-import { getLocationByCode, getLocations } from "@/lib/locations";
+import {
+  getLocationByCode,
+  getLocationStaticParams,
+} from "@/lib/locations";
 import { getMicrositeUrl } from "@/lib/urls";
 
 export const instant = false;
@@ -12,12 +15,7 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  try {
-    const locations = await getLocations();
-    return locations.map((location) => ({ code: location.code }));
-  } catch {
-    return [];
-  }
+  return getLocationStaticParams();
 }
 
 export async function generateMetadata({ params }: PageProps) {
