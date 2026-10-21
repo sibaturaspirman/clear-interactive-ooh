@@ -1,0 +1,108 @@
+:root {
+  color-scheme: dark;
+  --ink: #f4fbfc;
+  --muted: #9eb4b8;
+  --accent: #3ddee8;
+  --bad: #ffb4c4;
+}
+
+.led-player-stage {
+  position: relative;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  cursor: pointer;
+  background: #061316;
+  color: var(--ink);
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.led-player-media,
+.led-player-media img,
+.led-player-media video {
+  width: 100%;
+  height: 100%;
+}
+
+.led-player-media img,
+.led-player-media video {
+  object-fit: contain;
+  background: #061316;
+}
+
+.led-player-idle-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.led-player-idle-layer[hidden] {
+  display: none;
+}
+
+.led-player-chrome {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  gap: 10px;
+  padding: 18px 22px 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+}
+
+.led-player-chrome[hidden] {
+  display: none;
+}
+
+.led-player-bar {
+  height: 4px;
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+}
+
+.led-player-meta,
+.led-player-side {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.led-player-nama {
+  font-size: 28px;
+}
+
+.led-player-loc,
+.led-player-pos,
+.led-player-hint {
+  color: var(--muted);
+}
+
+.led-player-hint {
+  color: var(--accent);
+}
+
+.led-player-hint[hidden] {
+  display: none;
+}
+
+.led-player-status {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  margin: 0;
+  color: var(--bad);
+}
+
+@keyframes led-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
