@@ -17,7 +17,7 @@ export function LedParticipantNameText({
 
   return (
     <div
-      className="led-live-participant-name-wrap flex size-full items-end justify-center"
+      className="led-live-participant-name-wrap flex size-full items-end justify-start"
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       <p
