@@ -5,11 +5,13 @@ import {
   getLocationByCode,
   getLocationStaticParams,
 } from "@/lib/locations";
+import { parseMicrositeTestBypass } from "@/lib/microsite/test-bypass";
 
 export const instant = false;
 
 type PageProps = {
   params: Promise<{ code: string }>;
+  searchParams: Promise<{ test?: string | string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -27,13 +29,19 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function MicrositeLocationPage({ params }: PageProps) {
+export default async function MicrositeLocationPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { code } = await params;
+  const query = await searchParams;
   const location = await getLocationByCode(code);
 
   if (!location) {
     notFound();
   }
 
-  return <MicrositeFlow location={location} />;
+  const testBypass = parseMicrositeTestBypass(query.test);
+
+  return <MicrositeFlow location={location} testBypass={testBypass} />;
 }

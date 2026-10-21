@@ -21,9 +21,14 @@ type FormState = {
 
 type MicrositeFlowProps = {
   location: Location;
+  /** From `?test` — submit uses a fixed result URL instead of fal.ai. */
+  testBypass?: boolean;
 };
 
-export function MicrositeFlow({ location }: MicrositeFlowProps) {
+export function MicrositeFlow({
+  location,
+  testBypass = false,
+}: MicrositeFlowProps) {
   const [step, setStep] = useState<Step>("info");
   const [form, setForm] = useState<FormState>({
     fullName: "",
@@ -116,7 +121,7 @@ export function MicrositeFlow({ location }: MicrositeFlowProps) {
         <ReviewStep
           photoUrl={photoUrl}
           submitting={submitting}
-          submitLabel="Generating…"
+          submitLabel={testBypass ? "Mengirim…" : "Generating…"}
           error={error}
           onRetake={() => setStep("camera")}
           onSubmit={handleSubmit}

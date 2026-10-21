@@ -3,6 +3,10 @@
 import { publicApiPostJson } from "@/lib/api";
 import { generatePortraitAssetUrl } from "@/lib/fal/portrait";
 import { getLocationByCode } from "@/lib/locations";
+import {
+  MICROSITE_TEST_RESULT_URL,
+  canBypassFalGeneration,
+} from "@/lib/microsite/test-bypass";
 
 export type SubmitResult =
   | { ok: true; submissionId: number }
@@ -30,6 +34,8 @@ export async function submitParticipation(input: {
   fullName: string;
   phone: string;
   photo: File;
+  /** Set when microsite was opened with `?test` (honored only if bypass is allowed). */
+  testBypass?: boolean;
 }): Promise<SubmitResult> {
   const location = await getLocationByCode(input.locationCode);
   if (!location) {
@@ -42,7 +48,10 @@ export async function submitParticipation(input: {
   }
 
   try {
-    const url = await generatePortraitAssetUrl(input.photo);
+    const bypassFal = canBypassFalGeneration(Boolean(input.testBypass));
+    const url = bypassFal
+      ? MICROSITE_TEST_RESULT_URL
+      : await generatePortraitAssetUrl(input.photo);
     const submission = await publicApiPostJson<SubmissionResponse>(
       "/api/submissions",
       {

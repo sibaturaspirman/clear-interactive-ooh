@@ -95,7 +95,40 @@
   left: 16px;
   z-index: 30;
   margin: 0;
-  color: var(--bad);
+}
+
+.led-player-status-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.led-player-status-dot--ok {
+  background: #22c55e;
+  color: #22c55e;
+}
+
+.led-player-status-dot--warn {
+  background: #f59e0b;
+  color: #f59e0b;
+  animation: led-status-pulse 1.2s ease-in-out infinite;
+}
+
+.led-player-status-dot--bad {
+  background: #ef4444;
+  color: #ef4444;
+}
+
+@keyframes led-status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
 @keyframes led-shrink {
@@ -104,5 +137,266 @@
   }
   to {
     transform: scaleX(0);
+  }
+}
+
+.led-fixed-viewport {
+  --led-fixed-scale: min(
+    calc(100vw / var(--led-fixed-w, 3840)),
+    calc(100dvh / var(--led-fixed-h, 1536))
+  );
+}
+
+.led-fixed-canvas {
+  transform: scale(var(--led-fixed-scale));
+  transform-origin: center center;
+}
+
+.led-player-stage--fixed {
+  min-height: 100dvh;
+  background: #000;
+}
+
+.led-player-stage--fixed .led-player-status {
+  z-index: 50;
+}
+
+.led-fixed-canvas .led-player-media--in-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.led-bei-static-layer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.led-bei-static-layer--instant {
+  opacity: 1;
+}
+
+.led-bei-static-layer--enter {
+  opacity: 0;
+  animation: led-bei-static-fade-in 800ms ease-out forwards;
+}
+
+.led-bei-static-layer--exit {
+  opacity: 1;
+  animation: led-bei-static-fade-out 700ms ease-in forwards;
+}
+
+.led-bei-talent-zoom {
+  transform-origin: center bottom;
+  transform: scale(0.94);
+  animation: led-bei-talent-zoom ease-out forwards;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.led-bei-talent-zoom--hold {
+  animation: none;
+  transform: scale(1);
+}
+
+.led-bei-static-layer--exit .led-bei-talent-zoom {
+  animation: none;
+  transform: scale(1);
+}
+
+@keyframes led-bei-static-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes led-bei-static-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes led-bei-talent-zoom {
+  from {
+    transform: scale(0.94);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.led-bei-live-talent-zoom {
+  transform-origin: center bottom;
+  transform: scale(0.985);
+  animation: led-bei-live-talent-zoom var(--bei-live-talent-zoom-ms, 2600ms)
+    cubic-bezier(0.25, 0.1, 0.2, 1) forwards;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.led-bei-live-talent-zoom--hold {
+  animation: none;
+  transform: scale(1);
+}
+
+@keyframes led-bei-live-talent-zoom {
+  0% {
+    transform: scale(0.985);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Submission talent: no rise-in — only inner fade + subtle zoom */
+.led-bei-live-talent-slot {
+  transform: translate3d(0, 0, 0);
+  transition-property: opacity;
+}
+
+.led-bei-live-layer {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.led-bei-live-layer--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.led-bei-live-talent-fade {
+  width: 100%;
+  height: 100%;
+  will-change: opacity;
+}
+
+.led-bei-live-talent-fade--in {
+  opacity: 0;
+  animation: led-bei-static-fade-in 800ms ease-out forwards;
+}
+
+.led-bei-live-talent-fade--in-subtle {
+  opacity: 0;
+  animation: led-bei-static-fade-in var(--bei-live-talent-fade-in-ms, 1000ms) ease-out
+    forwards;
+}
+
+.led-bei-live-talent-fade--out {
+  opacity: 1;
+  animation: led-bei-static-fade-out 700ms ease-in forwards;
+}
+
+.led-bei-live-talent-fade--show {
+  opacity: 1;
+}
+
+.led-bei-static-pack-motion {
+  overflow: hidden;
+}
+
+.led-bei-static-pack-motion--in-right {
+  animation: led-bei-slide-in-right var(--bei-live-enter-ms, 900ms)
+    cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.led-bei-static-pack-motion--out-left {
+  animation: led-bei-slide-out-left 700ms ease-in forwards;
+}
+
+.led-bei-static-exit-fade {
+  animation: led-bei-static-fade-out var(--bei-static-fade-out-ms, 700ms) ease-in
+    forwards;
+}
+
+.led-bei-static-exit-fade .led-bei-talent-zoom {
+  animation: none;
+  transform: scale(1);
+}
+
+.led-bei-live-layer--slide-in-right {
+  opacity: 0;
+  transform: translate3d(var(--bei-slide-offset, 72px), 0, 0);
+  animation: led-bei-slide-in-right var(--bei-live-enter-ms, 900ms)
+    cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.led-bei-live-layer--slide-in-left {
+  opacity: 0;
+  transform: translate3d(calc(-1 * var(--bei-slide-offset, 72px)), 0, 0);
+  animation: led-bei-slide-in-left var(--bei-live-enter-ms, 900ms)
+    cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.led-bei-live-layer--slide-out-left {
+  animation: led-bei-slide-out-left 700ms ease-in forwards;
+}
+
+.led-bei-live-layer--slide-pending-right {
+  opacity: 0;
+  transform: translate3d(var(--bei-slide-offset, 72px), 0, 0);
+}
+
+.led-bei-live-layer--slide-pending-left {
+  opacity: 0;
+  transform: translate3d(calc(-1 * var(--bei-slide-offset, 72px)), 0, 0);
+}
+
+@keyframes led-bei-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--bei-slide-offset, 72px), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes led-bei-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(-1 * var(--bei-slide-offset, 72px)), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes led-bei-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(calc(-1 * var(--bei-slide-offset, 72px)), 0, 0);
+  }
+}
+
+.led-bei-live-pack-float {
+  animation: led-bei-live-pack-float var(--bei-live-pack-float-ms, 5600ms)
+    ease-in-out infinite;
+  animation-delay: var(--bei-live-pack-float-delay-ms, 900ms);
+  will-change: transform;
+}
+
+@keyframes led-bei-live-pack-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
   }
 }
