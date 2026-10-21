@@ -1,6 +1,6 @@
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
-/** BEI LED canvas — matches `bei-bg.jpg`. */
+/** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (4096×295). */
 export const DUKUH_ATAS_CANVAS = LED_CANVAS_BY_CODE["dukuh-atas"];
 
 export const DUKUH_ATAS_STATIC_DURATION_MS = 5000;
@@ -48,47 +48,52 @@ export function dukuhAtasLiveTalentZoomMs(playMs: number): number {
 }
 
 export const DUKUH_ATAS_ASSETS = {
-  background: "/images/led/bei-bg.jpg",
-  clear: "/images/led/bei-clear.png",
-  packGroup: "/images/led/bei-clear-pack-group.png",
-  pack: "/images/led/bei-clear-pack.png",
-  talent: "/images/led/bei-talent.png",
+  background: "/images/led/dukuh-atas-bg.jpg",
+  clear: "/images/led/dukuh-atas-clear.png",
+  packGroup: "/images/led/dukuh-atas-clear-pack-group.png",
+  pack: "/images/led/dukuh-atas-clear-pack.png",
+  talent: "/images/led/dukuh-atas-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
   layoutTalentDummy: "/images/led/talent-dummy.png",
-  tagline: "/images/led/bei-tagline.png",
-  text: "/images/led/bei-text.png",
-  qrFrame: "/images/led/bei-qr-frame.png",
-  /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
-  qrCode: "/images/led/bei-qr.png",
+  tagline: "/images/led/dukuh-atas-tagline.png",
+  text: "/images/led/dukuh-atas-text.png",
+  qrFrame: "/images/led/dukuh-atas-qr-frame.png",
+  /** Pre-rendered QR → `{origin}/microsite/dukuh-atas` (see `npm run led:dukuh-atas-qr`). */
+  qrCode: "/images/led/dukuh-atas-qr.png",
 } as const;
 
-/** Shared across static intro and live (same bg + clear placement). */
+/** Shared across static intro and live (same bg + dual Clear logos). */
 export const DUKUH_ATAS_LAYOUT_SHARED = {
-  clear: { left: 184, top: 94, width: 704, height: 261 },
+  clearLeft: { left: 184, top: 25, width: 654, height: 243 },
+  clearRight: {
+    left: 3158,
+    top: 25,
+    width: 654,
+    height: 243,
+  },
 } as const;
 
 /** Figma BEI 1 (13:127) — intro static, no QR. */
 export const DUKUH_ATAS_LAYOUT_STATIC = {
-  clear: DUKUH_ATAS_LAYOUT_SHARED.clear,
-  pack: { left: 184, top: 47, width: 1176, height: 1473 },
-  talent: { left: 1444, top: 106, width: 2396, height: 1430 },
-  text: { left: 881, top: 1117, width: 2563, height: 419 },
+  pack: { left: 941, top: 0, width: 162, height: 304 },
+  talent: { left: 2406, top: 4, width: 532, height: 292 },
+  text: { left: 1237, top: 60, width: 1731, height: 195 },
 } as const;
 
 /** Figma BEI 2 (13:150) — idle QR + queue playback (talent from API). */
 export const DUKUH_ATAS_LAYOUT_LIVE = {
-  clear: DUKUH_ATAS_LAYOUT_SHARED.clear,
-  /** Live only — relayout via `/led/bei?debug=live` (bukan intro `DUKUH_ATAS_LAYOUT_STATIC.pack`). */
-  packGroup: { left: 0, top: 384, width: 1065, height: 1124 },
-  talent: { left: 960, top: 20, width: 1511, height: 1511 },
-  tagline: { left: 2351, top: 71, width: 1162, height: 569 },
-  qrFrame: { left: 2594, top: 668, width: 820, height: 795 },
+  /** Live only — relayout via `/led/dukuh-atas?debug=live` (bukan intro `DUKUH_ATAS_LAYOUT_STATIC.pack`). */
+  packGroup: { left: 823, top: 0, width: 449, height: 304 },
+  talent: { left: 1411, top: 0, width: 300, height: 300 },
+  tagline: { left: 1903, top: 17, width: 538, height: 262 },
+  qrFrame: { left: 2644, top: 16, width: 280, height: 271 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;
 
 /** @deprecated use DUKUH_ATAS_LAYOUT_STATIC / DUKUH_ATAS_LAYOUT_LIVE */
 export const DUKUH_ATAS_LAYOUT = {
-  clear: DUKUH_ATAS_LAYOUT_LIVE.clear,
+  clearLeft: DUKUH_ATAS_LAYOUT_SHARED.clearLeft,
+  clearRight: DUKUH_ATAS_LAYOUT_SHARED.clearRight,
   packGroup: DUKUH_ATAS_LAYOUT_LIVE.packGroup,
   talent: DUKUH_ATAS_LAYOUT_LIVE.talent,
   tagline: DUKUH_ATAS_LAYOUT_LIVE.tagline,

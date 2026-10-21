@@ -21,8 +21,14 @@ export function LedDukuhAtasSharedLayers() {
       />
       <LedDukuhAtasLayerImage
         src={DUKUH_ATAS_ASSETS.clear}
-        alt="Clear x Oracle Red Bull Racing"
-        box={DUKUH_ATAS_LAYOUT_SHARED.clear}
+        alt=""
+        box={DUKUH_ATAS_LAYOUT_SHARED.clearLeft}
+        className="object-contain object-left-top"
+      />
+      <LedDukuhAtasLayerImage
+        src={DUKUH_ATAS_ASSETS.clear}
+        alt=""
+        box={DUKUH_ATAS_LAYOUT_SHARED.clearRight}
         className="object-contain object-left-top"
       />
     </>
