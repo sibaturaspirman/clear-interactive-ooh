@@ -193,6 +193,38 @@ body {
   bottom: -7px;
 }
 
+.microsite-generating-logo {
+  display: flex;
+  justify-content: center;
+  will-change: transform;
+  animation: microsite-logo-bob 1.25s ease-in-out infinite;
+}
+
+@keyframes microsite-logo-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
+  }
+}
+
+.microsite-generating-title {
+  font-size: clamp(2rem, 10vw, 2.5rem);
+  line-height: 1.1;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+.microsite-generating-subtitle {
+  max-width: 300px;
+  font-size: 15px;
+  line-height: 22px;
+  color: rgb(255 255 255 / 92%);
+}
+
 .microsite-camera-title {
   background: radial-gradient(
     circle at 10% 40%,

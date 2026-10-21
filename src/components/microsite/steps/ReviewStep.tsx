@@ -4,11 +4,12 @@ import Image from "next/image";
 
 import { CameraCardFrame } from "@/components/microsite/CameraCardFrame";
 import { CameraViewfinder } from "@/components/microsite/CameraViewfinder";
+import { MicrositeGeneratingOverlay } from "@/components/microsite/MicrositeGeneratingOverlay";
 
 type ReviewStepProps = {
   photoUrl: string;
   submitting: boolean;
-  submitLabel?: string;
+  testBypass?: boolean;
   error: string | null;
   onRetake: () => void;
   onSubmit: () => void;
@@ -17,12 +18,13 @@ type ReviewStepProps = {
 export function ReviewStep({
   photoUrl,
   submitting,
-  submitLabel = "Memproses foto…",
+  testBypass = false,
   error,
   onRetake,
   onSubmit,
 }: ReviewStepProps) {
   return (
+    <>
     <CameraCardFrame>
       <h2 className="microsite-camera-title shrink-0 text-center text-[28px] leading-8">
         Look at The Camera
@@ -57,9 +59,13 @@ export function ReviewStep({
           disabled={submitting}
           className="microsite-button microsite-button-submit uppercase"
         >
-          {submitting ? submitLabel : "submit"}
+          submit
         </button>
       </div>
     </CameraCardFrame>
+    {submitting ? (
+      <MicrositeGeneratingOverlay photoUrl={photoUrl} testBypass={testBypass} />
+    ) : null}
+    </>
   );
 }

@@ -122,7 +122,7 @@ export function MicrositeFlow({
         <ReviewStep
           photoUrl={photoUrl}
           submitting={submitting}
-          submitLabel={testBypass ? "Mengirim…" : "Generating…"}
+          testBypass={testBypass}
           error={error}
           onRetake={() => setStep("camera")}
           onSubmit={handleSubmit}

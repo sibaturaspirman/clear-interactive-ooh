@@ -7,10 +7,11 @@ export function MicrositeBackground() {
       aria-hidden
     >
       <Image
-        src="/images/microsite/background.png"
+        src="/images/microsite/bg.jpg"
         alt=""
         fill
         priority
+        unoptimized
         className="size-full object-cover object-center"
         sizes="100vw"
       />
