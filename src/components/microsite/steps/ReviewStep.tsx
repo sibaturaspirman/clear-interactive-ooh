@@ -8,6 +8,7 @@ import { CameraViewfinder } from "@/components/microsite/CameraViewfinder";
 type ReviewStepProps = {
   photoUrl: string;
   submitting: boolean;
+  submitLabel?: string;
   error: string | null;
   onRetake: () => void;
   onSubmit: () => void;
@@ -16,6 +17,7 @@ type ReviewStepProps = {
 export function ReviewStep({
   photoUrl,
   submitting,
+  submitLabel = "Memproses foto…",
   error,
   onRetake,
   onSubmit,
@@ -55,7 +57,7 @@ export function ReviewStep({
           disabled={submitting}
           className="microsite-button microsite-button-submit uppercase"
         >
-          {submitting ? "..." : "submit"}
+          {submitting ? submitLabel : "submit"}
         </button>
       </div>
     </CameraCardFrame>

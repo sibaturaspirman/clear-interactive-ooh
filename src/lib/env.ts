@@ -14,3 +14,7 @@ export function getServerEnv() {
     ledKey: required("LED_KEY"),
   } as const;
 }
+
+export function getFalKey(): string {
+  return required("FAL_KEY");
+}

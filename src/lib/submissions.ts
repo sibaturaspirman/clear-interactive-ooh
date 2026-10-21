@@ -1,12 +1,8 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
-
 import { publicApiPostJson } from "@/lib/api";
+import { generatePortraitAssetUrl } from "@/lib/fal/portrait";
 import { getLocationByCode } from "@/lib/locations";
-import { getAppOrigin } from "@/lib/urls";
 
 export type SubmitResult =
   | { ok: true; submissionId: number }
@@ -22,17 +18,6 @@ function formatNohp(input: string): string {
     return `62${digits.slice(1)}`;
   }
   return `62${digits}`;
-}
-
-async function storePhotoPublicUrl(file: File): Promise<string> {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = file.type.includes("png") ? "png" : "jpg";
-  const filename = `${Date.now()}-${randomUUID()}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), bytes);
-  const origin = await getAppOrigin();
-  return `${origin}/uploads/${filename}`;
 }
 
 type SubmissionResponse = {
@@ -57,7 +42,7 @@ export async function submitParticipation(input: {
   }
 
   try {
-    const url = await storePhotoPublicUrl(input.photo);
+    const url = await generatePortraitAssetUrl(input.photo);
     const submission = await publicApiPostJson<SubmissionResponse>(
       "/api/submissions",
       {
@@ -72,7 +57,9 @@ export async function submitParticipation(input: {
     return {
       ok: false,
       message:
-        error instanceof Error ? error.message : "Gagal mengirim submission.",
+        error instanceof Error
+          ? error.message
+          : "Gagal memproses foto atau mengirim submission.",
     };
   }
 }

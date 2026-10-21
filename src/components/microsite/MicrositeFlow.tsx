@@ -116,6 +116,7 @@ export function MicrositeFlow({ location }: MicrositeFlowProps) {
         <ReviewStep
           photoUrl={photoUrl}
           submitting={submitting}
+          submitLabel="Generating…"
           error={error}
           onRetake={() => setStep("camera")}
           onSubmit={handleSubmit}
