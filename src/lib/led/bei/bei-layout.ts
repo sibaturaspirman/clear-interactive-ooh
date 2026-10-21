@@ -1,3 +1,4 @@
+import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
 /** BEI LED canvas — matches `bei-bg.jpg`. */
@@ -82,6 +83,14 @@ export const BEI_LAYOUT_LIVE = {
   packGroup: { left: 0, top: 384, width: 1065, height: 1124 },
   talent: { left: 960, top: 20, width: 1511, height: 1511 },
   tagline: { left: 2351, top: 71, width: 1162, height: 569 },
+  participantName: participantNameSlot({
+    left: 2351,
+    top: 664,
+    width: 1162,
+    height: 100,
+    fontSize: 56,
+    rotate: 0,
+  }),
   qrFrame: { left: 2594, top: 668, width: 820, height: 795 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;

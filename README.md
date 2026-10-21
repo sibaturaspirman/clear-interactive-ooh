@@ -90,7 +90,7 @@ On `/led/[code]`, query param **`debug`** for relayout without motion:
 | URL | Effect |
 | --- | ------ |
 | `?debug=static` | **Stay on BEI intro static** — no transition to live/API |
-| `?debug=live` | **Frozen BEI live layout** — no anim, dummy talent, no queue playback |
+| `?debug=live` | **Frozen live layout** — no anim, dummy talent, sample name **`NAMA PESERTA`** (tune `participantName`: `left`, `top`, `width`, `height`, `fontSize`, `rotate` in `*_LAYOUT_LIVE`) |
 | `?debug` | No crossfade/talent fade, skip 5s intro → live layout (API/queue runs) |
 | `?debug=noanim` | Animations off only (keep 5s intro → live) |
 | `?debug=intro` | Skip BEI intro only (keep animations) |

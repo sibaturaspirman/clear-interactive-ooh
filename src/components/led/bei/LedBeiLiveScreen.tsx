@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedBeiLayerImage } from "@/components/led/bei/LedBeiLayerImage";
 import { LedBeiLiveAnimatedLayer } from "@/components/led/bei/LedBeiLiveAnimatedLayer";
 import { LedBeiTalentCrossfade } from "@/components/led/bei/LedBeiTalentCrossfade";
@@ -26,6 +27,7 @@ type LedBeiLiveScreenProps = {
   /** Hide idle `bei-talent` briefly after intro handoff (same asset as intro). */
   suppressIdleTalent?: boolean;
   photoUrl?: string;
+  participantName?: string;
   playbackQueueId?: number | null;
   playMs?: number;
   /** QR frame + static code (default on for live layout). */
@@ -41,6 +43,7 @@ export function LedBeiLiveScreen({
   disableAnimations = false,
   suppressIdleTalent = false,
   photoUrl,
+  participantName,
   playbackQueueId = null,
   playMs = 3000,
   showQr = true,
@@ -165,6 +168,19 @@ export function LedBeiLiveScreen({
             className="object-contain object-left-top"
           />
         </LedBeiLiveAnimatedLayer>
+      ) : null}
+
+      {chromeRevealed ? (
+        <LedParticipantNameCrossfade
+          slot={BEI_LAYOUT_LIVE.participantName}
+          nama={participantName}
+          playbackQueueId={playbackQueueId}
+          playMs={playMs}
+          disableAnimations={disableAnimations}
+          layoutDebug={
+            Boolean(participantName?.trim()) && playbackQueueId == null
+          }
+        />
       ) : null}
 
       {chromeRevealed && showQrBlock ? (

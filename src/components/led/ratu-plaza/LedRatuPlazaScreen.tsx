@@ -19,6 +19,7 @@ type LedRatuPlazaScreenProps = {
   introCycleKey?: number;
   liveReady?: boolean;
   photoUrl?: string;
+  participantName?: string;
   playbackQueueId?: number | null;
   playMs?: number;
   showQr?: boolean;
@@ -35,6 +36,7 @@ export function LedRatuPlazaScreen({
   introCycleKey = 0,
   liveReady = false,
   photoUrl,
+  participantName,
   playbackQueueId = null,
   playMs = 3000,
   showQr = true,
@@ -87,6 +89,7 @@ export function LedRatuPlazaScreen({
             disableAnimations={disableAnimations}
             suppressIdleTalent={!holdLiveLayout && suppressLiveTalent && !photoUrl}
             photoUrl={liveVisible && !holdLiveLayout ? photoUrl : undefined}
+            participantName={liveVisible ? participantName : undefined}
             playbackQueueId={
               liveVisible && !holdLiveLayout ? playbackQueueId : null
             }

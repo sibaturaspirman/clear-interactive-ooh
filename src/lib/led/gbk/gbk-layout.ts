@@ -1,3 +1,4 @@
+import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
 /** GBK LED canvas — matches `gbk-bg.jpg` (1680×840). */
@@ -82,6 +83,14 @@ export const GBK_LAYOUT_LIVE = {
   packGroup: { left: 2, top: 236, width: 509, height: 604 },
   talent: { left: 409, top: 76, width: 760, height: 760 },
   tagline: { left: 1028, top: 54, width: 595, height: 290 },
+  participantName: participantNameSlot({
+    left: 1050,
+    top: 95,
+    width: 460,
+    height: 56,
+    fontSize: 80,
+    rotate: -6,
+  }),
   qrFrame: { left: 1125, top: 375, width: 420, height: 408 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;

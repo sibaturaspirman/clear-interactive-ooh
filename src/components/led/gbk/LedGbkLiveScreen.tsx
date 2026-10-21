@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import { LedGbkLiveAnimatedLayer } from "@/components/led/gbk/LedGbkLiveAnimatedLayer";
 import { LedGbkTalentCrossfade } from "@/components/led/gbk/LedGbkTalentCrossfade";
@@ -26,6 +27,7 @@ type LedGbkLiveScreenProps = {
   /** Hide idle `bei-talent` briefly after intro handoff (same asset as intro). */
   suppressIdleTalent?: boolean;
   photoUrl?: string;
+  participantName?: string;
   playbackQueueId?: number | null;
   playMs?: number;
   /** QR frame + static code (default on for live layout). */
@@ -41,6 +43,7 @@ export function LedGbkLiveScreen({
   disableAnimations = false,
   suppressIdleTalent = false,
   photoUrl,
+  participantName,
   playbackQueueId = null,
   playMs = 3000,
   showQr = true,
@@ -165,6 +168,19 @@ export function LedGbkLiveScreen({
             className="object-contain object-left-top"
           />
         </LedGbkLiveAnimatedLayer>
+      ) : null}
+
+      {chromeRevealed ? (
+        <LedParticipantNameCrossfade
+          slot={GBK_LAYOUT_LIVE.participantName}
+          nama={participantName}
+          playbackQueueId={playbackQueueId}
+          playMs={playMs}
+          disableAnimations={disableAnimations}
+          layoutDebug={
+            Boolean(participantName?.trim()) && playbackQueueId == null
+          }
+        />
       ) : null}
 
       {chromeRevealed && showQrBlock ? (

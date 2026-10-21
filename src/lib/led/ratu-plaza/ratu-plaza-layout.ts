@@ -1,3 +1,4 @@
+import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
 /** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (4096×1170). */
@@ -82,6 +83,14 @@ export const RATU_PLAZA_LAYOUT_LIVE = {
   packGroup: { left: 0, top: 273, width: 856, height: 903 },
   talent: { left: 930, top: 67, width: 1100, height: 1100 },
   tagline: { left: 2011, top: 294, width: 1192, height: 582 },
+  participantName: participantNameSlot({
+    left: 2011,
+    top: 896,
+    width: 1192,
+    height: 90,
+    fontSize: 48,
+    rotate: 0,
+  }),
   qrFrame: { left: 3251, top: 228, width: 734, height: 712 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;

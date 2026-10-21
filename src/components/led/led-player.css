@@ -75,6 +75,26 @@
   font-size: 28px;
 }
 
+.led-live-participant-name-wrap {
+  transform-origin: center center;
+}
+
+.led-live-participant-name {
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow:
+    0 2px 10px rgb(0 0 0 / 70%),
+    0 0 28px rgb(0 0 0 / 45%);
+}
+
 .led-player-loc,
 .led-player-pos,
 .led-player-hint {

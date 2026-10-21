@@ -1,3 +1,4 @@
+import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
 /** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (4096×295). */
@@ -86,6 +87,14 @@ export const DUKUH_ATAS_LAYOUT_LIVE = {
   packGroup: { left: 823, top: 0, width: 449, height: 304 },
   talent: { left: 1411, top: 0, width: 300, height: 300 },
   tagline: { left: 1903, top: 17, width: 538, height: 262 },
+  participantName: participantNameSlot({
+    left: 1903,
+    top: 233,
+    width: 538,
+    height: 46,
+    fontSize: 22,
+    rotate: 0,
+  }),
   qrFrame: { left: 2644, top: 16, width: 280, height: 271 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;

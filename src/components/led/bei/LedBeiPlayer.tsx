@@ -3,7 +3,10 @@
 import { InteractiveLedPlayerShell } from "@/components/led/InteractiveLedPlayerShell";
 import { LedBeiScreen } from "@/components/led/bei/LedBeiScreen";
 import { BEI_ASSETS } from "@/lib/led/bei/bei-layout";
-import type { LedDebugOptions } from "@/lib/led/debug";
+import {
+  LED_DEBUG_PARTICIPANT_NAME,
+  type LedDebugOptions,
+} from "@/lib/led/debug";
 import { useInteractiveLedQueue } from "@/lib/led/useInteractiveLedQueue";
 import { getLedCanvas } from "@/lib/led/location-specs";
 
@@ -32,13 +35,18 @@ export function LedBeiPlayer({
     ledDebug,
   });
 
-  const photoUrl =
+  const livePlayback =
     !queue.holdLiveLayout &&
     queue.liveReady &&
     queue.phase === "live" &&
-    !queue.ui.idle
-      ? queue.ui.playbackUrl
-      : "";
+    !queue.ui.idle;
+
+  const photoUrl = livePlayback ? queue.ui.playbackUrl : "";
+  const participantName = queue.holdLiveLayout
+    ? LED_DEBUG_PARTICIPANT_NAME
+    : livePlayback && queue.ui.playbackQueueId != null
+      ? queue.ui.nama
+      : undefined;
 
   return (
     <InteractiveLedPlayerShell
@@ -64,6 +72,7 @@ export function LedBeiPlayer({
         introCycleKey={queue.introCycleKey}
         liveReady={queue.liveReady}
         photoUrl={photoUrl || undefined}
+        participantName={participantName}
         playbackQueueId={queue.ui.playbackQueueId}
         playMs={queue.ui.playMs}
         showQr

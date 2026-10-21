@@ -15,6 +15,10 @@ import type {
   LedPullResponse,
   LedQueueItem,
 } from "@/lib/led/led-queue-types";
+import {
+  preloadLedMediaUrl,
+  preloadLedQueueItems,
+} from "@/lib/led/preload-led-media";
 
 const DUMMY_QUEUE_ID = -1;
 
@@ -450,18 +454,26 @@ export function useInteractiveLedQueue({
       setConnectionStatus((prev) => (prev === "error" ? prev : "connected"));
       state.playMs = data.play_ms || state.playMs;
       state.bufferSize = data.buffer_size || state.bufferSize;
+      const buffered: LedQueueItem[] = [];
       if (data.mode === "fresh") {
         state.replaying = false;
         state.replayLoop = [];
         state.hint = false;
         for (const item of data.items) {
-          if (!held(item.queue_id) && slots() > 0) state.upcoming.push(item);
+          if (!held(item.queue_id) && slots() > 0) {
+            state.upcoming.push(item);
+            buffered.push(item);
+          }
         }
       } else if (data.mode === "replay" && askReplay) {
         state.replaying = true;
         state.replayLoop = data.items.slice();
         state.upcoming = data.items.slice();
         state.hint = false;
+        buffered.push(...data.items);
+      }
+      if (buffered.length > 0) {
+        void preloadLedQueueItems(buffered);
       }
       persist();
     } finally {
@@ -540,10 +552,12 @@ export function useInteractiveLedQueue({
     }
     state.current = state.upcoming.shift() ?? null;
     if (state.current) {
+      await preloadLedMediaUrl(state.current.url);
       liveHadPlaybackRef.current = true;
     }
     state.startedAt = Date.now();
     persist();
+    void preloadLedQueueItems(state.upcoming);
     arm(itemPlayMs(state.current, state.playMs));
   }
 
@@ -573,16 +587,25 @@ export function useInteractiveLedQueue({
   async function resume() {
     loadStore();
     const state = stateRef.current;
+    void preloadLedQueueItems([
+      ...(state.current ? [state.current] : []),
+      ...state.upcoming,
+    ]);
     if (!state.current) {
       await startIfIdle();
       return;
     }
+    await preloadLedMediaUrl(state.current.url);
     const duration = itemPlayMs(state.current, state.playMs);
     const elapsed = state.startedAt ? Date.now() - state.startedAt : 0;
     const remaining = duration - elapsed;
     if (remaining < 250) await finish();
     else arm(remaining);
   }
+
+  useEffect(() => {
+    void preloadLedMediaUrl(dummyTalentUrl);
+  }, [dummyTalentUrl]);
 
   useEffect(() => {
     stateRef.current.locationName = locationName;

@@ -22,6 +22,9 @@ export type LedDebugOptions = {
   holdLiveLayout: boolean;
 };
 
+/** Sample name on `?debug=live` for relayout (`participantName` in `*_LAYOUT_LIVE`). */
+export const LED_DEBUG_PARTICIPANT_NAME = "NAMA PESERTA";
+
 const LED_DEBUG_OFF: LedDebugOptions = {
   disableAnimations: false,
   skipIntro: false,

@@ -1,3 +1,4 @@
+import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
 /** Sency LED canvas — matches `sency-bg.jpg` (1920×922). */
@@ -82,6 +83,14 @@ export const SENCY_LAYOUT_LIVE = {
   packGroup: { left: 2, top: 233, width: 576, height: 689 },
   talent: { left: 500, top: 60, width: 876, height: 876 },
   tagline: { left: 1203, top: 46, width: 659, height: 321 },
+  participantName: participantNameSlot({
+    left: 1203,
+    top: 381,
+    width: 659,
+    height: 64,
+    fontSize: 34,
+    rotate: 0,
+  }),
   qrFrame: { left: 1302, top: 391, width: 479, height: 465 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;

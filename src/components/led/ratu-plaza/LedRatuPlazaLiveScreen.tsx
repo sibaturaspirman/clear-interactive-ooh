@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedRatuPlazaLayerImage } from "@/components/led/ratu-plaza/LedRatuPlazaLayerImage";
 import { LedRatuPlazaLiveAnimatedLayer } from "@/components/led/ratu-plaza/LedRatuPlazaLiveAnimatedLayer";
 import { LedRatuPlazaTalentCrossfade } from "@/components/led/ratu-plaza/LedRatuPlazaTalentCrossfade";
@@ -26,6 +27,7 @@ type LedRatuPlazaLiveScreenProps = {
   /** Hide idle `bei-talent` briefly after intro handoff (same asset as intro). */
   suppressIdleTalent?: boolean;
   photoUrl?: string;
+  participantName?: string;
   playbackQueueId?: number | null;
   playMs?: number;
   /** QR frame + static code (default on for live layout). */
@@ -41,6 +43,7 @@ export function LedRatuPlazaLiveScreen({
   disableAnimations = false,
   suppressIdleTalent = false,
   photoUrl,
+  participantName,
   playbackQueueId = null,
   playMs = 3000,
   showQr = true,
@@ -165,6 +168,19 @@ export function LedRatuPlazaLiveScreen({
             className="object-contain object-left-top"
           />
         </LedRatuPlazaLiveAnimatedLayer>
+      ) : null}
+
+      {chromeRevealed ? (
+        <LedParticipantNameCrossfade
+          slot={RATU_PLAZA_LAYOUT_LIVE.participantName}
+          nama={participantName}
+          playbackQueueId={playbackQueueId}
+          playMs={playMs}
+          disableAnimations={disableAnimations}
+          layoutDebug={
+            Boolean(participantName?.trim()) && playbackQueueId == null
+          }
+        />
       ) : null}
 
       {chromeRevealed && showQrBlock ? (

@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedSencyLayerImage } from "@/components/led/sency/LedSencyLayerImage";
 import { LedSencyLiveAnimatedLayer } from "@/components/led/sency/LedSencyLiveAnimatedLayer";
 import { LedSencyTalentCrossfade } from "@/components/led/sency/LedSencyTalentCrossfade";
@@ -26,6 +27,7 @@ type LedSencyLiveScreenProps = {
   /** Hide idle `bei-talent` briefly after intro handoff (same asset as intro). */
   suppressIdleTalent?: boolean;
   photoUrl?: string;
+  participantName?: string;
   playbackQueueId?: number | null;
   playMs?: number;
   /** QR frame + static code (default on for live layout). */
@@ -41,6 +43,7 @@ export function LedSencyLiveScreen({
   disableAnimations = false,
   suppressIdleTalent = false,
   photoUrl,
+  participantName,
   playbackQueueId = null,
   playMs = 3000,
   showQr = true,
@@ -165,6 +168,19 @@ export function LedSencyLiveScreen({
             className="object-contain object-left-top"
           />
         </LedSencyLiveAnimatedLayer>
+      ) : null}
+
+      {chromeRevealed ? (
+        <LedParticipantNameCrossfade
+          slot={SENCY_LAYOUT_LIVE.participantName}
+          nama={participantName}
+          playbackQueueId={playbackQueueId}
+          playMs={playMs}
+          disableAnimations={disableAnimations}
+          layoutDebug={
+            Boolean(participantName?.trim()) && playbackQueueId == null
+          }
+        />
       ) : null}
 
       {chromeRevealed && showQrBlock ? (
