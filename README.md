@@ -98,7 +98,7 @@ Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are d
 | -------- | ------ | --------- |
 | **bei** | Cityvision | 3840 × 1536 |
 | **ratu-plaza** | Cityvision | 2880 × 660 |
-| **dukuh-atas** | Cityvision | 4096 × 295 |
+| **dukuh-atas** | Cityvision | 6000 × 432 |
 | **sudirman** | Cityvision | 4200 × 1200 |
 | **gbk** | MIB | 1680 × 840 |
 | **sency** | MIB | 1200 × 576 |

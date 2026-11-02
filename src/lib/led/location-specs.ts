@@ -17,7 +17,7 @@ export type LedCanvasSpec = {
 
 export const LED_CANVAS_BY_CODE: Record<LedLocationCode, LedCanvasSpec> = {
   bei: { width: 3840, height: 1536 },
-  "dukuh-atas": { width: 4096, height: 295 },
+  "dukuh-atas": { width: 6000, height: 432 },
   gbk: { width: 1680, height: 840 },
   "ratu-plaza": { width: 2880, height: 660 },
   sency: { width: 1200, height: 576 },

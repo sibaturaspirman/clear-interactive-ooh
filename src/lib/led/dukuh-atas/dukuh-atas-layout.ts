@@ -2,7 +2,7 @@ import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
-/** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (4096×295). */
+/** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (6000×432). */
 export const DUKUH_ATAS_CANVAS = LED_CANVAS_BY_CODE["dukuh-atas"];
 
 export const DUKUH_ATAS_STATIC_DURATION_MS = 5000;
@@ -29,7 +29,7 @@ export const DUKUH_ATAS_STATIC_TALENT_ZOOM_MS = DUKUH_ATAS_STATIC_DURATION_MS;
 export const DUKUH_ATAS_LIVE_ENTER_MS = 900;
 export const DUKUH_ATAS_LIVE_STAGGER_MS = 140;
 /** Horizontal slide for pack / tagline enter & pack handoff. */
-export const DUKUH_ATAS_LIVE_SLIDE_OFFSET_PX = 72;
+export const DUKUH_ATAS_LIVE_SLIDE_OFFSET_PX = 105;
 export const DUKUH_ATAS_LIVE_LAYER_FADE_MS = 550;
 /** Gentle vertical bob on live pack group (one full up→down cycle). */
 export const DUKUH_ATAS_LIVE_PACK_FLOAT_CYCLE_MS = 5600;
@@ -64,39 +64,33 @@ export const DUKUH_ATAS_ASSETS = {
   qrCode: "/images/led/dukuh-atas-qr.png",
 } as const;
 
-/** Shared across static intro and live (same bg + dual Clear logos). */
+/** Dual Clear logos — scaled from 4096×295; tune via debug modes. */
 export const DUKUH_ATAS_LAYOUT_SHARED = {
-  clearLeft: { left: 184, top: 25, width: 654, height: 243 },
-  clearRight: {
-    left: 3158,
-    top: 25,
-    width: 654,
-    height: 243,
-  },
+  clearLeft: { left: 270, top: 37, width: 958, height: 356 },
+  clearRight: { left: 4626, top: 37, width: 958, height: 356 },
 } as const;
 
-/** Figma BEI 1 (13:127) — intro static, no QR. */
+/** Intro static, no QR. */
 export const DUKUH_ATAS_LAYOUT_STATIC = {
-  pack: { left: 941, top: 0, width: 162, height: 304 },
-  talent: { left: 2406, top: 4, width: 532, height: 292 },
-  text: { left: 1237, top: 60, width: 1731, height: 195 },
+  pack: { left: 1378, top: 0, width: 237, height: 445 },
+  talent: { left: 3524, top: 6, width: 779, height: 428 },
+  text: { left: 1812, top: 88, width: 2536, height: 286 },
 } as const;
 
-/** Figma BEI 2 (13:150) — idle QR + queue playback (talent from API). */
+/** Idle QR + queue playback (talent from API). */
 export const DUKUH_ATAS_LAYOUT_LIVE = {
-  /** Live only — relayout via `/led/dukuh-atas?debug=live` (bukan intro `DUKUH_ATAS_LAYOUT_STATIC.pack`). */
-  packGroup: { left: 823, top: 0, width: 449, height: 304 },
-  talent: { left: 1411, top: 0, width: 300, height: 300 },
-  tagline: { left: 1903, top: 17, width: 538, height: 262 },
+  packGroup: { left: 1206, top: 0, width: 658, height: 445 },
+  talent: { left: 2067, top: 0, width: 439, height: 439 },
+  tagline: { left: 2788, top: 25, width: 788, height: 384 },
   participantName: participantNameSlot({
-    left: 1895,
-    top: 58,
-    width: 308,
-    height: 46,
-    fontSize: 70,
+    left: 2776,
+    top: 85,
+    width: 451,
+    height: 67,
+    fontSize: 103,
     rotate: -6,
   }),
-  qrFrame: { left: 2644, top: 16, width: 280, height: 271 },
+  qrFrame: { left: 3873, top: 23, width: 410, height: 397 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;
 
