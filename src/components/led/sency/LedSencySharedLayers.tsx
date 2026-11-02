@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedSencyLayerImage } from "@/components/led/sency/LedSencyLayerImage";
 import {
   SENCY_ASSETS,
@@ -11,7 +10,7 @@ import {
 export function LedSencySharedLayers() {
   return (
     <>
-      <Image
+      <LedPublicImage
         src={SENCY_ASSETS.background}
         alt=""
         fill

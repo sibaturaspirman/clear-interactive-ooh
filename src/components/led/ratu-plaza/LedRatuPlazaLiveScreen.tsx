@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedRatuPlazaLayerImage } from "@/components/led/ratu-plaza/LedRatuPlazaLayerImage";
 import { LedRatuPlazaLiveAnimatedLayer } from "@/components/led/ratu-plaza/LedRatuPlazaLiveAnimatedLayer";
 import { LedRatuPlazaTalentCrossfade } from "@/components/led/ratu-plaza/LedRatuPlazaTalentCrossfade";
@@ -210,11 +210,10 @@ export function LedRatuPlazaLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <Image
+              <LedPublicImage
                 src={RATU_PLAZA_ASSETS.qrCode}
                 alt="QR microsite"
                 fill
-                unoptimized
                 className="object-contain"
                 sizes="447px"
                 priority

@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import {
   GBK_ASSETS,
@@ -11,7 +10,7 @@ import {
 export function LedGbkSharedLayers() {
   return (
     <>
-      <Image
+      <LedPublicImage
         src={GBK_ASSETS.background}
         alt=""
         fill

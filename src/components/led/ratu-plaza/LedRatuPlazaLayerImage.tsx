@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { ratuPlazaBoxStyle, type RatuPlazaBox } from "@/lib/led/ratu-plaza/ratu-plaza-box";
 
 type LedRatuPlazaLayerImageProps = {
@@ -27,7 +26,7 @@ export function LedRatuPlazaLayerImage({
   return (
     <div style={slotStyle} data-bei-fill-slot={fillSlot || undefined}>
       <div className="relative size-full">
-        <Image
+        <LedPublicImage
           src={src}
           alt={alt}
           fill

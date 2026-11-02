@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { gbkBoxStyle, type GbkBox } from "@/lib/led/gbk/gbk-box";
 
 type LedGbkLayerImageProps = {
@@ -27,7 +26,7 @@ export function LedGbkLayerImage({
   return (
     <div style={slotStyle} data-bei-fill-slot={fillSlot || undefined}>
       <div className="relative size-full">
-        <Image
+        <LedPublicImage
           src={src}
           alt={alt}
           fill

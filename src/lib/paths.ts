@@ -1,3 +1,7 @@
+export function locationListPath(): string {
+  return "/list";
+}
+
 export function micrositePath(code: string): string {
   return `/microsite/${code}`;
 }

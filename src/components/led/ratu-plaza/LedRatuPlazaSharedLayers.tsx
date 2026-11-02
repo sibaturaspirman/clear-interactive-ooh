@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedRatuPlazaLayerImage } from "@/components/led/ratu-plaza/LedRatuPlazaLayerImage";
 import {
   RATU_PLAZA_ASSETS,
@@ -11,7 +10,7 @@ import {
 export function LedRatuPlazaSharedLayers() {
   return (
     <>
-      <Image
+      <LedPublicImage
         src={RATU_PLAZA_ASSETS.background}
         alt=""
         fill

@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { sencyBoxStyle, type SencyBox } from "@/lib/led/sency/sency-box";
 
 type LedSencyLayerImageProps = {
@@ -27,7 +26,7 @@ export function LedSencyLayerImage({
   return (
     <div style={slotStyle} data-bei-fill-slot={fillSlot || undefined}>
       <div className="relative size-full">
-        <Image
+        <LedPublicImage
           src={src}
           alt={alt}
           fill

@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedDukuhAtasLayerImage } from "@/components/led/dukuh-atas/LedDukuhAtasLayerImage";
 import {
   DUKUH_ATAS_ASSETS,
@@ -11,7 +10,7 @@ import {
 export function LedDukuhAtasSharedLayers() {
   return (
     <>
-      <Image
+      <LedPublicImage
         src={DUKUH_ATAS_ASSETS.background}
         alt=""
         fill

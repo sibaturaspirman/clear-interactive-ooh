@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { beiBoxStyle, type BeiBox } from "@/lib/led/bei/bei-box";
 
 type LedBeiLayerImageProps = {
@@ -27,7 +26,7 @@ export function LedBeiLayerImage({
   return (
     <div style={slotStyle} data-bei-fill-slot={fillSlot || undefined}>
       <div className="relative size-full">
-        <Image
+        <LedPublicImage
           src={src}
           alt={alt}
           fill

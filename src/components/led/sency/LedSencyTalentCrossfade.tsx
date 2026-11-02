@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -193,7 +193,7 @@ export function LedSencyTalentCrossfade({
                 : undefined
             }
           >
-            <Image
+            <LedPublicImage
               src={displaySrc}
               alt=""
               fill

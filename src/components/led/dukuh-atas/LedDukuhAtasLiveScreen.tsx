@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedDukuhAtasLayerImage } from "@/components/led/dukuh-atas/LedDukuhAtasLayerImage";
 import { LedDukuhAtasLiveAnimatedLayer } from "@/components/led/dukuh-atas/LedDukuhAtasLiveAnimatedLayer";
 import { LedDukuhAtasTalentCrossfade } from "@/components/led/dukuh-atas/LedDukuhAtasTalentCrossfade";
@@ -210,11 +210,10 @@ export function LedDukuhAtasLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <Image
+              <LedPublicImage
                 src={DUKUH_ATAS_ASSETS.qrCode}
                 alt="QR microsite"
                 fill
-                unoptimized
                 className="object-contain"
                 sizes="447px"
                 priority

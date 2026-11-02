@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedSencyLayerImage } from "@/components/led/sency/LedSencyLayerImage";
 import { LedSencyLiveAnimatedLayer } from "@/components/led/sency/LedSencyLiveAnimatedLayer";
 import { LedSencyTalentCrossfade } from "@/components/led/sency/LedSencyTalentCrossfade";
@@ -210,11 +210,10 @@ export function LedSencyLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <Image
+              <LedPublicImage
                 src={SENCY_ASSETS.qrCode}
                 alt="QR microsite"
                 fill
-                unoptimized
                 className="object-contain"
                 sizes="447px"
                 priority

@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedBeiLayerImage } from "@/components/led/bei/LedBeiLayerImage";
 import { beiBoxStyle } from "@/lib/led/bei/bei-box";
 import {
@@ -93,7 +92,7 @@ export function LedBeiStaticScreen({
           }}
         >
           <div className="relative size-full">
-            <Image
+            <LedPublicImage
               src={BEI_ASSETS.talent}
               alt=""
               fill

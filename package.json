@@ -12,6 +12,7 @@
     "led:sency-qr": "node scripts/generate-sency-qr.mjs",
     "led:ratu-plaza-qr": "node scripts/generate-ratu-plaza-qr.mjs",
     "led:dukuh-atas-qr": "node scripts/generate-dukuh-atas-qr.mjs",
+    "led:sudirman-qr": "node scripts/generate-sudirman-qr.mjs",
     "clean": "rm -rf .next"
   },
   "dependencies": {

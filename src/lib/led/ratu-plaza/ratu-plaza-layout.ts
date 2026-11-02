@@ -2,7 +2,7 @@ import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
-/** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (4096×1170). */
+/** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (2880×660). */
 export const RATU_PLAZA_CANVAS = LED_CANVAS_BY_CODE["ratu-plaza"];
 
 export const RATU_PLAZA_STATIC_DURATION_MS = 5000;
@@ -29,7 +29,7 @@ export const RATU_PLAZA_STATIC_TALENT_ZOOM_MS = RATU_PLAZA_STATIC_DURATION_MS;
 export const RATU_PLAZA_LIVE_ENTER_MS = 900;
 export const RATU_PLAZA_LIVE_STAGGER_MS = 140;
 /** Horizontal slide for pack / tagline enter & pack handoff. */
-export const RATU_PLAZA_LIVE_SLIDE_OFFSET_PX = 72;
+export const RATU_PLAZA_LIVE_SLIDE_OFFSET_PX = 51;
 export const RATU_PLAZA_LIVE_LAYER_FADE_MS = 550;
 /** Gentle vertical bob on live pack group (one full up→down cycle). */
 export const RATU_PLAZA_LIVE_PACK_FLOAT_CYCLE_MS = 5600;
@@ -65,34 +65,34 @@ export const RATU_PLAZA_ASSETS = {
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */
+/** Layer boxes scaled from prior 4096×1170 art — tune via `/led/ratu-plaza?debug=live`. */
 export const RATU_PLAZA_LAYOUT_SHARED = {
-  clear: { left: 110, top: 67, width: 558, height: 207 },
+  clear: { left: 108, top: 37, width: 392, height: 117 },
 } as const;
 
-/** Figma BEI 1 (13:127) — intro static, no QR. */
+/** Intro static, no QR. */
 export const RATU_PLAZA_LAYOUT_STATIC = {
   clear: RATU_PLAZA_LAYOUT_SHARED.clear,
-  pack: { left: 110, top: -29, width: 980, height: 1228 },
-  talent: { left: 1444, top: 106, width: 2197, height: 1141 },
-  text: { left: 875, top: 729, width: 2812, height: 355 },
+  pack: { left: 154, top: 164, width: 235, height: 498 },
+  talent: { left: 1370, top: 0, width: 1436, height: 660 },
+  text: { left: 661, top: 403, width: 2033, height: 212 },
 } as const;
 
-/** Figma BEI 2 (13:150) — idle QR + queue playback (talent from API). */
+/** Idle QR + queue playback (talent from API). */
 export const RATU_PLAZA_LAYOUT_LIVE = {
   clear: RATU_PLAZA_LAYOUT_SHARED.clear,
-  /** Live only — relayout via `/led/bei?debug=live` (bukan intro `RATU_PLAZA_LAYOUT_STATIC.pack`). */
-  packGroup: { left: 0, top: 273, width: 856, height: 903 },
-  talent: { left: 930, top: 67, width: 1100, height: 1100 },
-  tagline: { left: 2011, top: 294, width: 1192, height: 582 },
+  packGroup: { left: 29, top: 132, width: 600, height: 584 },
+  talent: { left: 654, top: 38, width: 652, height: 652 },
+  tagline: { left: 1401, top: 153, width: 839, height: 366 },
   participantName: participantNameSlot({
-    left: 1995,
-    top: 453,
-    width: 692,
-    height: 56,
-    fontSize: 120,
+    left: 1443,
+    top: 256,
+    width: 440,
+    height: 32,
+    fontSize: 68,
     rotate: -6,
   }),
-  qrFrame: { left: 3251, top: 228, width: 734, height: 712 },
+  qrFrame: { left: 2286, top: 129, width: 516, height: 402 },
   qrInset: { left: 0.23, top: 0.357, width: 0.545, height: 0.562 },
 } as const;
 

@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedRatuPlazaLayerImage } from "@/components/led/ratu-plaza/LedRatuPlazaLayerImage";
 import { ratuPlazaBoxStyle } from "@/lib/led/ratu-plaza/ratu-plaza-box";
 import {
@@ -93,7 +92,7 @@ export function LedRatuPlazaStaticScreen({
           }}
         >
           <div className="relative size-full">
-            <Image
+            <LedPublicImage
               src={RATU_PLAZA_ASSETS.talent}
               alt=""
               fill

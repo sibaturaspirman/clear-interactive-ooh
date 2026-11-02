@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedDukuhAtasLayerImage } from "@/components/led/dukuh-atas/LedDukuhAtasLayerImage";
 import { dukuhAtasBoxStyle } from "@/lib/led/dukuh-atas/dukuh-atas-box";
 import {
@@ -93,7 +92,7 @@ export function LedDukuhAtasStaticScreen({
           }}
         >
           <div className="relative size-full">
-            <Image
+            <LedPublicImage
               src={DUKUH_ATAS_ASSETS.talent}
               alt=""
               fill

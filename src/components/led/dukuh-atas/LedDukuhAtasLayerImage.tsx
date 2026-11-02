@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { dukuhAtasBoxStyle, type DukuhAtasBox } from "@/lib/led/dukuh-atas/dukuh-atas-box";
 
 type LedDukuhAtasLayerImageProps = {
@@ -27,7 +26,7 @@ export function LedDukuhAtasLayerImage({
   return (
     <div style={slotStyle} data-bei-fill-slot={fillSlot || undefined}>
       <div className="relative size-full">
-        <Image
+        <LedPublicImage
           src={src}
           alt={alt}
           fill

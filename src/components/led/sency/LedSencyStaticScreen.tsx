@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedSencyLayerImage } from "@/components/led/sency/LedSencyLayerImage";
 import { sencyBoxStyle } from "@/lib/led/sency/sency-box";
 import {
@@ -93,7 +92,7 @@ export function LedSencyStaticScreen({
           }}
         >
           <div className="relative size-full">
-            <Image
+            <LedPublicImage
               src={SENCY_ASSETS.talent}
               alt=""
               fill

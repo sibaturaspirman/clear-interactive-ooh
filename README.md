@@ -20,39 +20,70 @@ npm run dev
 | `NEXT_PUBLIC_APP_URL` | Public origin for QR codes & uploads |
 | `MICROSITE_TEST_BYPASS` | Optional: `true` to allow `?test` bypass on non-dev deploys |
 
-Open [http://localhost:3000](http://localhost:3000) for the location index.
+Open [http://localhost:3000/list](http://localhost:3000/list) for the location index (`/` shows the logo only).
 
 ## Routes
 
 | Path | Description |
 | ---- | ----------- |
-| `/` | Location list (microsite + LED links) |
+| `/` | Logo landing |
+| `/list` | Location list — **Microsite** + **LED** only |
+| `/list?debug` | Same list with dev links (`?test`, LED `?debug*`); see sections below |
 | `/microsite/[code]` | Participation flow |
 | `/led/[code]` | LED queue player |
 
-Location codes: `bei`, `dukuh-atas`, `gbk`, `ratu-plaza`, `sency`.
+Location codes: `bei`, `dukuh-atas`, `gbk`, `ratu-plaza`, `sency`, `sudirman`.
+
+## LED vendors
+
+Urutan home & fallback mengikuti vendor. Mapping & helper branch teknis: [`src/lib/led/led-vendors.ts`](./src/lib/led/led-vendors.ts) (`isCityvisionLedLocation`, `isMibLedLocation`).
+
+### Cityvision
+
+| Site | Code |
+| ---- | ---- |
+| BEI | `bei` |
+| Ratu Plaza | `ratu-plaza` |
+| Dukuh Atas | `dukuh-atas` |
+| Gate Entry Sudirman | `sudirman` |
+
+### MIB
+
+| Site | Code |
+| ---- | ---- |
+| GBK | `gbk` |
+| Sency | `sency` |
 
 ## Production (Vercel)
+
+### Cityvision
 
 BEI
 
 * LED : https://clear-interactive-ooh-jsua.vercel.app/led/bei
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/bei
 
+Ratu Plaza
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/ratu-plaza
+
 Dukuh Atas
 
 * LED : https://clear-interactive-ooh-jsua.vercel.app/led/dukuh-atas
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/dukuh-atas
 
+Gate Entry Sudirman
+
+* LED : https://clear-interactive-ooh-jsua.vercel.app/led/sudirman
+* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/sudirman
+
+### MIB
+
 GBK
 
 * LED : https://clear-interactive-ooh-jsua.vercel.app/led/gbk
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/gbk
-
-Ratu Plaza
-
-* LED : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza
-* Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/ratu-plaza
 
 Sency
 
@@ -63,13 +94,14 @@ Sency
 
 Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are defined in [`src/lib/led/location-specs.ts`](./src/lib/led/location-specs.ts). Each site uses its own asset prefix (e.g. `bei-*` for BEI).
 
-| Location | Size (px) |
-| -------- | --------- |
-| **bei** | 3840 × 1536 |
-| **sency** | 1920 × 922 |
-| **ratu-plaza** | 4096 × 1170 |
-| **gbk** | 1680 × 840 |
-| **dukuh-atas** | 4096 × 295 |
+| Location | Vendor | Size (px) |
+| -------- | ------ | --------- |
+| **bei** | Cityvision | 3840 × 1536 |
+| **ratu-plaza** | Cityvision | 2880 × 660 |
+| **dukuh-atas** | Cityvision | 4096 × 295 |
+| **sudirman** | Cityvision | 4200 × 1200 |
+| **gbk** | MIB | 1680 × 840 |
+| **sency** | MIB | 1920 × 922 |
 
 ## Microsite test mode (skip fal.ai)
 
@@ -96,6 +128,12 @@ On `/led/[code]`, query param **`debug`** for relayout without motion:
 | `?debug=intro` | Skip BEI intro only (keep animations) |
 
 Examples: `/led/bei?debug=static` (relayout intro), `/led/bei?debug=live` (relayout live + QR)
+
+## LED / public image cache
+
+Local assets under `public/images/**` load with `?v=` (see [`src/lib/led/led-static-image.ts`](./src/lib/led/led-static-image.ts)) and bypass the Next image optimizer so swapping a file with the **same filename** picks up after refresh.
+
+After replacing art: bump `LED_STATIC_ASSET_VERSION` in that file, or set `NEXT_PUBLIC_LED_ASSET_VERSION` in env (then restart dev / redeploy). Dev: `rm -rf .next` if a stale optimized image still appears.
 
 ## Scripts
 

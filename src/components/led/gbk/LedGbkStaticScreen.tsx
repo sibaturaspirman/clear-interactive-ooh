@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import { gbkBoxStyle } from "@/lib/led/gbk/gbk-box";
 import {
@@ -93,7 +92,7 @@ export function LedGbkStaticScreen({
           }}
         >
           <div className="relative size-full">
-            <Image
+            <LedPublicImage
               src={GBK_ASSETS.talent}
               alt=""
               fill

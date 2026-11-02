@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedBeiLayerImage } from "@/components/led/bei/LedBeiLayerImage";
 import {
   BEI_ASSETS,
@@ -11,7 +10,7 @@ import {
 export function LedBeiSharedLayers() {
   return (
     <>
-      <Image
+      <LedPublicImage
         src={BEI_ASSETS.background}
         alt=""
         fill

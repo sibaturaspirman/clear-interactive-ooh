@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedBeiLayerImage } from "@/components/led/bei/LedBeiLayerImage";
 import { LedBeiLiveAnimatedLayer } from "@/components/led/bei/LedBeiLiveAnimatedLayer";
 import { LedBeiTalentCrossfade } from "@/components/led/bei/LedBeiTalentCrossfade";
@@ -210,11 +210,10 @@ export function LedBeiLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <Image
+              <LedPublicImage
                 src={BEI_ASSETS.qrCode}
                 alt="QR microsite"
                 fill
-                unoptimized
                 className="object-contain"
                 sizes="447px"
                 priority

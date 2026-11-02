@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
+import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import { LedGbkLiveAnimatedLayer } from "@/components/led/gbk/LedGbkLiveAnimatedLayer";
 import { LedGbkTalentCrossfade } from "@/components/led/gbk/LedGbkTalentCrossfade";
@@ -210,11 +210,10 @@ export function LedGbkLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <Image
+              <LedPublicImage
                 src={GBK_ASSETS.qrCode}
                 alt="QR microsite"
                 fill
-                unoptimized
                 className="object-contain"
                 sizes="447px"
                 priority
