@@ -20,7 +20,7 @@ export const LED_CANVAS_BY_CODE: Record<LedLocationCode, LedCanvasSpec> = {
   "dukuh-atas": { width: 4096, height: 295 },
   gbk: { width: 1680, height: 840 },
   "ratu-plaza": { width: 2880, height: 660 },
-  sency: { width: 1920, height: 922 },
+  sency: { width: 1200, height: 576 },
   sudirman: { width: 4200, height: 1200 },
 };
 

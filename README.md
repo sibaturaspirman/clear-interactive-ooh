@@ -101,7 +101,7 @@ Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are d
 | **dukuh-atas** | Cityvision | 4096 × 295 |
 | **sudirman** | Cityvision | 4200 × 1200 |
 | **gbk** | MIB | 1680 × 840 |
-| **sency** | MIB | 1920 × 922 |
+| **sency** | MIB | 1200 × 576 |
 
 ## Microsite test mode (skip fal.ai)
 
