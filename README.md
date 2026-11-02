@@ -27,7 +27,7 @@ Open [http://localhost:3000/list](http://localhost:3000/list) for the location i
 | Path | Description |
 | ---- | ----------- |
 | `/` | Logo landing |
-| `/list` | Location list — **Microsite** + **LED** only |
+| `/list` | Location list — **Microsite** + **LED** only (BEI hidden; routes still work) |
 | `/list?debug` | Same list with dev links (`?test`, LED `?debug*`); see sections below |
 | `/microsite/[code]` | Participation flow |
 | `/led/[code]` | LED queue player |

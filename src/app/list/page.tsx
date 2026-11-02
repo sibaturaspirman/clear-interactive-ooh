@@ -7,6 +7,7 @@ import {
 } from "@/lib/led/led-vendors";
 import { getLedCanvas } from "@/lib/led/location-specs";
 import { getLocations } from "@/lib/locations";
+import { filterLocationsForList } from "@/lib/locations/location-list-visible";
 import type { Location } from "@/types/location";
 import {
   ledDebugPath,
@@ -129,8 +130,10 @@ export default async function LocationListPage({
 }: LocationListPageProps) {
   const query = await searchParams;
   const showDebugLinks = listHasDebugQuery(query.debug);
-  const locations = await getLocations();
-  const vendorGroups = groupLocationsByLedVendor(locations);
+  const locations = filterLocationsForList(await getLocations());
+  const vendorGroups = groupLocationsByLedVendor(locations).filter(
+    ({ locations: groupLocations }) => groupLocations.length > 0,
+  );
   const unmapped = locationsWithoutLedVendor(locations);
 
   return (
