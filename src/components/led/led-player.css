@@ -17,6 +17,22 @@
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
+.led-player-stage--cityvision {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  cursor: none;
+  pointer-events: none;
+}
+
+.led-route-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 .led-player-media,
 .led-player-media img,
 .led-player-media video {

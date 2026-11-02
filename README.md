@@ -115,6 +115,20 @@ Works automatically in **development**. On staging/production, set `MICROSITE_TE
 
 Flow (form + photo) is unchanged; submit sends a fixed portrait URL to the CMS instead of running the fal pipeline.
 
+## Cityvision (Broadsign) — vendor LED only
+
+Sites: **BEI**, **Ratu Plaza**, **Dukuh Atas**, **Sudirman** (`isCityvisionLedLocation` in [`src/lib/led/led-vendors.ts`](./src/lib/led/led-vendors.ts)).
+
+| Behavior | MIB (GBK, Sency) |
+| -------- | ---------------- |
+| Motion/queue start on load | After **BroadSignPlay** — `postMessage({ type: "BroadSignPlay" })`, `window.BroadSignPlay()`, or preview **`?autoplay=1`** |
+| Slot | **15 s** per intro→live→playback cycle; hold final frame **0,5 s** before slot end; then **intro static** lagi (antrian kosong) |
+| UI | `100vw×100vh`, `cursor: none`, no click-to-fullscreen; **`Content-Security-Policy: frame-ancestors *`** on `/led/*` |
+
+Preview in Chrome: `/led/ratu-plaza?autoplay=1` (works alongside `?debug=…` for layout). Self-test: DevTools → `window.postMessage({ type: "BroadSignPlay" }, "*")`.
+
+Implementation: [`src/lib/led/cityvision/`](./src/lib/led/cityvision/), [`useInteractiveLedPlayer`](./src/lib/led/useInteractiveLedPlayer.ts).
+
 ## LED debug (layout)
 
 On `/led/[code]`, query param **`debug`** for relayout without motion:

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 
+import { CITYVISION_PLAYABLE_MS } from "@/lib/led/cityvision/cityvision-timing";
 import type { LedDebugOptions } from "@/lib/led/debug";
 import {
   INTERACTIVE_LED_DUMMY_PLAY_MS,
@@ -51,6 +52,10 @@ export type UseInteractiveLedQueueParams = {
   locationName: string;
   dummyTalentUrl: string;
   ledDebug?: LedDebugOptions;
+  /** Cityvision Broadsign — 15s slot, no intro loop between idle segments. */
+  cityvisionMode?: boolean;
+  /** When false, hold first static frame until BroadSignPlay / ?autoplay=1. */
+  playbackEnabled?: boolean;
 };
 
 function isVideo(url: string) {
@@ -73,6 +78,8 @@ export function useInteractiveLedQueue({
     holdStatic: false,
     holdLiveLayout: false,
   },
+  cityvisionMode = false,
+  playbackEnabled = true,
 }: UseInteractiveLedQueueParams) {
 
   const mediaRef = useRef<HTMLDivElement>(null);
@@ -129,6 +136,9 @@ export function useInteractiveLedQueue({
     exit: ReturnType<typeof setTimeout> | null;
     live: ReturnType<typeof setTimeout> | null;
   }>({ exit: null, live: null });
+  const slotStartRef = useRef(0);
+  const slotEndTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
+  const [slotFrozen, setSlotFrozen] = useState(false);
 
   const playerKey = `clear.led.playerId.${code}`;
   const storeKey = `clear.led.queue.${code}`;
@@ -144,6 +154,53 @@ export function useInteractiveLedQueue({
     if (timers.exit) clearTimeout(timers.exit);
     if (timers.live) clearTimeout(timers.live);
     introTimersRef.current = { exit: null, live: null };
+  }
+
+  function clearCityvisionSlotTimer() {
+    if (slotEndTimerRef.current) {
+      clearTimeout(slotEndTimerRef.current);
+      slotEndTimerRef.current = 0;
+    }
+  }
+
+  function freezeCityvisionSlot() {
+    if (!cityvisionMode || slotFrozen) {
+      return;
+    }
+    setSlotFrozen(true);
+    clearIntroTimers();
+    clearCityvisionSlotTimer();
+    const state = stateRef.current;
+    if (state.timer) {
+      clearTimeout(state.timer);
+      state.timer = 0;
+    }
+  }
+
+  function armCityvisionSlotDeadline() {
+    if (!cityvisionMode) {
+      return;
+    }
+    clearCityvisionSlotTimer();
+    if (!slotStartRef.current) {
+      slotStartRef.current = Date.now();
+    }
+    slotEndTimerRef.current = setTimeout(
+      freezeCityvisionSlot,
+      CITYVISION_PLAYABLE_MS,
+    );
+  }
+
+  function capPlayMsForCityvision(requested: number): number {
+    if (!cityvisionMode || !slotStartRef.current) {
+      return requested;
+    }
+    const elapsed = Date.now() - slotStartRef.current;
+    const budget = CITYVISION_PLAYABLE_MS - elapsed;
+    if (budget <= 0) {
+      return 800;
+    }
+    return Math.max(800, Math.min(requested, budget));
   }
 
   function resetPlaybackForIntro() {
@@ -199,7 +256,15 @@ export function useInteractiveLedQueue({
   }
 
   function runIntroCycle() {
+    if (!playbackEnabled) {
+      return;
+    }
     clearIntroTimers();
+    if (cityvisionMode) {
+      setSlotFrozen(false);
+      slotStartRef.current = Date.now();
+      armCityvisionSlotDeadline();
+    }
     introDoneRef.current = false;
     liveHadPlaybackRef.current = false;
     dummyPlayedThisLiveRef.current = false;
@@ -256,6 +321,9 @@ export function useInteractiveLedQueue({
   }
 
   function maybeScheduleIntroAfterIdle() {
+    if (slotFrozen) {
+      return;
+    }
     if (
       ledDebug.holdStatic ||
       ledDebug.skipIntro ||
@@ -353,7 +421,7 @@ export function useInteractiveLedQueue({
     if (isVideo(item.url)) {
       const video = document.createElement("video");
       video.src = item.url;
-      video.autoplay = true;
+      video.autoplay = false;
       video.muted = true;
       video.playsInline = true;
       video.play().catch(() => {});
@@ -369,6 +437,12 @@ export function useInteractiveLedQueue({
   }
 
   function playbackBlocked() {
+    if (!playbackEnabled) {
+      return true;
+    }
+    if (slotFrozen) {
+      return true;
+    }
     if (holdLiveLayout) {
       return true;
     }
@@ -427,7 +501,9 @@ export function useInteractiveLedQueue({
     });
 
     if (shownIdRef.current !== state.current.queue_id) {
-      const duration = itemPlayMs(state.current, state.playMs);
+      const duration = capPlayMsForCityvision(
+        itemPlayMs(state.current, state.playMs),
+      );
       mount(state.current, remaining ?? duration);
     }
   }
@@ -499,13 +575,16 @@ export function useInteractiveLedQueue({
     }
     const state = stateRef.current;
     if (state.timer) clearTimeout(state.timer);
-    const duration = itemPlayMs(state.current, state.playMs);
-    state.startedAt = Date.now() - (duration - remaining);
+    const duration = capPlayMsForCityvision(
+      itemPlayMs(state.current, state.playMs),
+    );
+    const waitMs = Math.min(remaining, duration);
+    state.startedAt = Date.now() - (duration - waitMs);
     persist();
-    render(remaining);
+    render(waitMs);
     state.timer = setTimeout(() => {
       enqueue(finish);
-    }, remaining);
+    }, waitMs);
   }
 
   async function startIfIdle() {
@@ -613,28 +692,60 @@ export function useInteractiveLedQueue({
   }, [locationName]);
 
   useEffect(() => {
+    if (!playbackEnabled) {
+      clearIntroTimers();
+      clearCityvisionSlotTimer();
+      introDoneRef.current = false;
+      setPhase("static");
+      setStaticExiting(false);
+      setLiveReady(false);
+      return;
+    }
+
     if (ledDebug.holdStatic) {
       clearIntroTimers();
       introDoneRef.current = false;
       setPhase("static");
+      if (cityvisionMode) {
+        armCityvisionSlotDeadline();
+      }
       return;
     }
 
     if (ledDebug.holdLiveLayout) {
       clearIntroTimers();
+      if (cityvisionMode) {
+        slotStartRef.current = Date.now();
+        armCityvisionSlotDeadline();
+      }
       startLiveLayoutHold();
       return;
     }
 
     if (ledDebug.skipIntro) {
       clearIntroTimers();
+      if (cityvisionMode) {
+        slotStartRef.current = Date.now();
+        armCityvisionSlotDeadline();
+      }
       startLiveQueue();
       return;
     }
 
+    slotStartRef.current = 0;
+    setSlotFrozen(false);
     runIntroCycle();
-    return () => clearIntroTimers();
-  }, [ledDebug.skipIntro, ledDebug.holdStatic, ledDebug.holdLiveLayout]);
+    return () => {
+      clearIntroTimers();
+      clearCityvisionSlotTimer();
+    };
+  }, [
+    playbackEnabled,
+    ledDebug.skipIntro,
+    ledDebug.holdStatic,
+    ledDebug.holdLiveLayout,
+    cityvisionMode,
+  ]);
 
 
   useEffect(() => {
@@ -741,6 +852,7 @@ export function useInteractiveLedQueue({
       socket.disconnect();
       const state = stateRef.current;
       if (state.timer) clearTimeout(state.timer);
+      clearCityvisionSlotTimer();
     };
   }, [apiBaseUrl, code, ledKey, locationName]);
 
@@ -753,6 +865,8 @@ export function useInteractiveLedQueue({
     liveReady,
     holdLiveLayout,
     holdStatic,
+    slotFrozen,
+    cityvisionMode,
     mediaRef,
     barRef,
   };

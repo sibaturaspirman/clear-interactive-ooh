@@ -11,6 +11,8 @@ type InteractiveLedPlayerShellProps = {
   canvas: LedCanvasSpec;
   stageClassName?: string;
   connectionStatus: LedConnectionStatus;
+  /** Cityvision Broadsign — no cursor / click, full viewport (doc §5–§6). */
+  cityvision?: boolean;
   children: ReactNode;
 };
 
@@ -18,14 +20,19 @@ export function InteractiveLedPlayerShell({
   canvas,
   stageClassName = "",
   connectionStatus,
+  cityvision = false,
   children,
 }: InteractiveLedPlayerShellProps) {
   return (
     <main
-      className={`led-player-stage led-player-stage--fixed ${stageClassName}`.trim()}
-      onClick={() => {
-        document.documentElement.requestFullscreen?.().catch(() => {});
-      }}
+      className={`led-player-stage led-player-stage--fixed ${cityvision ? "led-player-stage--cityvision" : ""} ${stageClassName}`.trim()}
+      onClick={
+        cityvision
+          ? undefined
+          : () => {
+              document.documentElement.requestFullscreen?.().catch(() => {});
+            }
+      }
     >
       <LedFixedCanvas width={canvas.width} height={canvas.height}>
         {children}
