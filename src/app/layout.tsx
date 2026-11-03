@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Clear Interactive OOH",
-  description: "Clear Interactive OOH — Next.js SSR",
+  description: "Clear Interactive OOH",
   icons: {
     icon: "/images/microsite/logo-men-ultra.png",
     apple: "/images/microsite/logo-men-ultra.png",
