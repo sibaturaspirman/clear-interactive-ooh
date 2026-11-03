@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "broadsign:build": "node scripts/build-broadsign-player.mjs",
+    "build": "npm run broadsign:build && next build",
     "start": "next start",
     "lint": "eslint",
     "led:bei-qr": "node scripts/generate-bei-qr.mjs",
@@ -30,6 +31,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "tailwindcss": "^4",

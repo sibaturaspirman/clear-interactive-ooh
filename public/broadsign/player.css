@@ -1,0 +1,121 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  cursor: none;
+  background: #000;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+#bs-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bs-stage {
+  position: relative;
+  overflow: hidden;
+  background: #061316;
+  flex-shrink: 0;
+}
+
+.bs-layer {
+  position: absolute;
+  pointer-events: none;
+}
+
+.bs-layer img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left top;
+}
+
+.bs-layer--cover img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.bs-layer--talent img {
+  object-position: bottom center;
+}
+
+.bs-static-root,
+.bs-live-root {
+  position: absolute;
+  inset: 0;
+}
+
+.bs-static-root {
+  z-index: 2;
+}
+
+.bs-live-root {
+  z-index: 1;
+  opacity: 1;
+  visibility: hidden;
+  pointer-events: none;
+  display: none;
+}
+
+.bs-live-root.bs-live-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.bs-static-root.bs-static-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.bs-participant-name {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  color: #fff;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  text-align: left;
+  transform-origin: center center;
+}
+
+.bs-talent-photo {
+  position: absolute;
+  overflow: hidden;
+}
+
+.bs-talent-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+.bs-qr-inset {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bs-qr-inset img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bs-frozen {
+  pointer-events: none;
+}

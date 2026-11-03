@@ -14,6 +14,14 @@ export function ledPath(code: string): string {
   return `/led/${code}`;
 }
 
+export function ledBroadsignPath(code: string): string {
+  return `/led/${code}/broadsign`;
+}
+
+export function ledBroadsignAutoplayPath(code: string): string {
+  return `${ledBroadsignPath(code)}?autoplay=1`;
+}
+
 export function ledDebugPath(code: string): string {
   return `${ledPath(code)}?debug`;
 }

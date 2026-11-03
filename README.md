@@ -65,17 +65,20 @@ BEI
 
 Ratu Plaza
 
-* LED : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza
+* LED (Broadsign) : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza/broadsign
+* LED (Next dev) : https://clear-interactive-ooh-jsua.vercel.app/led/ratu-plaza
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/ratu-plaza
 
 Dukuh Atas
 
-* LED : https://clear-interactive-ooh-jsua.vercel.app/led/dukuh-atas
+* LED (Broadsign) : https://clear-interactive-ooh-jsua.vercel.app/led/dukuh-atas/broadsign
+* LED (Next dev) : https://clear-interactive-ooh-jsua.vercel.app/led/dukuh-atas
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/dukuh-atas
 
 Gate Entry Sudirman
 
-* LED : https://clear-interactive-ooh-jsua.vercel.app/led/sudirman
+* LED (Broadsign) : https://clear-interactive-ooh-jsua.vercel.app/led/sudirman/broadsign
+* LED (Next dev) : https://clear-interactive-ooh-jsua.vercel.app/led/sudirman
 * Microsite : https://clear-interactive-ooh-jsua.vercel.app/microsite/sudirman
 
 ### MIB
@@ -117,17 +120,22 @@ Flow (form + photo) is unchanged; submit sends a fixed portrait URL to the CMS i
 
 ## Cityvision (Broadsign) — vendor LED only
 
-Sites: **BEI**, **Ratu Plaza**, **Dukuh Atas**, **Sudirman** (`isCityvisionLedLocation` in [`src/lib/led/led-vendors.ts`](./src/lib/led/led-vendors.ts)).
+Sites: **BEI**, **Ratu Plaza**, **Dukuh Atas**, **Sudirman** (`isCityvisionLedLocation`).
 
-| Behavior | MIB (GBK, Sency) |
-| -------- | ---------------- |
-| Motion/queue start on load | After **BroadSignPlay** — `postMessage({ type: "BroadSignPlay" })`, `window.BroadSignPlay()`, or preview **`?autoplay=1`** |
-| Slot | **15 s** per intro→live→playback cycle; hold final frame **0,5 s** before slot end; then **intro static** lagi (antrian kosong) |
-| UI | `100vw×100vh`, `cursor: none`, no click-to-fullscreen; **`Content-Security-Policy: frame-ancestors *`** on `/led/*` |
+### Dua URL (player lama tetap ada)
 
-Preview in Chrome: `/led/ratu-plaza?autoplay=1` (works alongside `?debug=…` for layout). Self-test: DevTools → `window.postMessage({ type: "BroadSignPlay" }, "*")`.
+| URL | Dipakai untuk |
+| --- | ------------- |
+| **`/led/[code]`** | Player **Next.js / React** (dev, layout `?debug=*`, MIB-style testing di browser modern) |
+| **`/led/[code]/broadsign`** | **Broadsign Chromium 87** — HTML + vanilla JS (`public/broadsign/player.js`, target `chrome87`), **tanpa socket** (polling API saja) |
 
-Implementation: [`src/lib/led/cityvision/`](./src/lib/led/cityvision/), [`useInteractiveLedPlayer`](./src/lib/led/useInteractiveLedPlayer.ts).
+**Daftarkan ke Cityvision:** `https://…/led/dukuh-atas/broadsign` (idem ratu-plaza, sudirman). Preview: tambah **`?autoplay=1`**.
+
+BroadSignPlay: script inline di `<head>` + bundle mendengarkan event `bs-start` (laporan pengujian §5.4).
+
+Build bundle: `npm run broadsign:build` (otomatis sebelum `npm run build`). Layout/assets reuse dari `*-layout.ts` via [`src/lib/broadsign-led/resolve-site-config.ts`](./src/lib/broadsign-led/resolve-site-config.ts).
+
+Player Next (Cityvision): [`src/lib/led/cityvision/`](./src/lib/led/cityvision/), [`useInteractiveLedPlayer`](./src/lib/led/useInteractiveLedPlayer.ts) — **tidak diganti** oleh `/broadsign`.
 
 ## LED debug (layout)
 

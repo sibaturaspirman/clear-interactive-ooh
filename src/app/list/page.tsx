@@ -9,7 +9,10 @@ import { getLedCanvas } from "@/lib/led/location-specs";
 import { getLocations } from "@/lib/locations";
 import { filterLocationsForList } from "@/lib/locations/location-list-visible";
 import type { Location } from "@/types/location";
+import { getBroadsignSitePayload } from "@/lib/broadsign-led/resolve-site-config";
 import {
+  ledBroadsignAutoplayPath,
+  ledBroadsignPath,
   ledDebugPath,
   ledLiveLayoutDebugPath,
   ledStaticDebugPath,
@@ -27,9 +30,11 @@ function listHasDebugQuery(debug: string | string[] | undefined): boolean {
 function LocationLinks({
   location,
   showDebugLinks,
+  showBroadsignLink,
 }: {
   location: Location;
   showDebugLinks: boolean;
+  showBroadsignLink: boolean;
 }) {
   return (
     <div className="flex flex-wrap gap-2 text-sm">
@@ -46,6 +51,15 @@ function LocationLinks({
           title="Skip fal.ai; fixed result image"
         >
           Microsite (?test)
+        </Link>
+      ) : null}
+      {showBroadsignLink ? (
+        <Link
+          href={ledBroadsignPath(location.code)}
+          className="rounded-full border border-emerald-600/70 bg-emerald-50 px-4 py-2 text-emerald-950 hover:bg-emerald-100 dark:border-emerald-500/50 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60"
+          title="Player HTML5 untuk Broadsign / Chromium 87"
+        >
+          Broadsign
         </Link>
       ) : null}
       <Link
@@ -77,6 +91,15 @@ function LocationLinks({
           >
             LED (?debug)
           </Link>
+          {showBroadsignLink ? (
+            <Link
+              href={ledBroadsignAutoplayPath(location.code)}
+              className="rounded-full border border-amber-400/60 px-4 py-2 text-amber-900 hover:bg-amber-50 dark:border-amber-600/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
+              title="Broadsign + autoplay (preview lab)"
+            >
+              Broadsign (?autoplay=1)
+            </Link>
+          ) : null}
         </>
       ) : null}
     </div>
@@ -92,6 +115,7 @@ function LocationRow({
 }) {
   const canvas = getLedCanvas(location.code);
   const ledVendor = getLedVendor(location.code);
+  const showBroadsignLink = getBroadsignSitePayload(location.code) !== null;
 
   return (
     <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -116,7 +140,11 @@ function LocationRow({
           </p>
         ) : null}
       </div>
-      <LocationLinks location={location} showDebugLinks={showDebugLinks} />
+      <LocationLinks
+        location={location}
+        showDebugLinks={showDebugLinks}
+        showBroadsignLink={showBroadsignLink}
+      />
     </li>
   );
 }
