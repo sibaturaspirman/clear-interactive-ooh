@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { LedGbkLiveScreen } from "@/components/led/gbk/LedGbkLiveScreen";
 import { LedGbkSharedLayers } from "@/components/led/gbk/LedGbkSharedLayers";
+import { LedGbkOutroScreen } from "@/components/led/gbk/LedGbkOutroScreen";
 import { LedGbkStaticScreen } from "@/components/led/gbk/LedGbkStaticScreen";
 import {
   GBK_LIVE_HANDOFF_MS,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/led/gbk/gbk-layout";
 
 type LedGbkScreenProps = {
-  phase: "static" | "live";
+  phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;
@@ -43,9 +44,11 @@ export function LedGbkScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedGbkScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
+  const showIntroClear = showStatic && !showOutro;
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export function LedGbkScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : GBK_LIVE_LAYER_FADE_MS;
 
@@ -67,7 +70,7 @@ export function LedGbkScreen({
     <div className="relative size-full overflow-hidden">
       {debugActive ? ledDebugBadge(holdStatic, holdLiveLayout) : null}
       <div className="absolute inset-0 z-0">
-        <LedGbkSharedLayers />
+        <LedGbkSharedLayers showIntroClear={showIntroClear} />
       </div>
 
       {liveMounted ? (
@@ -109,6 +112,12 @@ export function LedGbkScreen({
           />
         </div>
       ) : null}
+
+      <LedGbkOutroScreen
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

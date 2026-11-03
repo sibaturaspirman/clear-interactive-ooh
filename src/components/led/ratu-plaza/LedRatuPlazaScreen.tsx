@@ -11,7 +11,7 @@ import {
 } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 
 type LedRatuPlazaScreenProps = {
-  phase: "static" | "live";
+  phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;

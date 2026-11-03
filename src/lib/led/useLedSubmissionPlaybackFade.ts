@@ -14,6 +14,8 @@ type UseLedSubmissionPlaybackFadeOptions = {
   isSubmission: boolean;
   playbackQueueId: number | null | undefined;
   playMs: number;
+  /** Latest label from queue — applied on enter, not mid exit (matches talent `displaySrc`). */
+  nama?: string;
   disableAnimations?: boolean;
   /** Relayout / debug — hold visible, no cycle. */
   layoutDebug?: boolean;
@@ -26,11 +28,20 @@ export function useLedSubmissionPlaybackFade({
   isSubmission,
   playbackQueueId,
   playMs,
+  nama,
   disableAnimations = false,
   layoutDebug = false,
   fadeInMs = INTERACTIVE_LED_LIVE_TALENT_FADE_IN_MS,
   fadeOutMs = INTERACTIVE_LED_STATIC_FADE_OUT_MS,
 }: UseLedSubmissionPlaybackFadeOptions) {
+  const trimmedNama = nama?.trim() ?? "";
+
+  const [displayNama, setDisplayNama] = useState(() => {
+    if (layoutDebug) return trimmedNama;
+    if (isSubmission) return trimmedNama;
+    return "";
+  });
+
   const [fadeMode, setFadeMode] = useState<LedSubmissionFadeMode>(() => {
     if (layoutDebug) return "show";
     if (isSubmission) return disableAnimations ? "show" : "in";
@@ -52,7 +63,8 @@ export function useLedSubmissionPlaybackFade({
     setFadeMode("out");
   }
 
-  function beginEnter(durationMs: number) {
+  function beginEnter(durationMs: number, nextName: string) {
+    setDisplayNama(nextName);
     setFadeMode("in");
     exitAtRef.current = setTimeout(() => {
       startExitPhase();
@@ -73,21 +85,25 @@ export function useLedSubmissionPlaybackFade({
       prevQueueIdRef.current = null;
 
       if (disableAnimations || !hadPlayback) {
+        setDisplayNama("");
         setFadeMode("hidden");
         return;
       }
 
       startExitPhase();
       swapRef.current = setTimeout(() => {
+        setDisplayNama("");
         setFadeMode("hidden");
       }, fadeOutMs);
       return clearTimers;
     }
 
     const queueId = playbackQueueId!;
+    const nextName = trimmedNama;
 
     if (disableAnimations) {
       prevQueueIdRef.current = queueId;
+      setDisplayNama(nextName);
       setFadeMode("show");
       return;
     }
@@ -96,23 +112,21 @@ export function useLedSubmissionPlaybackFade({
     prevQueueIdRef.current = queueId;
 
     if (prevId != null && prevId !== queueId) {
-      startExitPhase();
-      swapRef.current = setTimeout(() => {
-        beginEnter(playMs);
-      }, fadeOutMs);
+      beginEnter(playMs, nextName);
       return clearTimers;
     }
 
-    beginEnter(playMs);
+    beginEnter(playMs, nextName);
     return clearTimers;
   }, [
     isSubmission,
     playbackQueueId,
     playMs,
+    trimmedNama,
     disableAnimations,
     layoutDebug,
     fadeOutMs,
   ]);
 
-  return { fadeMode, fadeInMs, fadeOutMs };
+  return { fadeMode, fadeInMs, fadeOutMs, displayNama };
 }

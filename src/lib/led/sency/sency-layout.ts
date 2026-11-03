@@ -5,9 +5,19 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Sency LED canvas — matches `sency-bg.jpg` (1200×576). */
 export const SENCY_CANVAS = LED_CANVAS_BY_CODE.sency;
 
-export const SENCY_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const SENCY_DUMMY_PLAY_MS = SENCY_STATIC_DURATION_MS;
+/** Intro hold — loop: 4s intro → 9s live → 4s outro. */
+export const SENCY_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (non-sequence / legacy). */
+export const SENCY_DUMMY_PLAY_MS = 5000;
+/** Full loop wall clock for Sency sequence player. */
+export const SENCY_SEQUENCE = {
+  introMs: 4000,
+  liveMs: 9000,
+  outroMs: 4000,
+  submissionMs: 3000,
+  slotMs: 17000,
+} as const;
+export const SENCY_OUTRO_FADE_IN_MS = 800;
 export const SENCY_STATIC_FADE_IN_MS = 800;
 export const SENCY_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -52,6 +62,8 @@ export function sencyLiveTalentZoomMs(playMs: number): number {
 export const SENCY_ASSETS = {
   background: "/images/led/sency-bg.jpg",
   clear: "/images/led/sency-clear.png",
+  clearLive: "/images/led/sency-logo-clear-live.png",
+  end: "/images/led/sency-end.jpg",
   packGroup: "/images/led/sency-clear-pack-group.png",
   pack: "/images/led/sency-clear-pack.png",
   talent: "/images/led/sency-talent.png",

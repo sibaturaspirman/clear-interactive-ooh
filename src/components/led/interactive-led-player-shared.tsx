@@ -10,8 +10,10 @@ import {
 import { useInteractiveLedPlayer } from "@/lib/led/useInteractiveLedPlayer";
 import { getLedCanvas } from "@/lib/led/location-specs";
 
+export type InteractiveLedPlaybackPhase = "static" | "live" | "outro";
+
 export type InteractiveLedScreenProps = {
-  phase: "static" | "live";
+  phase: InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;

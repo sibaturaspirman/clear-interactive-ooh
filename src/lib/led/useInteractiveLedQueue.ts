@@ -11,6 +11,12 @@ import {
   INTERACTIVE_LED_STATIC_DURATION_MS,
   INTERACTIVE_LED_STATIC_FADE_OUT_MS,
 } from "@/lib/led/interactive-led-timing";
+import {
+  MIB_LED_LIVE_START_AT_MS,
+  MIB_LED_SEQUENCE,
+  MIB_LED_STATIC_DURATION_MS,
+  MIB_LED_STATIC_FADE_OUT_MS,
+} from "@/lib/led/mib/mib-led-sequence";
 import type {
   LedConnectionStatus,
   LedPullResponse,
@@ -40,7 +46,11 @@ function createDummyQueueItem(url: string): LedQueueItem {
 function itemPlayMs(
   item: LedQueueItem | null | undefined,
   apiPlayMs: number,
+  sencySequenceMode: boolean,
 ) {
+  if (sencySequenceMode) {
+    return MIB_LED_SEQUENCE.submissionMs;
+  }
   if (item && isDummyQueueItem(item)) return INTERACTIVE_LED_DUMMY_PLAY_MS;
   return apiPlayMs;
 }
@@ -54,6 +64,8 @@ export type UseInteractiveLedQueueParams = {
   ledDebug?: LedDebugOptions;
   /** Cityvision Broadsign — 15s slot, no intro loop between idle segments. */
   cityvisionMode?: boolean;
+  /** Sency — 4s intro / 9s live (3×3s) / 4s outro loop. */
+  sencySequenceMode?: boolean;
   /** When false, hold first static frame until BroadSignPlay / ?autoplay=1. */
   playbackEnabled?: boolean;
 };
@@ -79,6 +91,7 @@ export function useInteractiveLedQueue({
     holdLiveLayout: false,
   },
   cityvisionMode = false,
+  sencySequenceMode = false,
   playbackEnabled = true,
 }: UseInteractiveLedQueueParams) {
 
@@ -120,7 +133,7 @@ export function useInteractiveLedQueue({
   const holdLiveLayout = ledDebug.holdLiveLayout;
   const skipIntro = ledDebug.skipIntro && !holdStatic;
   const introDoneRef = useRef(skipIntro && !holdStatic);
-  const [phase, setPhase] = useState<"static" | "live">(() => {
+  const [phase, setPhase] = useState<"static" | "live" | "outro">(() => {
     if (holdStatic) return "static";
     if (skipIntro) return "live";
     return "static";
@@ -138,7 +151,20 @@ export function useInteractiveLedQueue({
   }>({ exit: null, live: null });
   const slotStartRef = useRef(0);
   const slotEndTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
+  const liveSegmentEndRef = useRef(0);
+  const liveSegmentTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
+  const outroTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
   const [slotFrozen, setSlotFrozen] = useState(false);
+
+  const staticDurationMs = sencySequenceMode
+    ? MIB_LED_STATIC_DURATION_MS
+    : INTERACTIVE_LED_STATIC_DURATION_MS;
+  const staticFadeOutMs = sencySequenceMode
+    ? MIB_LED_STATIC_FADE_OUT_MS
+    : INTERACTIVE_LED_STATIC_FADE_OUT_MS;
+  const liveStartAtMs = sencySequenceMode
+    ? MIB_LED_LIVE_START_AT_MS
+    : INTERACTIVE_LED_LIVE_START_AT_MS;
 
   const playerKey = `clear.led.playerId.${code}`;
   const storeKey = `clear.led.queue.${code}`;
@@ -161,6 +187,29 @@ export function useInteractiveLedQueue({
       clearTimeout(slotEndTimerRef.current);
       slotEndTimerRef.current = 0;
     }
+  }
+
+  function clearSencySequenceTimers() {
+    if (liveSegmentTimerRef.current) {
+      clearTimeout(liveSegmentTimerRef.current);
+      liveSegmentTimerRef.current = 0;
+    }
+    if (outroTimerRef.current) {
+      clearTimeout(outroTimerRef.current);
+      outroTimerRef.current = 0;
+    }
+    liveSegmentEndRef.current = 0;
+  }
+
+  function armSencySlotDeadline() {
+    if (!sencySequenceMode) return;
+    clearCityvisionSlotTimer();
+    slotStartRef.current = Date.now();
+    slotEndTimerRef.current = setTimeout(() => {
+      if (ledDebug.holdStatic || ledDebug.holdLiveLayout) return;
+      clearSencySequenceTimers();
+      runIntroCycle();
+    }, MIB_LED_SEQUENCE.slotMs);
   }
 
   function freezeCityvisionSlot() {
@@ -201,6 +250,15 @@ export function useInteractiveLedQueue({
       return 800;
     }
     return Math.max(800, Math.min(requested, budget));
+  }
+
+  function capPlayMsForSlot(requested: number): number {
+    if (sencySequenceMode && liveSegmentEndRef.current) {
+      const liveLeft = liveSegmentEndRef.current - Date.now();
+      if (liveLeft <= 0) return 800;
+      return Math.max(800, Math.min(requested, liveLeft));
+    }
+    return capPlayMsForCityvision(requested);
   }
 
   function resetPlaybackForIntro() {
@@ -248,6 +306,15 @@ export function useInteractiveLedQueue({
     setPhase("live");
     setStaticExiting(false);
     setLiveReady(true);
+    if (sencySequenceMode) {
+      clearSencySequenceTimers();
+      const liveMs = MIB_LED_SEQUENCE.liveMs;
+      liveSegmentEndRef.current = Date.now() + liveMs;
+      liveSegmentTimerRef.current = setTimeout(
+        endSencyLiveSegment,
+        liveMs,
+      );
+    }
     enqueue(async () => {
       await resume();
       
@@ -255,15 +322,53 @@ export function useInteractiveLedQueue({
     });
   }
 
+  function endSencyLiveSegment() {
+    if (!sencySequenceMode) return;
+    liveSegmentTimerRef.current = 0;
+    liveSegmentEndRef.current = 0;
+    const state = stateRef.current;
+    if (state.timer) {
+      clearTimeout(state.timer);
+      state.timer = 0;
+    }
+    const done = state.current;
+    state.current = null;
+    state.upcoming = [];
+    state.startedAt = 0;
+    shownIdRef.current = null;
+    if (done && !state.replaying && !isDummyQueueItem(done)) {
+      ack(done.queue_id);
+    }
+    introDoneRef.current = false;
+    persist();
+    render();
+    runOutroPhase();
+  }
+
+  function runOutroPhase() {
+    if (!sencySequenceMode) return;
+    setPhase("outro");
+    setLiveReady(false);
+    if (outroTimerRef.current) clearTimeout(outroTimerRef.current);
+    outroTimerRef.current = setTimeout(() => {
+      outroTimerRef.current = 0;
+      runIntroCycle();
+    }, MIB_LED_SEQUENCE.outroMs);
+  }
+
   function runIntroCycle() {
     if (!playbackEnabled) {
       return;
     }
     clearIntroTimers();
+    clearSencySequenceTimers();
     if (cityvisionMode) {
       setSlotFrozen(false);
       slotStartRef.current = Date.now();
       armCityvisionSlotDeadline();
+    } else if (sencySequenceMode) {
+      setSlotFrozen(false);
+      armSencySlotDeadline();
     }
     introDoneRef.current = false;
     liveHadPlaybackRef.current = false;
@@ -273,18 +378,12 @@ export function useInteractiveLedQueue({
     setIntroCycle((cycle) => cycle + 1);
     setPhase("static");
     setStaticExiting(false);
-    const exitAt = Math.max(
-      0,
-      INTERACTIVE_LED_STATIC_DURATION_MS - INTERACTIVE_LED_STATIC_FADE_OUT_MS,
-    );
+    const exitAt = Math.max(0, staticDurationMs - staticFadeOutMs);
     introTimersRef.current.exit = setTimeout(
       () => setStaticExiting(true),
       exitAt,
     );
-    introTimersRef.current.live = setTimeout(
-      startLiveQueue,
-      INTERACTIVE_LED_LIVE_START_AT_MS,
-    );
+    introTimersRef.current.live = setTimeout(startLiveQueue, liveStartAtMs);
     enqueue(async () => {
       await fillQueueDuringIntro();
     });
@@ -313,6 +412,7 @@ export function useInteractiveLedQueue({
   }
 
   function shouldPlayDummyFill() {
+    if (sencySequenceMode) return false;
     return (
       !holdLiveLayout &&
       !ledDebug.holdStatic &&
@@ -321,6 +421,9 @@ export function useInteractiveLedQueue({
   }
 
   function maybeScheduleIntroAfterIdle() {
+    if (sencySequenceMode) {
+      return;
+    }
     if (slotFrozen) {
       return;
     }
@@ -392,10 +495,10 @@ export function useInteractiveLedQueue({
 
   function slots() {
     const state = stateRef.current;
-    return (
-      state.bufferSize -
-      ((state.current ? 1 : 0) + state.upcoming.length)
-    );
+    const capacity = sencySequenceMode
+      ? Math.min(state.bufferSize, 3)
+      : state.bufferSize;
+    return capacity - ((state.current ? 1 : 0) + state.upcoming.length);
   }
 
   function held(queueId: number) {
@@ -433,7 +536,10 @@ export function useInteractiveLedQueue({
       media.append(img);
     }
     shownIdRef.current = item.queue_id;
-    restartBar(remaining, itemPlayMs(item, stateRef.current.playMs));
+    restartBar(
+      remaining,
+      itemPlayMs(item, stateRef.current.playMs, sencySequenceMode),
+    );
   }
 
   function playbackBlocked() {
@@ -497,12 +603,12 @@ export function useInteractiveLedQueue({
       pos: `${state.upcoming.length} di belakang`,
       playbackUrl: state.current.url,
       playbackQueueId: state.current.queue_id,
-      playMs: itemPlayMs(state.current, state.playMs),
+      playMs: itemPlayMs(state.current, state.playMs, sencySequenceMode),
     });
 
     if (shownIdRef.current !== state.current.queue_id) {
-      const duration = capPlayMsForCityvision(
-        itemPlayMs(state.current, state.playMs),
+      const duration = capPlayMsForSlot(
+        itemPlayMs(state.current, state.playMs, sencySequenceMode),
       );
       mount(state.current, remaining ?? duration);
     }
@@ -528,7 +634,9 @@ export function useInteractiveLedQueue({
         throw new Error(data.message || "Gagal ambil antrian");
       }
       setConnectionStatus((prev) => (prev === "error" ? prev : "connected"));
-      state.playMs = data.play_ms || state.playMs;
+      if (!sencySequenceMode) {
+        state.playMs = data.play_ms || state.playMs;
+      }
       state.bufferSize = data.buffer_size || state.bufferSize;
       const buffered: LedQueueItem[] = [];
       if (data.mode === "fresh") {
@@ -575,8 +683,8 @@ export function useInteractiveLedQueue({
     }
     const state = stateRef.current;
     if (state.timer) clearTimeout(state.timer);
-    const duration = capPlayMsForCityvision(
-      itemPlayMs(state.current, state.playMs),
+    const duration = capPlayMsForSlot(
+      itemPlayMs(state.current, state.playMs, sencySequenceMode),
     );
     const waitMs = Math.min(remaining, duration);
     state.startedAt = Date.now() - (duration - waitMs);
@@ -598,7 +706,7 @@ export function useInteractiveLedQueue({
     }
     if (!state.upcoming.length) {
       if (shouldPlayDummyFill()) {
-        if (state.queued > 0) {
+        if (state.queued > 0 && !sencySequenceMode) {
           runIntroCycle();
           return;
         }
@@ -617,7 +725,7 @@ export function useInteractiveLedQueue({
         liveHadPlaybackRef.current = true;
         state.startedAt = Date.now();
         persist();
-        arm(itemPlayMs(state.current, state.playMs));
+        arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
         return;
       }
       persist();
@@ -637,15 +745,12 @@ export function useInteractiveLedQueue({
     state.startedAt = Date.now();
     persist();
     void preloadLedQueueItems(state.upcoming);
-    arm(itemPlayMs(state.current, state.playMs));
+    arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
   }
 
   async function finish() {
     const state = stateRef.current;
     const done = state.current;
-    state.current = null;
-    state.startedAt = 0;
-    shownIdRef.current = null;
     if (done && !state.replaying && !isDummyQueueItem(done)) {
       ack(done.queue_id);
     }
@@ -654,12 +759,36 @@ export function useInteractiveLedQueue({
       state.replayLoop = [];
       state.replaying = false;
     }
-    persist();
     if (done && isDummyQueueItem(done)) {
+      state.current = null;
+      state.startedAt = 0;
+      shownIdRef.current = null;
+      persist();
       render();
       maybeScheduleIntroAfterIdle();
       return;
     }
+
+    const nextUp =
+      !playbackBlocked() && state.upcoming.length > 0
+        ? state.upcoming[0]
+        : null;
+    if (nextUp) {
+      await preloadLedMediaUrl(nextUp.url);
+      state.current = state.upcoming.shift() ?? null;
+      state.startedAt = Date.now();
+      shownIdRef.current = null;
+      persist();
+      void preloadLedQueueItems(state.upcoming);
+      liveHadPlaybackRef.current = true;
+      arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
+      return;
+    }
+
+    state.current = null;
+    state.startedAt = 0;
+    shownIdRef.current = null;
+    persist();
     await startIfIdle();
   }
 
@@ -675,7 +804,11 @@ export function useInteractiveLedQueue({
       return;
     }
     await preloadLedMediaUrl(state.current.url);
-    const duration = itemPlayMs(state.current, state.playMs);
+    const duration = itemPlayMs(
+      state.current,
+      state.playMs,
+      sencySequenceMode,
+    );
     const elapsed = state.startedAt ? Date.now() - state.startedAt : 0;
     const remaining = duration - elapsed;
     if (remaining < 250) await finish();
@@ -738,6 +871,7 @@ export function useInteractiveLedQueue({
     return () => {
       clearIntroTimers();
       clearCityvisionSlotTimer();
+      clearSencySequenceTimers();
     };
   }, [
     playbackEnabled,
@@ -745,6 +879,7 @@ export function useInteractiveLedQueue({
     ledDebug.holdStatic,
     ledDebug.holdLiveLayout,
     cityvisionMode,
+    sencySequenceMode,
   ]);
 
 
@@ -821,6 +956,10 @@ export function useInteractiveLedQueue({
         state.hint = true;
         state.queued = msg.queued ?? state.queued;
         if (introDoneRef.current) {
+          if (sencySequenceMode) {
+            render();
+            return;
+          }
           const queued = msg.queued ?? state.queued;
           if (
             !state.current &&
@@ -853,6 +992,7 @@ export function useInteractiveLedQueue({
       const state = stateRef.current;
       if (state.timer) clearTimeout(state.timer);
       clearCityvisionSlotTimer();
+      clearSencySequenceTimers();
     };
   }, [apiBaseUrl, code, ledKey, locationName]);
 

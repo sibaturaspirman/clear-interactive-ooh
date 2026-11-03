@@ -6,8 +6,15 @@ import {
   SENCY_LAYOUT_SHARED,
 } from "@/lib/led/sency/sency-layout";
 
-/** Background + logo — same for intro static and live (no fade on transition). */
-export function LedSencySharedLayers() {
+type LedSencySharedLayersProps = {
+  /** Intro clear logo — hidden during live (live uses `clearLive`). */
+  showIntroClear?: boolean;
+};
+
+/** Background + optional intro clear logo. */
+export function LedSencySharedLayers({
+  showIntroClear = true,
+}: LedSencySharedLayersProps) {
   return (
     <>
       <LedPublicImage
@@ -18,12 +25,14 @@ export function LedSencySharedLayers() {
         priority
         sizes={`${SENCY_CANVAS.width}px`}
       />
-      <LedSencyLayerImage
-        src={SENCY_ASSETS.clear}
-        alt="Clear x Oracle Red Bull Racing"
-        box={SENCY_LAYOUT_SHARED.clear}
-        className="object-contain object-left-top"
-      />
+      {showIntroClear ? (
+        <LedSencyLayerImage
+          src={SENCY_ASSETS.clear}
+          alt="Clear x Oracle Red Bull Racing"
+          box={SENCY_LAYOUT_SHARED.clear}
+          className="object-contain object-left-top"
+        />
+      ) : null}
     </>
   );
 }

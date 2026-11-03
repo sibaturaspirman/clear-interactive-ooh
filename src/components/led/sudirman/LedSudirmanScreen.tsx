@@ -11,7 +11,7 @@ import {
 } from "@/lib/led/sudirman/sudirman-layout";
 
 type LedSudirmanScreenProps = {
-  phase: "static" | "live";
+  phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;

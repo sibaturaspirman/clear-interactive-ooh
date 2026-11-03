@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { LedSencyLiveScreen } from "@/components/led/sency/LedSencyLiveScreen";
 import { LedSencySharedLayers } from "@/components/led/sency/LedSencySharedLayers";
+import { LedSencyOutroScreen } from "@/components/led/sency/LedSencyOutroScreen";
 import { LedSencyStaticScreen } from "@/components/led/sency/LedSencyStaticScreen";
 import {
   SENCY_LIVE_HANDOFF_MS,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/led/sency/sency-layout";
 
 type LedSencyScreenProps = {
-  phase: "static" | "live";
+  phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;
@@ -43,9 +44,11 @@ export function LedSencyScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedSencyScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
+  const showIntroClear = showStatic && !showOutro;
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export function LedSencyScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : SENCY_LIVE_LAYER_FADE_MS;
 
@@ -67,7 +70,7 @@ export function LedSencyScreen({
     <div className="relative size-full overflow-hidden">
       {debugActive ? ledDebugBadge(holdStatic, holdLiveLayout) : null}
       <div className="absolute inset-0 z-0">
-        <LedSencySharedLayers />
+        <LedSencySharedLayers showIntroClear={showIntroClear} />
       </div>
 
       {liveMounted ? (
@@ -109,6 +112,12 @@ export function LedSencyScreen({
           />
         </div>
       ) : null}
+
+      <LedSencyOutroScreen
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

@@ -11,7 +11,7 @@ import {
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
 
 type LedDukuhAtasScreenProps = {
-  phase: "static" | "live";
+  phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
   holdStatic?: boolean;

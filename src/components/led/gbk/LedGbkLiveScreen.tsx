@@ -117,9 +117,25 @@ export function LedGbkLiveScreen({
   return (
     <>
       <LedGbkLiveAnimatedLayer
+        box={GBK_LAYOUT_LIVE.clear}
+        layerId="clearLive"
+        enterOrder={0}
+        slideEnter="right"
+        liveEntered={liveEntered}
+        disableAnimations={disableAnimations}
+      >
+        <LedGbkLayerImage
+          src={GBK_ASSETS.clearLive}
+          alt="Clear Men Ultra"
+          box={GBK_LAYOUT_LIVE.clear}
+          fillSlot
+          className="object-contain object-left-top"
+        />
+      </LedGbkLiveAnimatedLayer>
+      <LedGbkLiveAnimatedLayer
         box={GBK_LAYOUT_LIVE.packGroup}
         layerId="packGroup"
-        enterOrder={0}
+        enterOrder={1}
         slideEnter="right"
         slideExitLeft
         exiting={packExiting}
@@ -155,7 +171,7 @@ export function LedGbkLiveScreen({
         <LedGbkLiveAnimatedLayer
           box={GBK_LAYOUT_LIVE.tagline}
           layerId="tagline"
-          enterOrder={1}
+          enterOrder={2}
           slideEnter="right"
           liveEntered={chromeEntered}
           disableAnimations={disableAnimations}
@@ -187,7 +203,7 @@ export function LedGbkLiveScreen({
         <LedGbkLiveAnimatedLayer
           box={qrBox}
           layerId="qrFrame"
-          enterOrder={2}
+          enterOrder={3}
           visible
           liveEntered={chromeEntered}
           disableAnimations={disableAnimations}
@@ -232,7 +248,7 @@ export function LedGbkLiveScreen({
             idleTalentSrc={idleTalentSrc}
             disableAnimations={disableAnimations}
             liveEntered={talentEntered}
-            enterOrder={3}
+            enterOrder={4}
           />
         )
       ) : null}

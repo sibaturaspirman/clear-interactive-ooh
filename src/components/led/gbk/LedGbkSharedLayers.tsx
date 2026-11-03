@@ -6,8 +6,14 @@ import {
   GBK_LAYOUT_SHARED,
 } from "@/lib/led/gbk/gbk-layout";
 
-/** Background + logo — same for intro static and live (no fade on transition). */
-export function LedGbkSharedLayers() {
+type LedGbkSharedLayersProps = {
+  showIntroClear?: boolean;
+};
+
+/** Background + optional intro clear logo. */
+export function LedGbkSharedLayers({
+  showIntroClear = true,
+}: LedGbkSharedLayersProps) {
   return (
     <>
       <LedPublicImage
@@ -18,12 +24,14 @@ export function LedGbkSharedLayers() {
         priority
         sizes={`${GBK_CANVAS.width}px`}
       />
-      <LedGbkLayerImage
-        src={GBK_ASSETS.clear}
-        alt="Clear x Oracle Red Bull Racing"
-        box={GBK_LAYOUT_SHARED.clear}
-        className="object-contain object-left-top"
-      />
+      {showIntroClear ? (
+        <LedGbkLayerImage
+          src={GBK_ASSETS.clear}
+          alt="Clear x Oracle Red Bull Racing"
+          box={GBK_LAYOUT_SHARED.clear}
+          className="object-contain object-left-top"
+        />
+      ) : null}
     </>
   );
 }

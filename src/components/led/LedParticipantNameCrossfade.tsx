@@ -27,16 +27,20 @@ export function LedParticipantNameCrossfade({
   disableAnimations = false,
   layoutDebug = false,
 }: LedParticipantNameCrossfadeProps) {
-  const display = nama?.trim();
-  const isSubmission = Boolean(display && playbackQueueId != null);
+  const trimmed = nama?.trim();
+  const isSubmission = Boolean(trimmed && playbackQueueId != null);
 
-  const { fadeMode, fadeInMs, fadeOutMs } = useLedSubmissionPlaybackFade({
-    isSubmission,
-    playbackQueueId,
-    playMs,
-    disableAnimations,
-    layoutDebug: layoutDebug && Boolean(display),
-  });
+  const { fadeMode, fadeInMs, fadeOutMs, displayNama } =
+    useLedSubmissionPlaybackFade({
+      isSubmission,
+      playbackQueueId,
+      playMs,
+      nama: trimmed,
+      disableAnimations,
+      layoutDebug: layoutDebug && Boolean(trimmed),
+    });
+
+  const display = layoutDebug ? trimmed : displayNama;
 
   if (!display) {
     return null;

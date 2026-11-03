@@ -5,9 +5,18 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** GBK LED canvas — matches `gbk-bg.jpg` (1680×840). */
 export const GBK_CANVAS = LED_CANVAS_BY_CODE.gbk;
 
-export const GBK_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const GBK_DUMMY_PLAY_MS = GBK_STATIC_DURATION_MS;
+/** Intro hold — loop: 4s intro → 9s live → 4s outro. */
+export const GBK_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (non-sequence / legacy). */
+export const GBK_DUMMY_PLAY_MS = 5000;
+export const GBK_SEQUENCE = {
+  introMs: 4000,
+  liveMs: 9000,
+  outroMs: 4000,
+  submissionMs: 3000,
+  slotMs: 17000,
+} as const;
+export const GBK_OUTRO_FADE_IN_MS = 800;
 export const GBK_STATIC_FADE_IN_MS = 800;
 export const GBK_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -52,6 +61,8 @@ export function gbkLiveTalentZoomMs(playMs: number): number {
 export const GBK_ASSETS = {
   background: "/images/led/gbk-bg.jpg",
   clear: "/images/led/gbk-clear.png",
+  clearLive: "/images/led/gbk-logo-clear-live.png",
+  end: "/images/led/gbk-end.jpg",
   packGroup: "/images/led/gbk-clear-pack-group.png",
   pack: "/images/led/gbk-clear-pack.png",
   talent: "/images/led/gbk-talent.png",

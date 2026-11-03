@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedGbkScreen } from "@/components/led/gbk/LedGbkScreen";
 import { GBK_ASSETS } from "@/lib/led/gbk/gbk-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,11 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedGbkPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(GBK_ASSETS.end);
+    void preloadLedMediaUrl(GBK_ASSETS.clearLive);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

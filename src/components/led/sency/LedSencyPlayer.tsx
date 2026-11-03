@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedSencyScreen } from "@/components/led/sency/LedSencyScreen";
 import { SENCY_ASSETS } from "@/lib/led/sency/sency-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,11 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedSencyPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(SENCY_ASSETS.end);
+    void preloadLedMediaUrl(SENCY_ASSETS.clearLive);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

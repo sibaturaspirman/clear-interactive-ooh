@@ -118,10 +118,8 @@ export function LedSencyTalentCrossfade({
     prevQueueIdRef.current = queueId;
 
     if (prevId != null && prevId !== queueId) {
-      startExitPhase();
-      swapRef.current = setTimeout(() => {
-        beginEnter(url, playMs);
-      }, SENCY_STATIC_FADE_OUT_MS);
+      // Previous submission already faded out at end of its playMs — enter next immediately.
+      beginEnter(url, playMs);
       return clearTimers;
     }
 
