@@ -104,6 +104,8 @@
   var dummyPlayed = false;
   var pulling = false;
   var prevPlaybackQueueId = null;
+  var talentShowGen = 0;
+  var preloadCache = {};
 
   var stageEl = null;
   var staticRoot = null;
@@ -544,6 +546,82 @@
     return Boolean(url && queueId != null && queueId > 0);
   }
 
+  function isVideoMediaUrl(url) {
+    return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url || "");
+  }
+
+  function preloadMediaUrl(url, done) {
+    var trimmed = (url || "").trim();
+    if (!trimmed) {
+      if (done) done();
+      return;
+    }
+    if (Object.hasOwn(preloadCache, trimmed)) {
+      preloadCache[trimmed].then(function () {
+        if (done) done();
+      });
+      return;
+    }
+    preloadCache[trimmed] = new Promise(function (resolve) {
+      if (isVideoMediaUrl(trimmed)) {
+        var video = document.createElement("video");
+        video.preload = "auto";
+        video.muted = true;
+        video.playsInline = true;
+        var finish = function () {
+          resolve();
+        };
+        video.addEventListener("loadeddata", finish, { once: true });
+        video.addEventListener("error", finish, { once: true });
+        video.src = trimmed;
+        video.load();
+        return;
+      }
+      var img = new Image();
+      if (img.decoding) img.decoding = "async";
+      var finish = function () {
+        resolve();
+      };
+      img.addEventListener("load", finish, { once: true });
+      img.addEventListener("error", finish, { once: true });
+      img.src = trimmed;
+    });
+    preloadCache[trimmed].then(function () {
+      if (done) done();
+    });
+  }
+
+  function preloadQueueItems(items) {
+    if (!items || !items.length) return;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] && items[i].url) preloadMediaUrl(items[i].url, null);
+    }
+  }
+
+  function mountTalentImgWhenReady(url, whenReady) {
+    preloadMediaUrl(url, function () {
+      if (!talentPhotoImg) return;
+
+      function ready() {
+        if (whenReady) whenReady();
+      }
+
+      function onDone() {
+        talentPhotoImg.onload = null;
+        talentPhotoImg.onerror = null;
+        ready();
+      }
+
+      talentPhotoImg.onload = onDone;
+      talentPhotoImg.onerror = onDone;
+      talentPhotoImg.src = url;
+
+      if (talentPhotoImg.complete && talentPhotoImg.naturalWidth > 0) {
+        onDone();
+      }
+    });
+  }
+
   function hideLiveTalentSlot() {
     if (!talentPhotoEl || !talentPhotoImg) return;
     clearTalentTimers();
@@ -650,9 +728,10 @@
     }
   }
 
-  function showTalentPhoto(url, queueId, durationMs) {
+  function showTalentPhoto(url, queueId, durationMs, whenShown) {
     if (!talentPhotoImg || !talentPhotoEl) return;
     clearTalentTimers();
+    var showGen = ++talentShowGen;
 
     if (
       introDone &&
@@ -667,8 +746,11 @@
     if (isDummyPlayback(url, queueId)) {
       prevPlaybackQueueId = -1;
       talentPhotoEl.style.visibility = "visible";
-      talentPhotoImg.src = url;
-      applyTalentFadeClass("show");
+      mountTalentImgWhenReady(url, function () {
+        if (showGen !== talentShowGen) return;
+        applyTalentFadeClass("show");
+        if (whenShown) whenShown();
+      });
       return;
     }
 
@@ -688,11 +770,14 @@
     talentPhotoEl.style.visibility = "visible";
 
     function beginEnter() {
-      talentPhotoImg.src = url;
-      applyTalentFadeClass("in");
-      talentExitTimer = setTimeout(function () {
-        applyTalentFadeClass("out");
-      }, Math.max(0, durationMs - timing.fadeOutMs));
+      mountTalentImgWhenReady(url, function () {
+        if (showGen !== talentShowGen) return;
+        applyTalentFadeClass("in");
+        talentExitTimer = setTimeout(function () {
+          applyTalentFadeClass("out");
+        }, Math.max(0, durationMs - timing.fadeOutMs));
+        if (whenShown) whenShown();
+      });
     }
 
     if (prevId != null && prevId > 0 && prevId !== queueId) {
@@ -731,16 +816,20 @@
           if (data.mode === "fresh") {
             replaying = false;
             if (data.items && data.items.length) {
+              var buffered = [];
               for (var i = 0; i < data.items.length; i++) {
                 var item = data.items[i];
                 if (!heldQueueId(item.queue_id) && slots() > 0) {
                   upcoming.push(item);
+                  buffered.push(item);
                 }
               }
+              preloadQueueItems(buffered);
             }
           } else if (data.mode === "replay" && replay && data.items) {
             replaying = true;
             upcoming = data.items.slice();
+            preloadQueueItems(upcoming);
           }
         });
       })
@@ -839,19 +928,26 @@
     }
 
     if (upcoming.length > 0) {
-      currentItem = upcoming.shift();
+      var playing = upcoming.shift();
+      currentItem = playing;
       liveHadPlayback = true;
-      setParticipantName(
-        currentItem.nama || "",
-        currentItem.queue_id,
-        itemPlayMs(currentItem),
-      );
+      hideLiveTalentSlot();
+      hideParticipantName();
       showTalentPhoto(
-        currentItem.url,
-        currentItem.queue_id,
-        itemPlayMs(currentItem),
+        playing.url,
+        playing.queue_id,
+        itemPlayMs(playing),
+        function () {
+          if (currentItem !== playing) return;
+          if (!introDone || slotFrozen) return;
+          setParticipantName(
+            playing.nama || "",
+            playing.queue_id,
+            itemPlayMs(playing),
+          );
+          armCurrent(itemPlayMs(playing));
+        },
       );
-      armCurrent(itemPlayMs(currentItem));
       return;
     }
 
@@ -867,8 +963,16 @@
         url: site.assets.dummyTalent,
         nama: "",
       };
-      showTalentPhoto(site.assets.dummyTalent, -1, timing.dummyPlayMs);
-      armCurrent(timing.dummyPlayMs);
+      showTalentPhoto(
+        site.assets.dummyTalent,
+        -1,
+        timing.dummyPlayMs,
+        function () {
+          if (currentItem && currentItem.queue_id === -1) {
+            armCurrent(timing.dummyPlayMs);
+          }
+        },
+      );
       return;
     }
 
