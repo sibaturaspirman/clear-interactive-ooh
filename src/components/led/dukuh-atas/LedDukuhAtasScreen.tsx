@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 
 import { LedDukuhAtasLiveScreen } from "@/components/led/dukuh-atas/LedDukuhAtasLiveScreen";
 import { LedDukuhAtasSharedLayers } from "@/components/led/dukuh-atas/LedDukuhAtasSharedLayers";
+import { LedEndJpgOutroScreen } from "@/components/led/LedEndJpgOutroScreen";
 import { LedDukuhAtasStaticScreen } from "@/components/led/dukuh-atas/LedDukuhAtasStaticScreen";
 import {
+  DUKUH_ATAS_ASSETS,
+  DUKUH_ATAS_CANVAS,
   DUKUH_ATAS_LIVE_HANDOFF_MS,
   DUKUH_ATAS_LIVE_LAYER_FADE_MS,
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
@@ -43,9 +46,11 @@ export function LedDukuhAtasScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedDukuhAtasScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
+  const showIntroClear = showStatic && !showOutro;
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export function LedDukuhAtasScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : DUKUH_ATAS_LIVE_LAYER_FADE_MS;
 
@@ -67,7 +72,7 @@ export function LedDukuhAtasScreen({
     <div className="relative size-full overflow-hidden">
       {debugActive ? ledDebugBadge(holdStatic, holdLiveLayout) : null}
       <div className="absolute inset-0 z-0">
-        <LedDukuhAtasSharedLayers />
+        <LedDukuhAtasSharedLayers showIntroClear={showIntroClear} />
       </div>
 
       {liveMounted ? (
@@ -109,6 +114,14 @@ export function LedDukuhAtasScreen({
           />
         </div>
       ) : null}
+
+      <LedEndJpgOutroScreen
+        endSrc={DUKUH_ATAS_ASSETS.end}
+        canvasWidth={DUKUH_ATAS_CANVAS.width}
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

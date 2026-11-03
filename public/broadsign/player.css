@@ -76,6 +76,16 @@ body {
   pointer-events: none;
 }
 
+.bs-outro-root {
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 800ms ease-out;
+}
+
+.bs-outro-root:not(.bs-static-hidden) {
+  opacity: 1;
+}
+
 .bs-participant-name {
   position: absolute;
   overflow: hidden;

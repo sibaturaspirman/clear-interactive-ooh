@@ -72,6 +72,9 @@
     return base + "/api/led/" + encodeURIComponent(code) + suffix;
   }
   var timing = site.timing;
+  var isSequenceLoop = Boolean(
+    timing.liveDurationMs && timing.submissionPlayMs,
+  );
 
   var MOTION = {
     liveEnterMs: 900,
@@ -125,6 +128,20 @@
   var nameTextEl = null;
   var prevNameQueueId = null;
   var nameExitTimer = 0;
+  var outroRoot = null;
+  var liveSegmentTimer = 0;
+  var outroTimer = 0;
+  var liveSegmentEnd = 0;
+  var liveSegmentPlayMs = 3000;
+
+  function planLiveSegmentPlayback() {
+    var n = upcoming.length + (currentItem ? 1 : 0);
+    var slots = n === 0 ? 1 : Math.min(3, n);
+    var liveMs = timing.liveDurationMs || 9000;
+    if (slots <= 1) liveSegmentPlayMs = liveMs;
+    else if (slots === 2) liveSegmentPlayMs = liveMs / 2;
+    else liveSegmentPlayMs = timing.submissionPlayMs || 3000;
+  }
 
   function boxStyle(box) {
     return (
@@ -215,7 +232,11 @@
       true,
     );
 
-    if (site.clearMode === "dual" && site.layout.shared) {
+    if (
+      site.clearMode === "dual" &&
+      site.layout.shared &&
+      !site.assets.clearLive
+    ) {
       addImg(stageEl, site.assets.clear, site.layout.shared.clearLeft);
       addImg(stageEl, site.assets.clear, site.layout.shared.clearRight);
     } else if (
@@ -233,16 +254,48 @@
     var lv = site.layout.live;
     if (site.clearMode === "split" && lv.clear && site.assets.clearLive) {
       addLiveMotionLayer(liveRoot, site.assets.clearLive, lv.clear, null, 0);
-    } else if (site.clearMode === "shared" && lv.clear && site.assets.clear) {
-      addLiveMotionLayer(liveRoot, site.assets.clear, lv.clear, null, 0);
+    } else if (
+      site.clearMode === "dual" &&
+      site.assets.clearLive &&
+      lv.clearLeft &&
+      lv.clearRight
+    ) {
+      addLiveMotionLayer(
+        liveRoot,
+        site.assets.clearLive,
+        lv.clearLeft,
+        null,
+        0,
+      );
+      addLiveMotionLayer(
+        liveRoot,
+        site.assets.clearLive,
+        lv.clearRight,
+        null,
+        0,
+      );
+    } else if (site.clearMode === "shared" && lv.clear) {
+      var liveClearAsset = site.assets.clearLive || site.assets.clear;
+      if (liveClearAsset) {
+        addLiveMotionLayer(liveRoot, liveClearAsset, lv.clear, null, 0);
+      }
     }
 
+    var hasLiveClearLayer =
+      (site.clearMode === "split" && lv.clear && site.assets.clearLive) ||
+      (site.clearMode === "dual" &&
+        site.assets.clearLive &&
+        lv.clearLeft &&
+        lv.clearRight) ||
+      (site.clearMode === "shared" &&
+        lv.clear &&
+        (site.assets.clearLive || site.assets.clear));
     packGroupEl = addLiveMotionLayer(
       liveRoot,
       site.assets.packGroup,
       lv.packGroup,
       "led-bei-live-pack-float",
-      1,
+      hasLiveClearLayer ? 1 : 0,
     );
     setMotionVars(packGroupEl, {
       "--bei-live-pack-float-ms": MOTION.livePackFloatMs + "ms",
@@ -341,6 +394,21 @@
       addImg(staticContentEl, site.assets.clearStatic, st.clear);
     } else if (site.clearMode === "shared" && st.clear && site.assets.clear) {
       addImg(staticContentEl, site.assets.clear, st.clear);
+    } else if (
+      site.clearMode === "dual" &&
+      site.assets.clearLive &&
+      site.layout.shared
+    ) {
+      addImg(
+        staticContentEl,
+        site.assets.clear,
+        site.layout.shared.clearLeft,
+      );
+      addImg(
+        staticContentEl,
+        site.assets.clear,
+        site.layout.shared.clearRight,
+      );
     }
 
     packMotionEl = document.createElement("div");
@@ -388,6 +456,24 @@
     textLayer.appendChild(textImg);
     staticForegroundEl.appendChild(textLayer);
 
+    if (site.assets.end) {
+      outroRoot = document.createElement("div");
+      outroRoot.className = "bs-static-root bs-outro-root bs-static-hidden";
+      stageEl.appendChild(outroRoot);
+      addImg(
+        outroRoot,
+        site.assets.end,
+        {
+          left: 0,
+          top: 0,
+          width: site.canvas.width,
+          height: site.canvas.height,
+        },
+        null,
+        true,
+      );
+    }
+
     scaleStage();
     window.addEventListener("resize", scaleStage);
     preloadAssets();
@@ -410,15 +496,21 @@
     if (a.clear) urls.push(a.clear);
     if (a.clearStatic) urls.push(a.clearStatic);
     if (a.clearLive) urls.push(a.clearLive);
+    if (a.end) urls.push(a.end);
     for (var i = 0; i < urls.length; i++) {
       var im = new Image();
       im.src = urls[i];
     }
   }
 
+  function queueCapacity() {
+    if (isSequenceLoop) return Math.min(bufferSize, 3);
+    return bufferSize;
+  }
+
   function slots() {
     var held = (currentItem ? 1 : 0) + upcoming.length;
-    return Math.max(0, bufferSize - held);
+    return Math.max(0, queueCapacity() - held);
   }
 
   function heldQueueId(queueId) {
@@ -452,6 +544,11 @@
   }
 
   function capPlayMs(requested) {
+    if (isSequenceLoop && liveSegmentEnd) {
+      var liveLeft = liveSegmentEnd - Date.now();
+      if (liveLeft <= 0) return 800;
+      return Math.max(800, Math.min(requested, liveLeft));
+    }
     if (!slotStart) return requested;
     var elapsed = Date.now() - slotStart;
     var budget = timing.slotPlayableMs - elapsed;
@@ -496,6 +593,20 @@
     if (!staticRoot) return;
     if (visible) staticRoot.classList.remove("bs-static-hidden");
     else staticRoot.classList.add("bs-static-hidden");
+  }
+
+  function showOutro(visible) {
+    if (!outroRoot) return;
+    if (visible) outroRoot.classList.remove("bs-static-hidden");
+    else outroRoot.classList.add("bs-static-hidden");
+  }
+
+  function clearSequencePhaseTimers() {
+    if (liveSegmentTimer) clearTimeout(liveSegmentTimer);
+    liveSegmentTimer = 0;
+    if (outroTimer) clearTimeout(outroTimer);
+    outroTimer = 0;
+    liveSegmentEnd = 0;
   }
 
   function resetStaticMotion() {
@@ -686,8 +797,7 @@
     }
 
     if (prevId != null && prevId > 0 && prevId !== queueId) {
-      applyNameFadeClass("out");
-      nameExitTimer = setTimeout(beginNameIn, timing.fadeOutMs);
+      beginNameIn();
       return;
     }
 
@@ -781,8 +891,7 @@
     }
 
     if (prevId != null && prevId > 0 && prevId !== queueId) {
-      applyTalentFadeClass("out");
-      talentSwapTimer = setTimeout(beginEnter, timing.fadeOutMs);
+      beginEnter();
       return;
     }
 
@@ -811,7 +920,7 @@
       .then(function (res) {
         return res.json().then(function (data) {
           if (!res.ok) throw new Error(data.message || "pull failed");
-          if (data.play_ms) playMs = data.play_ms;
+          if (data.play_ms && !isSequenceLoop) playMs = data.play_ms;
           if (data.buffer_size) bufferSize = data.buffer_size;
           if (data.mode === "fresh") {
             replaying = false;
@@ -889,19 +998,57 @@
 
   function finishCurrent() {
     var done = currentItem;
-    currentItem = null;
-    if (playTimer) clearTimeout(playTimer);
     if (done && done.queue_id > 0 && !replaying) {
       ackQueue(done.queue_id);
     }
     if (done && done.queue_id === -1) {
+      currentItem = null;
+      if (playTimer) clearTimeout(playTimer);
       hideLiveTalentSlot();
       hideParticipantName();
-      maybeScheduleIntroAfterIdle();
+      if (!isSequenceLoop) maybeScheduleIntroAfterIdle();
       return;
     }
+    if (
+      isSequenceLoop &&
+      !slotFrozen &&
+      introDone &&
+      upcoming.length > 0
+    ) {
+      if (playTimer) clearTimeout(playTimer);
+      playTimer = 0;
+      var next = upcoming.shift();
+      currentItem = next;
+      liveHadPlayback = true;
+      hideLiveTalentSlot();
+      hideParticipantName();
+      showTalentPhoto(
+        next.url,
+        next.queue_id,
+        itemPlayMs(next),
+        function () {
+          if (currentItem !== next) return;
+          if (!introDone || slotFrozen) return;
+          setParticipantName(
+            next.nama || "",
+            next.queue_id,
+            itemPlayMs(next),
+          );
+          armCurrent(itemPlayMs(next));
+        },
+      );
+      return;
+    }
+    currentItem = null;
+    if (playTimer) clearTimeout(playTimer);
     tryStartPlayback();
-    if (!currentItem && upcoming.length === 0 && introDone && liveHadPlayback) {
+    if (
+      !isSequenceLoop &&
+      !currentItem &&
+      upcoming.length === 0 &&
+      introDone &&
+      liveHadPlayback
+    ) {
       maybeScheduleIntroAfterIdle();
     }
   }
@@ -913,7 +1060,11 @@
   }
 
   function itemPlayMs(item) {
-    if (item && item.queue_id === -1) return timing.dummyPlayMs;
+    if (item && item.queue_id === -1) {
+      if (isSequenceLoop) return timing.liveDurationMs || 9000;
+      return timing.dummyPlayMs;
+    }
+    if (isSequenceLoop) return liveSegmentPlayMs;
     return playMs;
   }
 
@@ -954,7 +1105,34 @@
     hideParticipantName();
     hideLiveTalentSlot();
 
-    if (!dummyPlayed && !liveHadPlayback) {
+    if (
+      isSequenceLoop &&
+      !dummyPlayed &&
+      upcoming.length === 0
+    ) {
+      dummyPlayed = true;
+      liveHadPlayback = true;
+      currentItem = {
+        queue_id: -1,
+        submission_id: 0,
+        url: site.assets.dummyTalent,
+        nama: "",
+      };
+      var dummyMs = itemPlayMs(currentItem);
+      showTalentPhoto(
+        site.assets.dummyTalent,
+        -1,
+        dummyMs,
+        function () {
+          if (currentItem && currentItem.queue_id === -1) {
+            armCurrent(dummyMs);
+          }
+        },
+      );
+      return;
+    }
+
+    if (!isSequenceLoop && !dummyPlayed && !liveHadPlayback) {
       dummyPlayed = true;
       liveHadPlayback = true;
       currentItem = {
@@ -976,9 +1154,45 @@
       return;
     }
 
-    if (liveHadPlayback) {
+    if (!isSequenceLoop && liveHadPlayback) {
       scheduleIntroAfterIdle();
     }
+  }
+
+  function endLiveSegment() {
+    liveSegmentTimer = 0;
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = 0;
+    }
+    if (playTimer) clearTimeout(playTimer);
+    playTimer = 0;
+    if (currentItem && currentItem.queue_id > 0 && !replaying) {
+      ackQueue(currentItem.queue_id);
+    }
+    currentItem = null;
+    clearTalentTimers();
+    hideLiveTalentSlot();
+    hideParticipantName();
+    upcoming = [];
+    runOutroPhase();
+  }
+
+  function runOutroPhase() {
+    if (!isSequenceLoop) {
+      scheduleIntroAfterIdle();
+      return;
+    }
+    introDone = false;
+    showLive(false);
+    showStatic(false);
+    showOutro(true);
+    if (outroTimer) clearTimeout(outroTimer);
+    outroTimer = setTimeout(function () {
+      outroTimer = 0;
+      showOutro(false);
+      runIntroCycle();
+    }, timing.outroDurationMs || 4000);
   }
 
   function scheduleIntroAfterIdle() {
@@ -989,6 +1203,8 @@
 
   function runIntroCycle() {
     if (!started || introRunning) return;
+    clearSequencePhaseTimers();
+    showOutro(false);
     resetCityvisionSlotForIntro();
     introRunning = true;
     if (pollTimer) {
@@ -1033,7 +1249,15 @@
     introRunning = false;
     introDone = true;
     showStatic(false);
+    showOutro(false);
     showLive(true);
+    if (isSequenceLoop) {
+      planLiveSegmentPlayback();
+      var liveMs = timing.liveDurationMs || 9000;
+      liveSegmentEnd = Date.now() + liveMs;
+      if (liveSegmentTimer) clearTimeout(liveSegmentTimer);
+      liveSegmentTimer = setTimeout(endLiveSegment, liveMs);
+    }
     tryStartPlayback();
     if (pollTimer) clearInterval(pollTimer);
     pollTimer = setInterval(function () {

@@ -117,9 +117,41 @@ export function LedDukuhAtasLiveScreen({
   return (
     <>
       <LedDukuhAtasLiveAnimatedLayer
+        box={DUKUH_ATAS_LAYOUT_LIVE.clearLeft}
+        layerId="clearLiveLeft"
+        enterOrder={0}
+        slideEnter="right"
+        liveEntered={liveEntered}
+        disableAnimations={disableAnimations}
+      >
+        <LedDukuhAtasLayerImage
+          src={DUKUH_ATAS_ASSETS.clearLive}
+          alt="Clear Men Ultra"
+          box={DUKUH_ATAS_LAYOUT_LIVE.clearLeft}
+          fillSlot
+          className="object-contain object-left-top"
+        />
+      </LedDukuhAtasLiveAnimatedLayer>
+      <LedDukuhAtasLiveAnimatedLayer
+        box={DUKUH_ATAS_LAYOUT_LIVE.clearRight}
+        layerId="clearLiveRight"
+        enterOrder={0}
+        slideEnter="right"
+        liveEntered={liveEntered}
+        disableAnimations={disableAnimations}
+      >
+        <LedDukuhAtasLayerImage
+          src={DUKUH_ATAS_ASSETS.clearLive}
+          alt="Clear Men Ultra"
+          box={DUKUH_ATAS_LAYOUT_LIVE.clearRight}
+          fillSlot
+          className="object-contain object-left-top"
+        />
+      </LedDukuhAtasLiveAnimatedLayer>
+      <LedDukuhAtasLiveAnimatedLayer
         box={DUKUH_ATAS_LAYOUT_LIVE.packGroup}
         layerId="packGroup"
-        enterOrder={0}
+        enterOrder={1}
         slideEnter="right"
         slideExitLeft
         exiting={packExiting}
@@ -155,7 +187,7 @@ export function LedDukuhAtasLiveScreen({
         <LedDukuhAtasLiveAnimatedLayer
           box={DUKUH_ATAS_LAYOUT_LIVE.tagline}
           layerId="tagline"
-          enterOrder={1}
+          enterOrder={2}
           slideEnter="right"
           liveEntered={chromeEntered}
           disableAnimations={disableAnimations}
@@ -187,7 +219,7 @@ export function LedDukuhAtasLiveScreen({
         <LedDukuhAtasLiveAnimatedLayer
           box={qrBox}
           layerId="qrFrame"
-          enterOrder={2}
+          enterOrder={3}
           visible
           liveEntered={chromeEntered}
           disableAnimations={disableAnimations}
@@ -232,7 +264,7 @@ export function LedDukuhAtasLiveScreen({
             idleTalentSrc={idleTalentSrc}
             disableAnimations={disableAnimations}
             liveEntered={talentEntered}
-            enterOrder={3}
+            enterOrder={4}
           />
         )
       ) : null}

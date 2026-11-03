@@ -5,9 +5,9 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Sudirman LED canvas — matches `sudirman-bg.jpg` (4200×1200). */
 export const SUDIRMAN_CANVAS = LED_CANVAS_BY_CODE.sudirman;
 
-export const SUDIRMAN_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const SUDIRMAN_DUMMY_PLAY_MS = SUDIRMAN_STATIC_DURATION_MS;
+export const SUDIRMAN_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (legacy). */
+export const SUDIRMAN_DUMMY_PLAY_MS = 5000;
 export const SUDIRMAN_STATIC_FADE_IN_MS = 800;
 export const SUDIRMAN_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -65,6 +65,7 @@ export const SUDIRMAN_ASSETS = {
   qrFrame: "/images/led/sudirman-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/sudirman` (see `npm run led:sudirman-qr`). */
   qrCode: ledStaticImage("/images/led/sudirman-qr.png"),
+  end: "/images/led/sudirman-end.jpg",
 } as const;
 
 /** Intro static — relayout via `?debug=static`. */

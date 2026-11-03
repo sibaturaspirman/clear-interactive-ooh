@@ -5,9 +5,9 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** BEI LED canvas — matches `bei-bg.jpg`. */
 export const BEI_CANVAS = LED_CANVAS_BY_CODE.bei;
 
-export const BEI_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const BEI_DUMMY_PLAY_MS = BEI_STATIC_DURATION_MS;
+export const BEI_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (legacy). */
+export const BEI_DUMMY_PLAY_MS = 5000;
 export const BEI_STATIC_FADE_IN_MS = 800;
 export const BEI_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -62,6 +62,7 @@ export const BEI_ASSETS = {
   qrFrame: "/images/led/bei-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
   qrCode: ledStaticImage("/images/led/bei-qr.png"),
+  end: "/images/led/bei-end.jpg",
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */

@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedSudirmanScreen } from "@/components/led/sudirman/LedSudirmanScreen";
 import { SUDIRMAN_ASSETS } from "@/lib/led/sudirman/sudirman-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,10 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedSudirmanPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(SUDIRMAN_ASSETS.end);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

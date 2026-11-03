@@ -5,9 +5,9 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (6000×432). */
 export const DUKUH_ATAS_CANVAS = LED_CANVAS_BY_CODE["dukuh-atas"];
 
-export const DUKUH_ATAS_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const DUKUH_ATAS_DUMMY_PLAY_MS = DUKUH_ATAS_STATIC_DURATION_MS;
+export const DUKUH_ATAS_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (legacy). */
+export const DUKUH_ATAS_DUMMY_PLAY_MS = 5000;
 export const DUKUH_ATAS_STATIC_FADE_IN_MS = 800;
 export const DUKUH_ATAS_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -52,6 +52,7 @@ export function dukuhAtasLiveTalentZoomMs(playMs: number): number {
 export const DUKUH_ATAS_ASSETS = {
   background: "/images/led/dukuh-atas-bg.jpg",
   clear: "/images/led/dukuh-atas-clear.png",
+  clearLive: "/images/led/dukuh-atas-logo-clear-live.png",
   packGroup: "/images/led/dukuh-atas-clear-pack-group.png",
   pack: "/images/led/dukuh-atas-clear-pack.png",
   talent: "/images/led/dukuh-atas-talent.png",
@@ -62,6 +63,7 @@ export const DUKUH_ATAS_ASSETS = {
   qrFrame: "/images/led/dukuh-atas-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/dukuh-atas` (see `npm run led:dukuh-atas-qr`). */
   qrCode: ledStaticImage("/images/led/dukuh-atas-qr.png"),
+  end: "/images/led/dukuh-atas-end.jpg",
 } as const;
 
 /** Dual Clear logos — scaled from 4096×295; tune via debug modes. */
@@ -79,6 +81,8 @@ export const DUKUH_ATAS_LAYOUT_STATIC = {
 
 /** Idle QR + queue playback (talent from API). */
 export const DUKUH_ATAS_LAYOUT_LIVE = {
+  clearLeft: DUKUH_ATAS_LAYOUT_SHARED.clearLeft,
+  clearRight: DUKUH_ATAS_LAYOUT_SHARED.clearRight,
   packGroup: { left: 1206, top: 0, width: 658, height: 445 },
   talent: { left: 2067, top: 0, width: 439, height: 439 },
   tagline: { left: 2788, top: 25, width: 788, height: 384 },

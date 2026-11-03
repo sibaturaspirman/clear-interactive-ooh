@@ -1,15 +1,15 @@
 import {
-  CITYVISION_PLAYABLE_MS,
-} from "@/lib/led/cityvision/cityvision-timing";
+  LED_SEQUENCE,
+  LED_SEQUENCE_LIVE_START_AT_MS,
+  LED_SEQUENCE_STATIC_DURATION_MS,
+  LED_SEQUENCE_STATIC_FADE_OUT_MS,
+} from "@/lib/led/led-sequence-loop";
 import {
   DUKUH_ATAS_ASSETS,
   DUKUH_ATAS_LAYOUT_LIVE,
   DUKUH_ATAS_LAYOUT_SHARED,
   DUKUH_ATAS_LAYOUT_STATIC,
   DUKUH_ATAS_CANVAS,
-  DUKUH_ATAS_STATIC_DURATION_MS,
-  DUKUH_ATAS_STATIC_FADE_OUT_MS,
-  DUKUH_ATAS_LIVE_START_AT_MS,
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
 import {
   RATU_PLAZA_ASSETS,
@@ -17,18 +17,12 @@ import {
   RATU_PLAZA_LAYOUT_SHARED,
   RATU_PLAZA_LAYOUT_STATIC,
   RATU_PLAZA_CANVAS,
-  RATU_PLAZA_STATIC_DURATION_MS,
-  RATU_PLAZA_STATIC_FADE_OUT_MS,
-  RATU_PLAZA_LIVE_START_AT_MS,
 } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 import {
   SUDIRMAN_ASSETS,
   SUDIRMAN_LAYOUT_LIVE,
   SUDIRMAN_LAYOUT_STATIC,
   SUDIRMAN_CANVAS,
-  SUDIRMAN_STATIC_DURATION_MS,
-  SUDIRMAN_STATIC_FADE_OUT_MS,
-  SUDIRMAN_LIVE_START_AT_MS,
 } from "@/lib/led/sudirman/sudirman-layout";
 import {
   BEI_ASSETS,
@@ -36,20 +30,20 @@ import {
   BEI_LAYOUT_SHARED,
   BEI_LAYOUT_STATIC,
   BEI_CANVAS,
-  BEI_STATIC_DURATION_MS,
-  BEI_STATIC_FADE_OUT_MS,
-  BEI_LIVE_START_AT_MS,
 } from "@/lib/led/bei/bei-layout";
 import { isCityvisionLedLocation } from "@/lib/led/led-vendors";
 import type { BroadsignSitePayload } from "@/lib/broadsign-led/types";
 
-function timing(staticMs: number, fadeOutMs: number, liveStartMs: number) {
+function sequenceTiming() {
   return {
-    staticDurationMs: staticMs,
-    fadeOutMs,
-    liveStartMs,
-    slotPlayableMs: CITYVISION_PLAYABLE_MS,
-    dummyPlayMs: staticMs,
+    staticDurationMs: LED_SEQUENCE_STATIC_DURATION_MS,
+    fadeOutMs: LED_SEQUENCE_STATIC_FADE_OUT_MS,
+    liveStartMs: LED_SEQUENCE_LIVE_START_AT_MS,
+    slotPlayableMs: LED_SEQUENCE.slotMs,
+    dummyPlayMs: LED_SEQUENCE.submissionMs,
+    liveDurationMs: LED_SEQUENCE.liveMs,
+    outroDurationMs: LED_SEQUENCE.outroMs,
+    submissionPlayMs: LED_SEQUENCE.submissionMs,
   };
 }
 
@@ -57,15 +51,12 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
   "dukuh-atas": {
     code: "dukuh-atas",
     canvas: { width: DUKUH_ATAS_CANVAS.width, height: DUKUH_ATAS_CANVAS.height },
-    timing: timing(
-      DUKUH_ATAS_STATIC_DURATION_MS,
-      DUKUH_ATAS_STATIC_FADE_OUT_MS,
-      DUKUH_ATAS_LIVE_START_AT_MS,
-    ),
+    timing: sequenceTiming(),
     clearMode: "dual",
     assets: {
       background: DUKUH_ATAS_ASSETS.background,
       clear: DUKUH_ATAS_ASSETS.clear,
+      clearLive: DUKUH_ATAS_ASSETS.clearLive,
       pack: DUKUH_ATAS_ASSETS.pack,
       packGroup: DUKUH_ATAS_ASSETS.packGroup,
       talent: DUKUH_ATAS_ASSETS.talent,
@@ -74,6 +65,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       qrFrame: DUKUH_ATAS_ASSETS.qrFrame,
       qrCode: DUKUH_ATAS_ASSETS.qrCode,
       dummyTalent: DUKUH_ATAS_ASSETS.layoutTalentDummy,
+      end: DUKUH_ATAS_ASSETS.end,
     },
     layout: {
       shared: {
@@ -86,6 +78,8 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
         text: { ...DUKUH_ATAS_LAYOUT_STATIC.text },
       },
       live: {
+        clearLeft: { ...DUKUH_ATAS_LAYOUT_LIVE.clearLeft },
+        clearRight: { ...DUKUH_ATAS_LAYOUT_LIVE.clearRight },
         packGroup: { ...DUKUH_ATAS_LAYOUT_LIVE.packGroup },
         talent: { ...DUKUH_ATAS_LAYOUT_LIVE.talent },
         tagline: { ...DUKUH_ATAS_LAYOUT_LIVE.tagline },
@@ -98,11 +92,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
   "ratu-plaza": {
     code: "ratu-plaza",
     canvas: { width: RATU_PLAZA_CANVAS.width, height: RATU_PLAZA_CANVAS.height },
-    timing: timing(
-      RATU_PLAZA_STATIC_DURATION_MS,
-      RATU_PLAZA_STATIC_FADE_OUT_MS,
-      RATU_PLAZA_LIVE_START_AT_MS,
-    ),
+    timing: sequenceTiming(),
     clearMode: "shared",
     assets: {
       background: RATU_PLAZA_ASSETS.background,
@@ -115,6 +105,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       qrFrame: RATU_PLAZA_ASSETS.qrFrame,
       qrCode: RATU_PLAZA_ASSETS.qrCode,
       dummyTalent: RATU_PLAZA_ASSETS.layoutTalentDummy,
+      end: RATU_PLAZA_ASSETS.end,
     },
     layout: {
       shared: { clear: { ...RATU_PLAZA_LAYOUT_SHARED.clear } },
@@ -138,11 +129,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
   sudirman: {
     code: "sudirman",
     canvas: { width: SUDIRMAN_CANVAS.width, height: SUDIRMAN_CANVAS.height },
-    timing: timing(
-      SUDIRMAN_STATIC_DURATION_MS,
-      SUDIRMAN_STATIC_FADE_OUT_MS,
-      SUDIRMAN_LIVE_START_AT_MS,
-    ),
+    timing: sequenceTiming(),
     clearMode: "split",
     assets: {
       background: SUDIRMAN_ASSETS.background,
@@ -156,6 +143,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       qrFrame: SUDIRMAN_ASSETS.qrFrame,
       qrCode: SUDIRMAN_ASSETS.qrCode,
       dummyTalent: SUDIRMAN_ASSETS.layoutTalentDummy,
+      end: SUDIRMAN_ASSETS.end,
     },
     layout: {
       static: {
@@ -178,11 +166,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
   bei: {
     code: "bei",
     canvas: { width: BEI_CANVAS.width, height: BEI_CANVAS.height },
-    timing: timing(
-      BEI_STATIC_DURATION_MS,
-      BEI_STATIC_FADE_OUT_MS,
-      BEI_LIVE_START_AT_MS,
-    ),
+    timing: sequenceTiming(),
     clearMode: "shared",
     assets: {
       background: BEI_ASSETS.background,
@@ -195,6 +179,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       qrFrame: BEI_ASSETS.qrFrame,
       qrCode: BEI_ASSETS.qrCode,
       dummyTalent: BEI_ASSETS.layoutTalentDummy,
+      end: BEI_ASSETS.end,
     },
     layout: {
       shared: { clear: { ...BEI_LAYOUT_SHARED.clear } },

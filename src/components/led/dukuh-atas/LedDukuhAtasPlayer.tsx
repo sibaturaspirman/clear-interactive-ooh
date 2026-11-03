@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedDukuhAtasScreen } from "@/components/led/dukuh-atas/LedDukuhAtasScreen";
 import { DUKUH_ATAS_ASSETS } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,11 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedDukuhAtasPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(DUKUH_ATAS_ASSETS.end);
+    void preloadLedMediaUrl(DUKUH_ATAS_ASSETS.clearLive);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

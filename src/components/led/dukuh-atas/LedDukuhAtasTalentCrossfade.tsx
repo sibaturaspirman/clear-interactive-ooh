@@ -118,10 +118,7 @@ export function LedDukuhAtasTalentCrossfade({
     prevQueueIdRef.current = queueId;
 
     if (prevId != null && prevId !== queueId) {
-      startExitPhase();
-      swapRef.current = setTimeout(() => {
-        beginEnter(url, playMs);
-      }, DUKUH_ATAS_STATIC_FADE_OUT_MS);
+      beginEnter(url, playMs);
       return clearTimers;
     }
 

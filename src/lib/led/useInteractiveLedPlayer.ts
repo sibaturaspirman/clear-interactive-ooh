@@ -2,7 +2,7 @@
 
 import { bypassBroadSignForLedDebug } from "@/lib/led/cityvision/broadsign-bypass";
 import { useBroadSignPlay } from "@/lib/led/cityvision/useBroadSignPlay";
-import { isMibLedSequenceCode } from "@/lib/led/mib/mib-led-sequence";
+import { isLedSequenceLoopCode } from "@/lib/led/led-sequence-loop";
 import { isCityvisionLedLocation } from "@/lib/led/led-vendors";
 import {
   useInteractiveLedQueue,
@@ -27,7 +27,7 @@ export function useInteractiveLedPlayer({
     code,
     ...queueParams,
     cityvisionMode: cityvision,
-    sencySequenceMode: isMibLedSequenceCode(code),
+    sencySequenceMode: isLedSequenceLoopCode(code),
     playbackEnabled,
   });
 

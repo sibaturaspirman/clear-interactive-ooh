@@ -5,9 +5,9 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (2880×660). */
 export const RATU_PLAZA_CANVAS = LED_CANVAS_BY_CODE["ratu-plaza"];
 
-export const RATU_PLAZA_STATIC_DURATION_MS = 5000;
-/** Live filler when API queue is empty — same hold as intro static. */
-export const RATU_PLAZA_DUMMY_PLAY_MS = RATU_PLAZA_STATIC_DURATION_MS;
+export const RATU_PLAZA_STATIC_DURATION_MS = 4000;
+/** Live filler when API queue is empty (legacy). */
+export const RATU_PLAZA_DUMMY_PLAY_MS = 5000;
 export const RATU_PLAZA_STATIC_FADE_IN_MS = 800;
 export const RATU_PLAZA_STATIC_FADE_OUT_MS = 700;
 /** Brief bg-only beat after intro exit before live pack enters. */
@@ -62,6 +62,7 @@ export const RATU_PLAZA_ASSETS = {
   qrFrame: "/images/led/ratu-plaza-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/ratu-plaza` (see `npm run led:ratu-plaza-qr`). */
   qrCode: ledStaticImage("/images/led/ratu-plaza-qr.png"),
+  end: "/images/led/ratu-plaza-end.jpg",
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */

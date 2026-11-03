@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedRatuPlazaScreen } from "@/components/led/ratu-plaza/LedRatuPlazaScreen";
 import { RATU_PLAZA_ASSETS } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,10 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedRatuPlazaPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(RATU_PLAZA_ASSETS.end);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

@@ -20,6 +20,9 @@ export type BroadsignSitePayload = {
     liveStartMs: number;
     slotPlayableMs: number;
     dummyPlayMs: number;
+    liveDurationMs?: number;
+    outroDurationMs?: number;
+    submissionPlayMs?: number;
   };
   assets: {
     background: string;
@@ -37,6 +40,7 @@ export type BroadsignSitePayload = {
     clearRight?: string;
     clearStatic?: string;
     clearLive?: string;
+    end?: string;
   };
   layout: {
     shared?: {
@@ -52,6 +56,8 @@ export type BroadsignSitePayload = {
     };
     live: {
       clear?: BroadsignBox;
+      clearLeft?: BroadsignBox;
+      clearRight?: BroadsignBox;
       packGroup: BroadsignBox;
       talent: BroadsignBox;
       tagline: BroadsignBox;

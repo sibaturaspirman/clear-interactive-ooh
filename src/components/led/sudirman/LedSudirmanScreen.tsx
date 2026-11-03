@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 
 import { LedSudirmanLiveScreen } from "@/components/led/sudirman/LedSudirmanLiveScreen";
 import { LedSudirmanSharedLayers } from "@/components/led/sudirman/LedSudirmanSharedLayers";
+import { LedEndJpgOutroScreen } from "@/components/led/LedEndJpgOutroScreen";
 import { LedSudirmanStaticScreen } from "@/components/led/sudirman/LedSudirmanStaticScreen";
 import {
+  SUDIRMAN_ASSETS,
+  SUDIRMAN_CANVAS,
   SUDIRMAN_LIVE_HANDOFF_MS,
   SUDIRMAN_LIVE_LAYER_FADE_MS,
 } from "@/lib/led/sudirman/sudirman-layout";
@@ -43,9 +46,10 @@ export function LedSudirmanScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedSudirmanScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ export function LedSudirmanScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : SUDIRMAN_LIVE_LAYER_FADE_MS;
 
@@ -109,6 +113,14 @@ export function LedSudirmanScreen({
           />
         </div>
       ) : null}
+
+      <LedEndJpgOutroScreen
+        endSrc={SUDIRMAN_ASSETS.end}
+        canvasWidth={SUDIRMAN_CANVAS.width}
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

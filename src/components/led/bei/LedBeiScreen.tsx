@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 
 import { LedBeiLiveScreen } from "@/components/led/bei/LedBeiLiveScreen";
 import { LedBeiSharedLayers } from "@/components/led/bei/LedBeiSharedLayers";
+import { LedEndJpgOutroScreen } from "@/components/led/LedEndJpgOutroScreen";
 import { LedBeiStaticScreen } from "@/components/led/bei/LedBeiStaticScreen";
 import {
+  BEI_ASSETS,
+  BEI_CANVAS,
   BEI_LIVE_HANDOFF_MS,
   BEI_LIVE_LAYER_FADE_MS,
 } from "@/lib/led/bei/bei-layout";
@@ -43,9 +46,10 @@ export function LedBeiScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedBeiScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ export function LedBeiScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : BEI_LIVE_LAYER_FADE_MS;
 
@@ -109,6 +113,14 @@ export function LedBeiScreen({
           />
         </div>
       ) : null}
+
+      <LedEndJpgOutroScreen
+        endSrc={BEI_ASSETS.end}
+        canvasWidth={BEI_CANVAS.width}
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { LedBeiScreen } from "@/components/led/bei/LedBeiScreen";
 import { BEI_ASSETS } from "@/lib/led/bei/bei-layout";
+import { preloadLedMediaUrl } from "@/lib/led/preload-led-media";
 import {
   InteractiveLedPlayerFrame,
   type InteractiveLedScreenProps,
@@ -17,6 +20,10 @@ export type LedLocationPlayerProps = {
 };
 
 export function LedBeiPlayer(props: LedLocationPlayerProps) {
+  useEffect(() => {
+    void preloadLedMediaUrl(BEI_ASSETS.end);
+  }, []);
+
   return (
     <InteractiveLedPlayerFrame
       code={props.code}

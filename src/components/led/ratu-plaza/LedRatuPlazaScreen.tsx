@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 
 import { LedRatuPlazaLiveScreen } from "@/components/led/ratu-plaza/LedRatuPlazaLiveScreen";
 import { LedRatuPlazaSharedLayers } from "@/components/led/ratu-plaza/LedRatuPlazaSharedLayers";
+import { LedEndJpgOutroScreen } from "@/components/led/LedEndJpgOutroScreen";
 import { LedRatuPlazaStaticScreen } from "@/components/led/ratu-plaza/LedRatuPlazaStaticScreen";
+import {
+  RATU_PLAZA_ASSETS,
+  RATU_PLAZA_CANVAS,
+} from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 import {
   RATU_PLAZA_LIVE_HANDOFF_MS,
   RATU_PLAZA_LIVE_LAYER_FADE_MS,
@@ -43,9 +48,10 @@ export function LedRatuPlazaScreen({
   holdLiveLayout = false,
   idleTalentSrc,
 }: LedRatuPlazaScreenProps) {
-  const liveMounted = !holdStatic;
+  const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
+  const showOutro = phase === "outro";
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -59,7 +65,7 @@ export function LedRatuPlazaScreen({
       setSuppressLiveTalent(!photoUrl);
     }, delay);
     return () => clearTimeout(timer);
-  }, [liveVisible, introCycleKey, photoUrl, disableAnimations, holdLiveLayout]);
+  }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
 
   const liveFadeMs = disableAnimations ? 0 : RATU_PLAZA_LIVE_LAYER_FADE_MS;
 
@@ -109,6 +115,14 @@ export function LedRatuPlazaScreen({
           />
         </div>
       ) : null}
+
+      <LedEndJpgOutroScreen
+        endSrc={RATU_PLAZA_ASSETS.end}
+        canvasWidth={RATU_PLAZA_CANVAS.width}
+        active={showOutro}
+        disableAnimations={disableAnimations}
+        cycleKey={introCycleKey}
+      />
     </div>
   );
 }

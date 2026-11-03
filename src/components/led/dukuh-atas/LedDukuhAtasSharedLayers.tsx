@@ -6,8 +6,15 @@ import {
   DUKUH_ATAS_LAYOUT_SHARED,
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
 
-/** Background + logo — same for intro static and live (no fade on transition). */
-export function LedDukuhAtasSharedLayers() {
+type LedDukuhAtasSharedLayersProps = {
+  /** Intro dual clear — hidden during live (`clearLive` in live screen). */
+  showIntroClear?: boolean;
+};
+
+/** Background + optional intro dual clear. */
+export function LedDukuhAtasSharedLayers({
+  showIntroClear = true,
+}: LedDukuhAtasSharedLayersProps) {
   return (
     <>
       <LedPublicImage
@@ -18,18 +25,22 @@ export function LedDukuhAtasSharedLayers() {
         priority
         sizes={`${DUKUH_ATAS_CANVAS.width}px`}
       />
-      <LedDukuhAtasLayerImage
-        src={DUKUH_ATAS_ASSETS.clear}
-        alt=""
-        box={DUKUH_ATAS_LAYOUT_SHARED.clearLeft}
-        className="object-contain object-left-top"
-      />
-      <LedDukuhAtasLayerImage
-        src={DUKUH_ATAS_ASSETS.clear}
-        alt=""
-        box={DUKUH_ATAS_LAYOUT_SHARED.clearRight}
-        className="object-contain object-left-top"
-      />
+      {showIntroClear ? (
+        <>
+          <LedDukuhAtasLayerImage
+            src={DUKUH_ATAS_ASSETS.clear}
+            alt=""
+            box={DUKUH_ATAS_LAYOUT_SHARED.clearLeft}
+            className="object-contain object-left-top"
+          />
+          <LedDukuhAtasLayerImage
+            src={DUKUH_ATAS_ASSETS.clear}
+            alt=""
+            box={DUKUH_ATAS_LAYOUT_SHARED.clearRight}
+            className="object-contain object-left-top"
+          />
+        </>
+      ) : null}
     </>
   );
 }

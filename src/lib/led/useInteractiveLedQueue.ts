@@ -17,6 +17,10 @@ import {
   MIB_LED_STATIC_DURATION_MS,
   MIB_LED_STATIC_FADE_OUT_MS,
 } from "@/lib/led/mib/mib-led-sequence";
+import {
+  liveSegmentPlayMsForSlotCount,
+  liveSegmentSlotCount,
+} from "@/lib/led/led-sequence-loop";
 import type {
   LedConnectionStatus,
   LedPullResponse,
@@ -47,9 +51,11 @@ function itemPlayMs(
   item: LedQueueItem | null | undefined,
   apiPlayMs: number,
   sencySequenceMode: boolean,
+  sequenceLivePlayMs: number,
 ) {
   if (sencySequenceMode) {
-    return MIB_LED_SEQUENCE.submissionMs;
+    if (item && isDummyQueueItem(item)) return MIB_LED_SEQUENCE.liveMs;
+    return sequenceLivePlayMs;
   }
   if (item && isDummyQueueItem(item)) return INTERACTIVE_LED_DUMMY_PLAY_MS;
   return apiPlayMs;
@@ -154,7 +160,17 @@ export function useInteractiveLedQueue({
   const liveSegmentEndRef = useRef(0);
   const liveSegmentTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
   const outroTimerRef = useRef<ReturnType<typeof setTimeout> | 0>(0);
+  const sequenceLivePlayMsRef = useRef<number>(MIB_LED_SEQUENCE.submissionMs);
   const [slotFrozen, setSlotFrozen] = useState(false);
+
+  function planLiveSegmentPlayback() {
+    const state = stateRef.current;
+    const slots = liveSegmentSlotCount(
+      state.upcoming.length,
+      Boolean(state.current),
+    );
+    sequenceLivePlayMsRef.current = liveSegmentPlayMsForSlotCount(slots);
+  }
 
   const staticDurationMs = sencySequenceMode
     ? MIB_LED_STATIC_DURATION_MS
@@ -316,8 +332,13 @@ export function useInteractiveLedQueue({
       );
     }
     enqueue(async () => {
+      if (sencySequenceMode) {
+        if (stateRef.current.upcoming.length === 0 && !stateRef.current.current) {
+          await fillQueueDuringIntro();
+        }
+        planLiveSegmentPlayback();
+      }
       await resume();
-      
       render();
     });
   }
@@ -362,13 +383,13 @@ export function useInteractiveLedQueue({
     }
     clearIntroTimers();
     clearSencySequenceTimers();
-    if (cityvisionMode) {
+    if (sencySequenceMode) {
+      setSlotFrozen(false);
+      armSencySlotDeadline();
+    } else if (cityvisionMode) {
       setSlotFrozen(false);
       slotStartRef.current = Date.now();
       armCityvisionSlotDeadline();
-    } else if (sencySequenceMode) {
-      setSlotFrozen(false);
-      armSencySlotDeadline();
     }
     introDoneRef.current = false;
     liveHadPlaybackRef.current = false;
@@ -412,7 +433,7 @@ export function useInteractiveLedQueue({
   }
 
   function shouldPlayDummyFill() {
-    if (sencySequenceMode) return false;
+    if (sencySequenceMode) return true;
     return (
       !holdLiveLayout &&
       !ledDebug.holdStatic &&
@@ -538,7 +559,12 @@ export function useInteractiveLedQueue({
     shownIdRef.current = item.queue_id;
     restartBar(
       remaining,
-      itemPlayMs(item, stateRef.current.playMs, sencySequenceMode),
+      itemPlayMs(
+        item,
+        stateRef.current.playMs,
+        sencySequenceMode,
+        sequenceLivePlayMsRef.current,
+      ),
     );
   }
 
@@ -603,12 +629,22 @@ export function useInteractiveLedQueue({
       pos: `${state.upcoming.length} di belakang`,
       playbackUrl: state.current.url,
       playbackQueueId: state.current.queue_id,
-      playMs: itemPlayMs(state.current, state.playMs, sencySequenceMode),
+      playMs: itemPlayMs(
+        state.current,
+        state.playMs,
+        sencySequenceMode,
+        sequenceLivePlayMsRef.current,
+      ),
     });
 
     if (shownIdRef.current !== state.current.queue_id) {
       const duration = capPlayMsForSlot(
-        itemPlayMs(state.current, state.playMs, sencySequenceMode),
+        itemPlayMs(
+          state.current,
+          state.playMs,
+          sencySequenceMode,
+          sequenceLivePlayMsRef.current,
+        ),
       );
       mount(state.current, remaining ?? duration);
     }
@@ -684,7 +720,12 @@ export function useInteractiveLedQueue({
     const state = stateRef.current;
     if (state.timer) clearTimeout(state.timer);
     const duration = capPlayMsForSlot(
-      itemPlayMs(state.current, state.playMs, sencySequenceMode),
+      itemPlayMs(
+        state.current,
+        state.playMs,
+        sencySequenceMode,
+        sequenceLivePlayMsRef.current,
+      ),
     );
     const waitMs = Math.min(remaining, duration);
     state.startedAt = Date.now() - (duration - waitMs);
@@ -725,7 +766,14 @@ export function useInteractiveLedQueue({
         liveHadPlaybackRef.current = true;
         state.startedAt = Date.now();
         persist();
-        arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
+        arm(
+          itemPlayMs(
+            state.current,
+            state.playMs,
+            sencySequenceMode,
+            sequenceLivePlayMsRef.current,
+          ),
+        );
         return;
       }
       persist();
@@ -745,7 +793,14 @@ export function useInteractiveLedQueue({
     state.startedAt = Date.now();
     persist();
     void preloadLedQueueItems(state.upcoming);
-    arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
+    arm(
+      itemPlayMs(
+        state.current,
+        state.playMs,
+        sencySequenceMode,
+        sequenceLivePlayMsRef.current,
+      ),
+    );
   }
 
   async function finish() {
@@ -781,7 +836,14 @@ export function useInteractiveLedQueue({
       persist();
       void preloadLedQueueItems(state.upcoming);
       liveHadPlaybackRef.current = true;
-      arm(itemPlayMs(state.current, state.playMs, sencySequenceMode));
+      arm(
+        itemPlayMs(
+          state.current,
+          state.playMs,
+          sencySequenceMode,
+          sequenceLivePlayMsRef.current,
+        ),
+      );
       return;
     }
 
@@ -808,6 +870,7 @@ export function useInteractiveLedQueue({
       state.current,
       state.playMs,
       sencySequenceMode,
+      sequenceLivePlayMsRef.current,
     );
     const elapsed = state.startedAt ? Date.now() - state.startedAt : 0;
     const remaining = duration - elapsed;
