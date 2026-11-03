@@ -42,6 +42,7 @@ fs.writeFileSync(
     ".justify-start{justify-content:flex-start}",
     ".pointer-events-none{pointer-events:none}",
     ".absolute{position:absolute}",
+    ".inset-0{inset:0}",
     ".bs-z-name{z-index:4}",
     motionCss,
   ].join("\n"),

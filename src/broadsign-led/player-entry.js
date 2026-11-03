@@ -108,6 +108,7 @@
   var stageEl = null;
   var staticRoot = null;
   var staticContentEl = null;
+  var staticForegroundEl = null;
   var packMotionEl = null;
   var staticTalentWrap = null;
   var liveRoot = null;
@@ -352,8 +353,12 @@
     packMotionEl.appendChild(packImg);
     staticContentEl.appendChild(packMotionEl);
 
+    staticForegroundEl = document.createElement("div");
+    staticForegroundEl.className = "pointer-events-none absolute inset-0";
+    staticContentEl.appendChild(staticForegroundEl);
+
     staticTalentWrap = document.createElement("div");
-    staticTalentWrap.className = "led-bei-talent-zoom absolute bs-z-name";
+    staticTalentWrap.className = "led-bei-talent-zoom absolute";
     staticTalentWrap.style.cssText = boxStyle(st.talent);
     setMotionVars(staticTalentWrap, {
       animationDuration: timing.staticDurationMs + "ms",
@@ -364,9 +369,19 @@
     talentImg.style.cssText =
       "width:100%;height:100%;object-fit:contain;object-position:bottom center;";
     staticTalentWrap.appendChild(talentImg);
-    staticContentEl.appendChild(staticTalentWrap);
+    staticForegroundEl.appendChild(staticTalentWrap);
 
-    addImg(staticContentEl, site.assets.text, st.text);
+    var textLayer = document.createElement("div");
+    textLayer.className = "bs-layer";
+    textLayer.style.cssText = boxStyle(st.text);
+    var textImg = document.createElement("img");
+    textImg.src = site.assets.text;
+    textImg.alt = "";
+    textImg.draggable = false;
+    textImg.style.cssText =
+      "width:100%;height:100%;object-fit:contain;object-position:left bottom;";
+    textLayer.appendChild(textImg);
+    staticForegroundEl.appendChild(textLayer);
 
     scaleStage();
     window.addEventListener("resize", scaleStage);
@@ -495,8 +510,11 @@
       void staticRoot.offsetWidth;
       staticRoot.classList.add("led-bei-static-layer--enter");
     }
+    if (staticForegroundEl) {
+      staticForegroundEl.className = "pointer-events-none absolute inset-0";
+    }
     if (staticTalentWrap) {
-      staticTalentWrap.className = "led-bei-talent-zoom absolute bs-z-name";
+      staticTalentWrap.className = "led-bei-talent-zoom absolute";
       staticTalentWrap.style.cssText = boxStyle(site.layout.static.talent);
       setMotionVars(staticTalentWrap, {
         animationDuration: timing.staticDurationMs + "ms",
@@ -888,10 +906,12 @@
     var exitAt = Math.max(0, timing.staticDurationMs - timing.fadeOutMs);
     setTimeout(function () {
       if (introDone) return;
-      staticContentEl.classList.add("led-bei-static-exit-fade");
-      setMotionVars(staticContentEl, {
-        "--bei-static-fade-out-ms": timing.fadeOutMs + "ms",
-      });
+      if (staticForegroundEl) {
+        staticForegroundEl.classList.add("led-bei-static-exit-fade");
+        setMotionVars(staticForegroundEl, {
+          "--bei-static-fade-out-ms": timing.fadeOutMs + "ms",
+        });
+      }
       if (packMotionEl) {
         packMotionEl.classList.remove("led-bei-static-pack-motion--in-right");
         packMotionEl.classList.add("led-bei-static-pack-motion--out-left");
