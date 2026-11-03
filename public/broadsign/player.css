@@ -13,17 +13,17 @@ body {
 #bs-root {
   width: 100vw;
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 .bs-stage {
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   overflow: hidden;
   background: #061316;
-  flex-shrink: 0;
+  transform-origin: 0 0;
 }
 
 .bs-layer {

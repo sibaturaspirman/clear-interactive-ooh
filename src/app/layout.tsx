@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Clear Interactive OOH",
   description: "Clear Interactive OOH — Next.js SSR",
+  icons: {
+    icon: "/images/microsite/logo-men-ultra.png",
+    apple: "/images/microsite/logo-men-ultra.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

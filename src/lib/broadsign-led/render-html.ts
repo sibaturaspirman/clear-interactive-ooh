@@ -42,6 +42,7 @@ export function renderBroadsignHtml(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/images/microsite/logo-men-ultra.png" type="image/png" />
   <title>Clear LED Broadsign — ${site.code}</title>
   ${BROADSIGN_HEAD_SCRIPT}
   <link rel="stylesheet" href="/broadsign/player.css" />

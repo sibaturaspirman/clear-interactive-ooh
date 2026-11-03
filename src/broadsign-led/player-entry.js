@@ -186,12 +186,15 @@
 
   function scaleStage() {
     if (!stageEl) return;
-    var w = site.canvas.width;
-    var h = site.canvas.height;
-    var scale = Math.min(window.innerWidth / w, window.innerHeight / h);
-    stageEl.style.width = w + "px";
-    stageEl.style.height = h + "px";
-    stageEl.style.transform = "scale(" + scale + ")";
+    var canvasW = site.canvas.width;
+    var canvasH = site.canvas.height;
+    // Stretch to fill the Broadsign frame; no letterbox if its ratio differs from the canvas
+    var sx = window.innerWidth / canvasW;
+    var sy = window.innerHeight / canvasH;
+    stageEl.style.width = canvasW + "px";
+    stageEl.style.height = canvasH + "px";
+    stageEl.style.transformOrigin = "0 0";
+    stageEl.style.transform = "scale(" + sx + "," + sy + ")";
   }
 
   function buildDom() {
