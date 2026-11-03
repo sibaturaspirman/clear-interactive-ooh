@@ -14,7 +14,7 @@ npm run dev
 
 | Variable | Purpose |
 | -------- | ------- |
-| `CLEAR_API_URL` | CMS public API base URL |
+| `CLEAR_API_URL` | CMS public API base URL (e.g. `https://clear-api.srv1.antigravity.dev`) |
 | `LED_KEY` | `x-led-key` for LED player routes |
 | `FAL_KEY` | fal.ai (microsite portrait pipeline only) |
 | `NEXT_PUBLIC_APP_URL` | Public origin for QR codes & uploads |

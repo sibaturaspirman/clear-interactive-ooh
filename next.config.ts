@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "clear-api.q.antigravity.dev",
+        hostname: "clear-api.srv1.antigravity.dev",
       },
     ],
   },
