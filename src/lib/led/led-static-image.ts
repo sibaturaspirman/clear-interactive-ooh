@@ -2,7 +2,7 @@
  * Bump when replacing files under `public/images/**` (same filename, new art).
  * Override at deploy: `NEXT_PUBLIC_LED_ASSET_VERSION`.
  */
-export const LED_STATIC_ASSET_VERSION = "3";
+export const LED_STATIC_ASSET_VERSION = "4";
 
 /** Path without query — safe to pass into `ledStaticImage`. */
 export function publicAssetPath(src: string): string {

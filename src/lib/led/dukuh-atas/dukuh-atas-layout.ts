@@ -61,7 +61,7 @@ export const DUKUH_ATAS_ASSETS = {
   text: "/images/led/dukuh-atas-text.png",
   qrFrame: "/images/led/dukuh-atas-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/dukuh-atas` (see `npm run led:dukuh-atas-qr`). */
-  qrCode: "/images/led/dukuh-atas-qr.png",
+  qrCode: ledStaticImage("/images/led/dukuh-atas-qr.png"),
 } as const;
 
 /** Dual Clear logos — scaled from 4096×295; tune via debug modes. */

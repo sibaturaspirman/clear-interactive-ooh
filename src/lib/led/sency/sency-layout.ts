@@ -61,7 +61,7 @@ export const SENCY_ASSETS = {
   text: "/images/led/sency-text.png",
   qrFrame: "/images/led/sency-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/sency` (see `npm run led:sency-qr`). */
-  qrCode: "/images/led/sency-qr.png",
+  qrCode: ledStaticImage("/images/led/sency-qr.png"),
 } as const;
 
 /** Layer boxes scaled from prior 1920×922 — tune via `/led/sency?debug=live`. */

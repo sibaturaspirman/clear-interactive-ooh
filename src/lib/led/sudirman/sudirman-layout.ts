@@ -64,7 +64,7 @@ export const SUDIRMAN_ASSETS = {
   text: "/images/led/sudirman-text.png",
   qrFrame: "/images/led/sudirman-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/sudirman` (see `npm run led:sudirman-qr`). */
-  qrCode: "/images/led/sudirman-qr.png",
+  qrCode: ledStaticImage("/images/led/sudirman-qr.png"),
 } as const;
 
 /** Intro static — relayout via `?debug=static`. */

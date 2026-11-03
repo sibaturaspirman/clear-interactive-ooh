@@ -14,6 +14,7 @@
     "led:ratu-plaza-qr": "node scripts/generate-ratu-plaza-qr.mjs",
     "led:dukuh-atas-qr": "node scripts/generate-dukuh-atas-qr.mjs",
     "led:sudirman-qr": "node scripts/generate-sudirman-qr.mjs",
+    "led:qr-all": "npm run led:bei-qr && npm run led:gbk-qr && npm run led:sency-qr && npm run led:ratu-plaza-qr && npm run led:dukuh-atas-qr && npm run led:sudirman-qr",
     "clean": "rm -rf .next"
   },
   "dependencies": {

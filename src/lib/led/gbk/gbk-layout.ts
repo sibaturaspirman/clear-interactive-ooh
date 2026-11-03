@@ -61,7 +61,7 @@ export const GBK_ASSETS = {
   text: "/images/led/gbk-text.png",
   qrFrame: "/images/led/gbk-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/gbk` (see `npm run led:gbk-qr`). */
-  qrCode: "/images/led/gbk-qr.png",
+  qrCode: ledStaticImage("/images/led/gbk-qr.png"),
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */

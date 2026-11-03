@@ -61,7 +61,7 @@ export const RATU_PLAZA_ASSETS = {
   text: "/images/led/ratu-plaza-text.png",
   qrFrame: "/images/led/ratu-plaza-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/ratu-plaza` (see `npm run led:ratu-plaza-qr`). */
-  qrCode: "/images/led/ratu-plaza-qr.png",
+  qrCode: ledStaticImage("/images/led/ratu-plaza-qr.png"),
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */

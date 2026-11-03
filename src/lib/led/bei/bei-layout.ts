@@ -61,7 +61,7 @@ export const BEI_ASSETS = {
   text: "/images/led/bei-text.png",
   qrFrame: "/images/led/bei-qr-frame.png",
   /** Pre-rendered QR → `{origin}/microsite/bei` (see `npm run led:bei-qr`). */
-  qrCode: "/images/led/bei-qr.png",
+  qrCode: ledStaticImage("/images/led/bei-qr.png"),
 } as const;
 
 /** Shared across static intro and live (same bg + clear placement). */

@@ -17,7 +17,7 @@ npm run dev
 | `CLEAR_API_URL` | CMS public API base URL (e.g. `https://clear-api.srv1.antigravity.dev`) |
 | `LED_KEY` | `x-led-key` for LED player routes |
 | `FAL_KEY` | fal.ai (microsite portrait pipeline only) |
-| `NEXT_PUBLIC_APP_URL` | Public origin for QR codes & uploads |
+| `NEXT_PUBLIC_APP_URL` | Public origin for QR codes & uploads (e.g. `https://www.clearxorbr.id`) |
 | `MICROSITE_TEST_BYPASS` | Optional: `true` to allow `?test` bypass on non-dev deploys |
 
 Open [http://localhost:3000/list](http://localhost:3000/list) for the location index (`/` shows the logo only).
