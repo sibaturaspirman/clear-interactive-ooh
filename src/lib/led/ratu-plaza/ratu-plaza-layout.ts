@@ -52,6 +52,7 @@ export function ratuPlazaLiveTalentZoomMs(playMs: number): number {
 export const RATU_PLAZA_ASSETS = {
   background: "/images/led/ratu-plaza-bg.jpg",
   clear: "/images/led/ratu-plaza-clear.png",
+  clearLive: "/images/led/ratu-plaza-logo-clear-live.png",
   packGroup: "/images/led/ratu-plaza-clear-pack-group.png",
   pack: "/images/led/ratu-plaza-clear-pack.png",
   talent: "/images/led/ratu-plaza-talent.png",
@@ -81,7 +82,7 @@ export const RATU_PLAZA_LAYOUT_STATIC = {
 
 /** Idle QR + queue playback (talent from API). */
 export const RATU_PLAZA_LAYOUT_LIVE = {
-  clear: RATU_PLAZA_LAYOUT_SHARED.clear,
+  clear: { left: 178, top: 33, width: 392, height: 117 },
   packGroup: { left: 29, top: 132, width: 600, height: 584 },
   talent: { left: 654, top: 38, width: 652, height: 652 },
   tagline: { left: 1401, top: 153, width: 839, height: 366 },

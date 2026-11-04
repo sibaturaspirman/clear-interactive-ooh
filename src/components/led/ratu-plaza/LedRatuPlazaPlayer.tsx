@@ -22,6 +22,7 @@ export type LedLocationPlayerProps = {
 export function LedRatuPlazaPlayer(props: LedLocationPlayerProps) {
   useEffect(() => {
     void preloadLedMediaUrl(RATU_PLAZA_ASSETS.end);
+    void preloadLedMediaUrl(RATU_PLAZA_ASSETS.clearLive);
   }, []);
 
   return (

@@ -52,6 +52,7 @@ export function LedRatuPlazaScreen({
   const liveVisible = !holdStatic && phase === "live" && liveReady;
   const showStatic = holdStatic || phase === "static";
   const showOutro = phase === "outro";
+  const showIntroClear = showStatic && !showOutro;
   const [suppressLiveTalent, setSuppressLiveTalent] = useState(false);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export function LedRatuPlazaScreen({
     <div className="relative size-full overflow-hidden">
       {debugActive ? ledDebugBadge(holdStatic, holdLiveLayout) : null}
       <div className="absolute inset-0 z-0">
-        <LedRatuPlazaSharedLayers />
+        <LedRatuPlazaSharedLayers showIntroClear={showIntroClear} />
       </div>
 
       {liveMounted ? (

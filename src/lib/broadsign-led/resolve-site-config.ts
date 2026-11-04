@@ -97,6 +97,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
     assets: {
       background: RATU_PLAZA_ASSETS.background,
       clear: RATU_PLAZA_ASSETS.clear,
+      clearLive: RATU_PLAZA_ASSETS.clearLive,
       pack: RATU_PLAZA_ASSETS.pack,
       packGroup: RATU_PLAZA_ASSETS.packGroup,
       talent: RATU_PLAZA_ASSETS.talent,

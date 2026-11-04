@@ -111,6 +111,7 @@
   var preloadCache = {};
 
   var stageEl = null;
+  var sharedClearEl = null;
   var staticRoot = null;
   var staticContentEl = null;
   var staticForegroundEl = null;
@@ -244,7 +245,11 @@
       site.layout.shared &&
       site.layout.shared.clear
     ) {
-      addImg(stageEl, site.assets.clear, site.layout.shared.clear);
+      sharedClearEl = addImg(
+        stageEl,
+        site.assets.clear,
+        site.layout.shared.clear,
+      );
     }
 
     liveRoot = document.createElement("div");
@@ -574,6 +579,10 @@
 
   function showLive(visible) {
     if (!liveRoot) return;
+    if (sharedClearEl && site.assets.clearLive) {
+      sharedClearEl.style.visibility =
+        visible ? "hidden" : "visible";
+    }
     if (visible) {
       liveRoot.style.display = "block";
       liveRoot.classList.add("bs-live-active");

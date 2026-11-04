@@ -6,8 +6,15 @@ import {
   RATU_PLAZA_LAYOUT_SHARED,
 } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 
-/** Background + logo — same for intro static and live (no fade on transition). */
-export function LedRatuPlazaSharedLayers() {
+type LedRatuPlazaSharedLayersProps = {
+  /** Intro clear — hidden during live (`clearLive` on live screen). */
+  showIntroClear?: boolean;
+};
+
+/** Background + optional intro clear logo. */
+export function LedRatuPlazaSharedLayers({
+  showIntroClear = true,
+}: LedRatuPlazaSharedLayersProps) {
   return (
     <>
       <LedPublicImage
@@ -18,12 +25,14 @@ export function LedRatuPlazaSharedLayers() {
         priority
         sizes={`${RATU_PLAZA_CANVAS.width}px`}
       />
-      <LedRatuPlazaLayerImage
-        src={RATU_PLAZA_ASSETS.clear}
-        alt="Clear x Oracle Red Bull Racing"
-        box={RATU_PLAZA_LAYOUT_SHARED.clear}
-        className="object-contain object-left-top"
-      />
+      {showIntroClear ? (
+        <LedRatuPlazaLayerImage
+          src={RATU_PLAZA_ASSETS.clear}
+          alt="Clear x Oracle Red Bull Racing"
+          box={RATU_PLAZA_LAYOUT_SHARED.clear}
+          className="object-contain object-left-top"
+        />
+      ) : null}
     </>
   );
 }
