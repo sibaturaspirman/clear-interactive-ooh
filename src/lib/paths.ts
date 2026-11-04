@@ -10,6 +10,10 @@ export function micrositeTestPath(code: string): string {
   return `${micrositePath(code)}?test`;
 }
 
+export function micrositeOverlayPreviewPath(code: string): string {
+  return `${micrositePath(code)}?overlay`;
+}
+
 export function ledPath(code: string): string {
   return `/led/${code}`;
 }

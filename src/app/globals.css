@@ -210,19 +210,112 @@ body {
   }
 }
 
-.microsite-generating-title {
-  font-size: clamp(2rem, 10vw, 2.5rem);
-  line-height: 1.1;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.01em;
-}
+@layer components {
+  .microsite-generating-promo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 8px;
+  }
 
-.microsite-generating-subtitle {
-  max-width: 300px;
-  font-size: 15px;
-  line-height: 22px;
-  color: rgb(255 255 255 / 92%);
+  .microsite-generating-kicker {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 400;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgb(255 255 255 / 92%);
+  }
+
+  .microsite-generating-headline {
+    margin: 0;
+    font-size: 21px;
+    line-height: 1.12;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: radial-gradient(
+      circle at 10% 40%,
+      #bcbcbc 0%,
+      #dedede 25%,
+      #ffffff 50%,
+      #d3d3d3 75%,
+      #a7a7a7 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 2px 6px rgb(0 0 0 / 45%));
+  }
+
+  .microsite-generating-event-frame {
+    position: relative;
+    margin-top: 4px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgb(255 255 255 / 88%);
+  }
+
+  .microsite-generating-event-corner {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: #fff;
+  }
+
+  .microsite-generating-event-corner-tl {
+    top: -4px;
+    left: -4px;
+  }
+
+  .microsite-generating-event-corner-tr {
+    top: -4px;
+    right: -4px;
+  }
+
+  .microsite-generating-event-corner-bl {
+    bottom: -4px;
+    left: -4px;
+  }
+
+  .microsite-generating-event-corner-br {
+    right: -4px;
+    bottom: -4px;
+  }
+
+  .microsite-generating-event-copy {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 400;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgb(255 255 255 / 95%);
+  }
+
+  /* Overlay “Please wait…” — edit sizes here (?overlay to preview). */
+  .microsite-generating-title {
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+
+  .microsite-generating-subtitle {
+    max-width: 300px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgb(255 255 255 / 92%);
+  }
 }
 
 .microsite-camera-title {

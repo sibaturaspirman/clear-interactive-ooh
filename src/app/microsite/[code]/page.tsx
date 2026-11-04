@@ -5,13 +5,14 @@ import {
   getLocationByCode,
   getLocationStaticParams,
 } from "@/lib/locations";
+import { parseMicrositeOverlayPreview } from "@/lib/microsite/overlay-preview";
 import { parseMicrositeTestBypass } from "@/lib/microsite/test-bypass";
 
 export const instant = false;
 
 type PageProps = {
   params: Promise<{ code: string }>;
-  searchParams: Promise<{ test?: string | string[] }>;
+  searchParams: Promise<{ test?: string | string[]; overlay?: string | string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -42,6 +43,13 @@ export default async function MicrositeLocationPage({
   }
 
   const testBypass = parseMicrositeTestBypass(query.test);
+  const overlayPreviewMode = parseMicrositeOverlayPreview(query.overlay);
 
-  return <MicrositeFlow location={location} testBypass={testBypass} />;
+  return (
+    <MicrositeFlow
+      location={location}
+      testBypass={testBypass}
+      overlayPreviewMode={overlayPreviewMode}
+    />
+  );
 }

@@ -18,6 +18,7 @@ import {
   ledStaticDebugPath,
   ledPath,
   micrositePath,
+  micrositeOverlayPreviewPath,
   micrositeTestPath,
 } from "@/lib/paths";
 
@@ -51,6 +52,15 @@ function LocationLinks({
           title="Skip fal.ai; fixed result image"
         >
           Microsite (?test)
+        </Link>
+      ) : null}
+      {showDebugLinks ? (
+        <Link
+          href={micrositeOverlayPreviewPath(location.code)}
+          className="rounded-full border border-sky-400/60 px-4 py-2 text-sky-950 hover:bg-sky-50 dark:border-sky-600/50 dark:text-sky-200 dark:hover:bg-sky-950/40"
+          title="Preview submit loading overlay (no fal/API)"
+        >
+          Microsite (?overlay)
         </Link>
       ) : null}
       {showBroadsignLink ? (

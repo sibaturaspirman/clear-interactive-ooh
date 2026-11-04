@@ -118,6 +118,16 @@ Works automatically in **development**. On staging/production, set `MICROSITE_TE
 
 Flow (form + photo) is unchanged; submit sends a fixed portrait URL to the CMS instead of running the fal pipeline.
 
+### Loading overlay debug (`?overlay`)
+
+Debug **tampilan overlay** submit saja (no form, no fal, no API):
+
+```
+/microsite/bei?overlay
+```
+
+Overlay terbuka otomatis; tutup dengan tap luar kartu atau **Esc**, lalu **Tampilkan overlay** untuk buka lagi. Link juga di `/list?debug`.
+
 ### Portrait pipeline (submit)
 
 On **Submit**, the server runs (unless `?test` bypass):
