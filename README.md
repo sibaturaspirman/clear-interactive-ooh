@@ -118,6 +118,22 @@ Works automatically in **development**. On staging/production, set `MICROSITE_TE
 
 Flow (form + photo) is unchanged; submit sends a fixed portrait URL to the CMS instead of running the fal pipeline.
 
+### Portrait pipeline (submit)
+
+On **Submit**, the server runs (unless `?test` bypass):
+
+1. **google/nano-banana-2.1/edit** — talent base + selfie + prompts  
+2. *(optional)* **fal-ai/face-swap** — nano output + selfie  
+3. **fal-ai/ideogram/remove-background**  
+4. POST **`/api/submissions`** with the final image URL  
+
+**Switch face-swap on/off** (one place in code, or env without redeploy logic change):
+
+| Method | How |
+| ------ | --- |
+| Code default | `PORTRAIT_PIPELINE_DEFAULT` in [`src/lib/fal/portrait-pipeline.ts`](./src/lib/fal/portrait-pipeline.ts) — `"with-face-swap"` or `"without-face-swap"` |
+| Env override | `FAL_PORTRAIT_FACE_SWAP=true` or `false` (wins over code default) |
+
 ## Cityvision (Broadsign) — vendor LED only
 
 Sites: **BEI**, **Ratu Plaza**, **Dukuh Atas**, **Sudirman** (`isCityvisionLedLocation`).

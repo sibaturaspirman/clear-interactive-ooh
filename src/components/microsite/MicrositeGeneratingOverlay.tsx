@@ -56,7 +56,7 @@ export function MicrositeGeneratingOverlay({
               <>
                 Your AI photo is being processed,
                 <br />
-                estimated 40–90s
+                estimated 40–120s
               </>
             )}
           </p>

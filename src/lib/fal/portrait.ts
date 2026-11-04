@@ -6,12 +6,19 @@ import path from "node:path";
 
 import { getFalKey } from "@/lib/env";
 import {
+  portraitPipelineUsesFalFaceSwap,
+} from "@/lib/fal/portrait-pipeline";
+import {
   FACE_SWAP_SYSTEM_PROMPT,
   FACE_SWAP_USER_PROMPT,
 } from "@/lib/fal/prompts";
 
 type NanoBananaResult = {
   images?: Array<{ url?: string }>;
+};
+
+type FalFaceSwapResult = {
+  image?: { url?: string };
 };
 
 type RemoveBackgroundResult = {
@@ -104,6 +111,66 @@ async function uploadTalentBaseImage(): Promise<string> {
   return fal.storage.upload(file);
 }
 
+async function runNanoBananaEdit(
+  baseImageUrl: string,
+  faceReferenceUrl: string,
+): Promise<string> {
+  const faceSwap = await fal.subscribe("google/nano-banana-2.1/edit", {
+    input: {
+      prompt: FACE_SWAP_USER_PROMPT,
+      system_prompt: FACE_SWAP_SYSTEM_PROMPT,
+      image_urls: [baseImageUrl, faceReferenceUrl],
+      aspect_ratio: "auto",
+      resolution: "1K",
+      output_format: "png",
+      safety_tolerance: "5",
+      limit_generations: true,
+    },
+    logs: true,
+  });
+
+  const swappedUrl = (faceSwap.data as NanoBananaResult)?.images?.[0]?.url;
+  if (!swappedUrl) {
+    throw new Error("Nano-banana gagal: tidak ada gambar dari fal.");
+  }
+  return swappedUrl;
+}
+
+async function runFalFaceSwap(
+  baseImageUrl: string,
+  swapImageUrl: string,
+): Promise<string> {
+  const result = await fal.subscribe("fal-ai/face-swap", {
+    input: {
+      base_image_url: baseImageUrl,
+      swap_image_url: swapImageUrl,
+    },
+    pollInterval: 5000,
+    logs: true,
+  });
+
+  const url = (result.data as FalFaceSwapResult)?.image?.url;
+  if (!url) {
+    throw new Error("Face swap gagal: tidak ada URL hasil.");
+  }
+  return url;
+}
+
+async function runRemoveBackground(imageUrl: string): Promise<string> {
+  const removedBg = await fal.subscribe("fal-ai/ideogram/remove-background", {
+    input: {
+      image_url: imageUrl,
+    },
+  });
+
+  const finalUrl = (removedBg.data as RemoveBackgroundResult)?.image?.url;
+  if (!finalUrl) {
+    throw new Error("Remove background gagal: tidak ada URL hasil.");
+  }
+  return finalUrl;
+}
+
+/** Pipeline steps depend on {@link portraitPipelineUsesFalFaceSwap}. */
 export async function generatePortraitAssetUrl(selfie: File): Promise<string> {
   ensureFalClient();
   assertPrompts();
@@ -118,37 +185,11 @@ export async function generatePortraitAssetUrl(selfie: File): Promise<string> {
       fal.storage.upload(selfie),
     ]);
 
-    const faceSwap = await fal.subscribe("google/nano-banana-2.1/edit", {
-      input: {
-        prompt: FACE_SWAP_USER_PROMPT,
-        system_prompt: FACE_SWAP_SYSTEM_PROMPT,
-        image_urls: [baseImageUrl, faceReferenceUrl],
-        aspect_ratio: "auto",
-        resolution: "1K",
-        output_format: "png",
-        safety_tolerance: "5",
-        limit_generations: true,
-      },
-      logs: true,
-    });
-
-    const swappedUrl = (faceSwap.data as NanoBananaResult)?.images?.[0]?.url;
-    if (!swappedUrl) {
-      throw new Error("Face swap gagal: tidak ada gambar dari fal.");
-    }
-
-    const removedBg = await fal.subscribe("fal-ai/ideogram/remove-background", {
-      input: {
-        image_url: swappedUrl,
-      },
-    });
-
-    const finalUrl = (removedBg.data as RemoveBackgroundResult)?.image?.url;
-    if (!finalUrl) {
-      throw new Error("Remove background gagal: tidak ada URL hasil.");
-    }
-
-    return finalUrl;
+    const nanoUrl = await runNanoBananaEdit(baseImageUrl, faceReferenceUrl);
+    const beforeRemoveBg = portraitPipelineUsesFalFaceSwap()
+      ? await runFalFaceSwap(nanoUrl, faceReferenceUrl)
+      : nanoUrl;
+    return await runRemoveBackground(beforeRemoveBg);
   } catch (error) {
     throw new Error(formatFalError(error));
   }
