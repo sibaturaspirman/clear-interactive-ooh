@@ -2,6 +2,8 @@
  * Broadsign / Chromium 87 LED player (vanilla). Bundled to /public/broadsign/player.js
  * Queue + motion aligned with `useInteractiveLedQueue` + `led-player.css`.
  */
+import { ledParticipantDisplayName } from "../lib/led/led-participant-display-name.ts";
+
 (function () {
   "use strict";
 
@@ -780,7 +782,7 @@
     if (nameExitTimer) clearTimeout(nameExitTimer);
     nameExitTimer = 0;
 
-    var display = (text || "").trim();
+    var display = ledParticipantDisplayName(text);
     if (!display || queueId == null || queueId <= 0) {
       if (prevNameQueueId != null && prevNameQueueId > 0) {
         applyNameFadeClass("out");

@@ -21,6 +21,7 @@ import {
   liveSegmentPlayMsForSlotCount,
   liveSegmentSlotCount,
 } from "@/lib/led/led-sequence-loop";
+import { ledParticipantDisplayName } from "@/lib/led/led-participant-display-name";
 import type {
   LedConnectionStatus,
   LedPullResponse,
@@ -552,7 +553,7 @@ export function useInteractiveLedQueue({
       media.append(video);
     } else {
       const img = document.createElement("img");
-      img.alt = item.nama;
+      img.alt = ledParticipantDisplayName(item.nama);
       img.src = item.url;
       media.append(img);
     }
@@ -624,7 +625,7 @@ export function useInteractiveLedQueue({
       idle: false,
       chrome: true,
       hint: state.hint,
-      nama: state.current.nama,
+      nama: ledParticipantDisplayName(state.current.nama),
       loc: state.locationName,
       pos: `${state.upcoming.length} di belakang`,
       playbackUrl: state.current.url,

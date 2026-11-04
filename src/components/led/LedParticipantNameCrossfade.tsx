@@ -7,6 +7,7 @@ import {
   participantNameSlotBox,
   type LedParticipantNameSlot,
 } from "@/lib/led/participant-name-layout";
+import { ledParticipantDisplayName } from "@/lib/led/led-participant-display-name";
 import { useLedSubmissionPlaybackFade } from "@/lib/led/useLedSubmissionPlaybackFade";
 
 type LedParticipantNameCrossfadeProps = {
@@ -27,7 +28,7 @@ export function LedParticipantNameCrossfade({
   disableAnimations = false,
   layoutDebug = false,
 }: LedParticipantNameCrossfadeProps) {
-  const trimmed = nama?.trim();
+  const trimmed = ledParticipantDisplayName(nama);
   const isSubmission = Boolean(trimmed && playbackQueueId != null);
 
   const { fadeMode, fadeInMs, fadeOutMs, displayNama } =

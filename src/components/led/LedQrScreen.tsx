@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { ledParticipantDisplayName } from "@/lib/led/led-participant-display-name";
+
 type LedQrScreenProps = {
   participantName?: string;
   qrDataUrl: string;
@@ -13,7 +15,8 @@ export function LedQrScreen({
   photoUrl,
   showDynamicHeadline = false,
 }: LedQrScreenProps) {
-  const displayName = participantName?.trim() || "NAMA";
+  const displayName =
+    ledParticipantDisplayName(participantName) || "NAMA";
 
   return (
     <div className="relative size-full">
