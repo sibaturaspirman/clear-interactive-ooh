@@ -2,6 +2,7 @@
  * Broadsign / Chromium 87 LED player (vanilla). Bundled to /public/broadsign/player.js
  * Queue + motion aligned with `useInteractiveLedQueue` + `led-player.css`.
  */
+import { LED_DUMMY_PARTICIPANT_NAME } from "../lib/led/led-dummy.ts";
 import { ledParticipantDisplayName } from "../lib/led/led-participant-display-name.ts";
 
 (function () {
@@ -783,8 +784,8 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     nameExitTimer = 0;
 
     var display = ledParticipantDisplayName(text);
-    if (!display || queueId == null || queueId <= 0) {
-      if (prevNameQueueId != null && prevNameQueueId > 0) {
+    if (!display || queueId == null || queueId === 0) {
+      if (prevNameQueueId != null && prevNameQueueId !== 0) {
         applyNameFadeClass("out");
         nameExitTimer = setTimeout(hideParticipantName, timing.fadeOutMs);
       } else {
@@ -1127,7 +1128,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
         queue_id: -1,
         submission_id: 0,
         url: site.assets.dummyTalent,
-        nama: "",
+        nama: LED_DUMMY_PARTICIPANT_NAME,
       };
       var dummyMs = itemPlayMs(currentItem);
       showTalentPhoto(
@@ -1136,6 +1137,11 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
         dummyMs,
         function () {
           if (currentItem && currentItem.queue_id === -1) {
+            setParticipantName(
+              LED_DUMMY_PARTICIPANT_NAME,
+              -1,
+              dummyMs,
+            );
             armCurrent(dummyMs);
           }
         },
@@ -1150,7 +1156,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
         queue_id: -1,
         submission_id: 0,
         url: site.assets.dummyTalent,
-        nama: "",
+        nama: LED_DUMMY_PARTICIPANT_NAME,
       };
       showTalentPhoto(
         site.assets.dummyTalent,
@@ -1158,6 +1164,11 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
         timing.dummyPlayMs,
         function () {
           if (currentItem && currentItem.queue_id === -1) {
+            setParticipantName(
+              LED_DUMMY_PARTICIPANT_NAME,
+              -1,
+              timing.dummyPlayMs,
+            );
             armCurrent(timing.dummyPlayMs);
           }
         },

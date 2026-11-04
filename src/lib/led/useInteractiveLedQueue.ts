@@ -21,6 +21,7 @@ import {
   liveSegmentPlayMsForSlotCount,
   liveSegmentSlotCount,
 } from "@/lib/led/led-sequence-loop";
+import { LED_DUMMY_PARTICIPANT_NAME } from "@/lib/led/led-dummy";
 import { ledParticipantDisplayName } from "@/lib/led/led-participant-display-name";
 import type {
   LedConnectionStatus,
@@ -42,7 +43,7 @@ function createDummyQueueItem(url: string): LedQueueItem {
   return {
     queue_id: DUMMY_QUEUE_ID,
     submission_id: 0,
-    nama: "",
+    nama: LED_DUMMY_PARTICIPANT_NAME,
     url,
     location_id: 0,
   };
