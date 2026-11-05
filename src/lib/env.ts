@@ -18,3 +18,7 @@ export function getServerEnv() {
 export function getFalKey(): string {
   return required("FAL_KEY");
 }
+
+export function getWaveSpeedApiKey(): string {
+  return required("WAVESPEED_API_KEY");
+}

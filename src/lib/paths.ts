@@ -14,6 +14,10 @@ export function micrositeOverlayPreviewPath(code: string): string {
   return `${micrositePath(code)}?overlay`;
 }
 
+export function micrositeFotoDebugPath(code: string): string {
+  return `${micrositePath(code)}?foto`;
+}
+
 export function ledPath(code: string): string {
   return `/led/${code}`;
 }

@@ -18,6 +18,7 @@ import {
   ledStaticDebugPath,
   ledPath,
   micrositePath,
+  micrositeFotoDebugPath,
   micrositeOverlayPreviewPath,
   micrositeTestPath,
 } from "@/lib/paths";
@@ -61,6 +62,15 @@ function LocationLinks({
           title="Preview submit loading overlay (no fal/API)"
         >
           Microsite (?overlay)
+        </Link>
+      ) : null}
+      {showDebugLinks ? (
+        <Link
+          href={micrositeFotoDebugPath(location.code)}
+          className="rounded-full border border-violet-400/60 px-4 py-2 text-violet-950 hover:bg-violet-50 dark:border-violet-600/50 dark:text-violet-200 dark:hover:bg-violet-950/40"
+          title="Upload selfie; nano → face-swap only (no CMS)"
+        >
+          Microsite (?foto)
         </Link>
       ) : null}
       {showBroadsignLink ? (

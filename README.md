@@ -128,21 +128,46 @@ Debug **tampilan overlay** submit saja (no form, no fal, no API):
 
 Overlay terbuka otomatis; tutup dengan tap luar kartu atau **Esc**, lalu **Tampilkan overlay** untuk buka lagi. Link juga di `/list?debug`.
 
+### Portrait pipeline debug (`?foto`)
+
+Upload selfie, jalankan **portrait edit (fal/wavespeed) → face-swap (WaveSpeed)** saja (tanpa remove-bg, tanpa CMS). Di UI bisa pilih provider + model edit; face-swap tetap WaveSpeed.
+
+```
+/microsite/bei?foto
+```
+
+Di **development** aktif otomatis; di deploy production set `MICROSITE_FOTO_DEBUG=true` (atau `MICROSITE_TEST_BYPASS=true`). Link di `/list?debug`.
+
 ### Portrait pipeline (submit)
 
-On **Submit**, the server runs (unless `?test` bypass):
+On **Submit**, the server runs (unless `?test` bypass), then POST **`/api/submissions`** with the final image URL.
 
-1. **google/nano-banana-2.1/edit** — talent base + selfie + prompts  
-2. *(optional)* **fal-ai/face-swap** — nano output + selfie  
-3. **fal-ai/ideogram/remove-background**  
-4. POST **`/api/submissions`** with the final image URL  
+**Per-step providers** (each falls back to `PORTRAIT_PROVIDER`, default `fal`):
 
-**Switch face-swap on/off** (one place in code, or env without redeploy logic change):
+| Step | Env | Values |
+| ---- | --- | ------ |
+| 1 Portrait edit | `PORTRAIT_EDIT_PROVIDER` | `fal` \| `wavespeed` |
+| 2 Face-swap | *(fixed)* | **WaveSpeed** — `wavespeed-ai/image-face-swap` (`PORTRAIT_FACE_SWAP_PROVIDER` ignored if set to fal) |
+| 3 Remove BG | `PORTRAIT_REMOVE_BG_PROVIDER` | `fal` \| `wavespeed` |
 
-| Method | How |
-| ------ | --- |
-| Code default | `PORTRAIT_PIPELINE_DEFAULT` in [`src/lib/fal/portrait-pipeline.ts`](./src/lib/fal/portrait-pipeline.ts) — `"with-face-swap"` or `"without-face-swap"` |
-| Env override | `FAL_PORTRAIT_FACE_SWAP=true` or `false` (wins over code default) |
+**Edit model** (`PORTRAIT_EDIT_MODEL`): `nano-banana` (default) or `seedream-v5-pro` — works on fal & WaveSpeed (endpoint paths differ per host).
+
+Example mixed pipeline:
+
+```env
+PORTRAIT_EDIT_PROVIDER=fal
+PORTRAIT_EDIT_MODEL=nano-banana
+PORTRAIT_REMOVE_BG_PROVIDER=wavespeed
+# face-swap always WaveSpeed → need WAVESPEED_API_KEY when face-swap enabled
+```
+
+Keys: **`FAL_KEY`** for fal steps + selfie upload (fal.storage); **`WAVESPEED_API_KEY`** whenever face-swap runs or any step uses WaveSpeed. Talent base: `NEXT_PUBLIC_APP_URL` when set.
+
+Orchestrator: [`src/lib/portrait/portrait-orchestrator.ts`](./src/lib/portrait/portrait-orchestrator.ts).
+
+**Face-swap step on/off:** `PORTRAIT_FACE_SWAP` or `FAL_PORTRAIT_FACE_SWAP`, or `PORTRAIT_PIPELINE_DEFAULT` in [`src/lib/portrait/portrait-pipeline.ts`](./src/lib/portrait/portrait-pipeline.ts).
+
+Entry: [`src/lib/portrait/generate-portrait.ts`](./src/lib/portrait/generate-portrait.ts).
 
 ## Cityvision (Broadsign) — vendor LED only
 
