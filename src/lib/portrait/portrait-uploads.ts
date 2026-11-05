@@ -20,8 +20,8 @@ async function readTalentBaseFile(): Promise<File> {
   const root = path.join(process.cwd(), "public");
   const candidates = [
     {
-      path: path.join(root, "images/microsite/talent.jpg"),
-      name: "talent.jpg",
+      path: path.join(root, "images/microsite/talent2.jpg"),
+      name: "talent2.jpg",
       type: "image/jpeg",
     },
     {
@@ -46,7 +46,7 @@ async function readTalentBaseFile(): Promise<File> {
   }
 
   throw new Error(
-    "Base talent tidak ditemukan. Taruh `public/images/microsite/talent.jpg` (driver CLEAR suit) lalu coba lagi.",
+    "Base talent tidak ditemukan. Taruh `public/images/microsite/talent2.jpg` (driver CLEAR suit) lalu coba lagi.",
   );
 }
 
@@ -61,7 +61,7 @@ export async function resolveTalentBaseImageUrl(): Promise<string> {
   if (origin) {
     const root = path.join(process.cwd(), "public");
     const relativePaths = [
-      "/images/microsite/talent.jpg",
+      "/images/microsite/talent2.jpg",
       "/images/microsite/talent.png",
       "/images/led/bei-talent.png",
     ];
