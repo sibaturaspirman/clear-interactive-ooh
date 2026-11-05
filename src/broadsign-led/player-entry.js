@@ -910,6 +910,14 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     beginEnter();
   }
 
+  function replayItemsForPlayback(items) {
+    var sorted = items.slice().sort(function (a, b) {
+      return b.queue_id - a.queue_id;
+    });
+    if (!isSequenceLoop) return sorted;
+    return sorted.slice(0, 3);
+  }
+
   function pullQueue(limit, replay, done) {
     if (pulling || slotFrozen || !started) {
       if (done) done(false);
@@ -927,7 +935,13 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     pulling = true;
     var beforeLen = upcoming.length;
     var url =
-      apiQueuePath("/next?limit=" + limit + "&replay=" + (replay ? "1" : "0"));
+      apiQueuePath(
+        "/next?limit=" +
+          limit +
+          "&replay=" +
+          (replay ? "1" : "0") +
+          "&order=desc",
+      );
     fetch(url, { headers: { "x-led-key": ledKey, Accept: "application/json" } })
       .then(function (res) {
         return res.json().then(function (data) {
@@ -949,7 +963,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
             }
           } else if (data.mode === "replay" && replay && data.items) {
             replaying = true;
-            upcoming = data.items.slice();
+            upcoming = replayItemsForPlayback(data.items);
             preloadQueueItems(upcoming);
           }
         });
@@ -968,7 +982,8 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
       if (done) done();
       return;
     }
-    pullQueue(bufferSize, true, function () {
+    var replayLimit = isSequenceLoop ? queueCapacity() : bufferSize;
+    pullQueue(replayLimit, true, function () {
       if (done) done();
     });
   }

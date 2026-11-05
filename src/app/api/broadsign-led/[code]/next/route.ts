@@ -18,10 +18,11 @@ export async function GET(request: Request, context: RouteContext) {
   const url = new URL(request.url);
   const limit = url.searchParams.get("limit") ?? "5";
   const replay = url.searchParams.get("replay") ?? "0";
+  const order = url.searchParams.get("order") ?? "desc";
 
   try {
     const data = await ledApiFetch<unknown>(
-      `/api/led/${encodeURIComponent(code)}/next?limit=${encodeURIComponent(limit)}&replay=${encodeURIComponent(replay)}`,
+      `/api/led/${encodeURIComponent(code)}/next?limit=${encodeURIComponent(limit)}&replay=${encodeURIComponent(replay)}&order=${encodeURIComponent(order)}`,
     );
     return Response.json(data);
   } catch (error) {

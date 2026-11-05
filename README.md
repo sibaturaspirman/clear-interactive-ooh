@@ -169,6 +169,15 @@ Orchestrator: [`src/lib/portrait/portrait-orchestrator.ts`](./src/lib/portrait/p
 
 Entry: [`src/lib/portrait/generate-portrait.ts`](./src/lib/portrait/generate-portrait.ts).
 
+## LED playback queue
+
+Players pull `GET /api/led/{code}/next?order=desc` so **newest approved** submissions play first (LIFO). Requires **Clear API** (`backend-cms`) with `order` support on `/next`.
+
+- Microsite creates **pending** submissions; CMS must **approve** before they enter the LED queue (`playback_items.status = queued`).
+- Avoid **replay** filler while the server reports `queued > 0` (socket `queue:hint` on Next.js player).
+- **Replay** responses are played **newest-first** on all players (Next.js, Broadsign, reference `player.js`); sequence-loop sites (Sency, GBK, Cityvision) take the **3 newest** per 9s live window.
+- After deploy: hard-refresh LED tabs or clear `localStorage` key `clear.led.queue.{code}` if old names stick.
+
 ## Cityvision (Broadsign) — vendor LED only
 
 Sites: **BEI**, **Ratu Plaza**, **Dukuh Atas**, **Sudirman** (`isCityvisionLedLocation`).

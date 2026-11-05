@@ -28,6 +28,8 @@ import type {
   LedPullResponse,
   LedQueueItem,
 } from "@/lib/led/led-queue-types";
+import { buildLedNextUrl } from "@/lib/led/led-next-url";
+import { replayItemsForPlayback } from "@/lib/led/replay-items-for-playback";
 import {
   preloadLedMediaUrl,
   preloadLedQueueItems,
@@ -129,6 +131,7 @@ export function useInteractiveLedQueue({
     replaying: false,
     hint: false,
     queued: 0,
+    preferFresh: false,
     pulling: false,
     startedAt: 0,
     timer: 0 as ReturnType<typeof setTimeout> | 0,
@@ -335,8 +338,11 @@ export function useInteractiveLedQueue({
     }
     enqueue(async () => {
       if (sencySequenceMode) {
-        if (stateRef.current.upcoming.length === 0 && !stateRef.current.current) {
-          await fillQueueDuringIntro();
+        if (
+          stateRef.current.upcoming.length === 0 &&
+          !stateRef.current.current
+        ) {
+          await fillQueueDuringIntro({ force: true });
         }
         planLiveSegmentPlayback();
       }
@@ -412,22 +418,44 @@ export function useInteractiveLedQueue({
     });
   }
 
-  async function fillQueueDuringIntro() {
-    if (introDoneRef.current) return;
+  async function fillQueueDuringIntro(options?: { force?: boolean }) {
+    if (!options?.force && introDoneRef.current) return;
     while (slots() > 0) {
       const before = stateRef.current.upcoming.length;
-      await pull({ replay: false });
+      await pull({ replay: false, force: options?.force });
       if (stateRef.current.upcoming.length === before) break;
     }
     const state = stateRef.current;
+    const mayReplay =
+      !state.preferFresh && state.queued === 0 && !state.replaying;
     if (
       state.upcoming.length === 0 &&
       !state.current &&
       slots() > 0 &&
-      !state.replaying
+      mayReplay
     ) {
-      await pull({ replay: true });
+      await pull({ replay: true, force: options?.force });
     }
+  }
+
+  /** Pull fresh when socket reports new queue items (all locations). */
+  async function pullFreshWhenHinted() {
+    const state = stateRef.current;
+    if (state.pulling || state.queued <= 0) return;
+    state.preferFresh = true;
+    if (state.replaying) {
+      state.replaying = false;
+      state.replayLoop = [];
+      if (!state.current) {
+        state.upcoming = [];
+      }
+    }
+    while (slots() > 0) {
+      const before = state.upcoming.length;
+      await pull({ replay: false, force: true });
+      if (stateRef.current.upcoming.length === before) break;
+    }
+    persist();
   }
 
   function fetchQueueDuringIntroOnly() {
@@ -652,18 +680,20 @@ export function useInteractiveLedQueue({
     }
   }
 
-  async function pull(options?: { replay?: boolean }) {
+  async function pull(options?: { replay?: boolean; force?: boolean }) {
     const state = stateRef.current;
     if (state.pulling) return;
-    if (fetchQueueDuringIntroOnly()) return;
+    if (!options?.force && fetchQueueDuringIntroOnly()) return;
     const free = slots();
     if (free <= 0) return;
     const askReplay = options?.replay ?? false;
+    if (askReplay && state.preferFresh && state.queued > 0) {
+      return;
+    }
     state.pulling = true;
     try {
-      const base = apiBaseUrl.replace(/\/$/, "");
       const res = await fetch(
-        `${base}/api/led/${encodeURIComponent(code)}/next?limit=${free}&replay=${askReplay ? "1" : "0"}`,
+        buildLedNextUrl(apiBaseUrl, code, { limit: free, replay: askReplay }),
         { headers: { "x-led-key": ledKey } },
       );
       const data = (await res.json()) as LedPullResponse & { message?: string };
@@ -681,6 +711,7 @@ export function useInteractiveLedQueue({
         state.replaying = false;
         state.replayLoop = [];
         state.hint = false;
+        state.preferFresh = false;
         for (const item of data.items) {
           if (!held(item.queue_id) && slots() > 0) {
             state.upcoming.push(item);
@@ -688,11 +719,15 @@ export function useInteractiveLedQueue({
           }
         }
       } else if (data.mode === "replay" && askReplay) {
+        const replayItems = replayItemsForPlayback(
+          data.items,
+          sencySequenceMode,
+        );
         state.replaying = true;
-        state.replayLoop = data.items.slice();
-        state.upcoming = data.items.slice();
+        state.replayLoop = replayItems;
+        state.upcoming = replayItems.slice();
         state.hint = false;
-        buffered.push(...data.items);
+        buffered.push(...replayItems);
       }
       if (buffered.length > 0) {
         void preloadLedQueueItems(buffered);
@@ -1019,14 +1054,17 @@ export function useInteractiveLedQueue({
       enqueue(async () => {
         const state = stateRef.current;
         state.hint = true;
-        state.queued = msg.queued ?? state.queued;
+        const queued = msg.queued ?? state.queued;
+        state.queued = queued;
+        if (queued > 0) {
+          state.preferFresh = true;
+        }
         if (introDoneRef.current) {
-          if (sencySequenceMode) {
-            render();
-            return;
+          if (queued > 0) {
+            await pullFreshWhenHinted();
           }
-          const queued = msg.queued ?? state.queued;
           if (
+            !sencySequenceMode &&
             !state.current &&
             !state.upcoming.length &&
             !state.replaying &&
@@ -1036,11 +1074,12 @@ export function useInteractiveLedQueue({
             return;
           }
           render();
+          if (!state.current) await startIfIdle();
           return;
         }
-        if (state.replaying) {
-          render();
-          return;
+        if (state.replaying && queued > 0) {
+          state.replaying = false;
+          state.replayLoop = [];
         }
         await fillQueueDuringIntro();
         if (!state.current) await startIfIdle();
