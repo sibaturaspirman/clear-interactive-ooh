@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { MICROSITE_SCAN_QR_AGAIN_MESSAGE } from "@/lib/microsite/microsite-session-user-message";
+import { isWindowSubmitConsumed } from "@/lib/microsite/session-consumed";
 import {
   micrositeSubmitTicketCookie,
   mintSubmitTicket,
@@ -44,7 +45,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const ticket = mintSubmitTicket(payload.c, payload.wid);
+  if (isWindowSubmitConsumed(payload.c, payload.wid, payload.iat)) {
+    return NextResponse.json(
+      { ok: false, message: MICROSITE_SCAN_QR_AGAIN_MESSAGE },
+      { status: 401 },
+    );
+  }
+
+  const ticket = mintSubmitTicket(payload.c, payload.wid, payload.iat);
   const res = NextResponse.json({ ok: true });
   res.cookies.set(micrositeSubmitTicketCookie, ticket, {
     httpOnly: true,

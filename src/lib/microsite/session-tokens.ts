@@ -24,6 +24,8 @@ type SubmitTicketPayload = {
   jti: string;
   c: string;
   wid: number;
+  /** Matches `WindowPayload.iat` — identifies which QR URL / `w` this ticket came from. */
+  winIat: number;
   iat: number;
   exp: number;
 };
@@ -120,13 +122,18 @@ export function verifyWindowToken(w: string): WindowPayload | null {
   return payload;
 }
 
-export function mintSubmitTicket(locationCode: string, windowId: number): string {
+export function mintSubmitTicket(
+  locationCode: string,
+  windowId: number,
+  windowIssuedAt: number,
+): string {
   const now = Date.now();
   const jti = base64UrlEncode(randomBytes(24));
   const payload: SubmitTicketPayload = {
     jti,
     c: locationCode,
     wid: windowId,
+    winIat: windowIssuedAt,
     iat: now,
     exp: now + MICROSITE_SUBMIT_TICKET_TTL_MS,
   };
@@ -157,6 +164,7 @@ export function parseSubmitTicket(
     !payload.jti ||
     !payload.c ||
     typeof payload.exp !== "number" ||
+    typeof payload.winIat !== "number" ||
     now > payload.exp
   ) {
     return null;

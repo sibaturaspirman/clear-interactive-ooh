@@ -5,7 +5,13 @@ import { cookies } from "next/headers";
 import { publicApiPostJson } from "@/lib/api";
 import { generatePortraitAssetUrl } from "@/lib/fal/portrait";
 import { getLocationByCode } from "@/lib/locations";
-import { releaseSubmitTicket, tryClaimSubmitTicket } from "@/lib/microsite/session-consumed";
+import {
+  markWindowSubmitSucceeded,
+  releaseSubmitTicket,
+  releaseWindowSubmit,
+  tryBeginWindowSubmit,
+  tryClaimSubmitTicket,
+} from "@/lib/microsite/session-consumed";
 import {
   micrositeSubmitTicketCookie,
   parseSubmitTicket,
@@ -36,9 +42,29 @@ function formatNohp(input: string): string {
 }
 
 type SubmissionResponse = {
-  id: number;
+  id?: number;
+  submission_id?: number;
+  data?: { id?: number };
   message?: string;
 };
+
+function resolveSubmissionId(payload: unknown): number | null {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+  const o = payload as SubmissionResponse;
+  if (typeof o.id === "number" && Number.isFinite(o.id)) {
+    return o.id;
+  }
+  if (typeof o.submission_id === "number" && Number.isFinite(o.submission_id)) {
+    return o.submission_id;
+  }
+  const nested = o.data?.id;
+  if (typeof nested === "number" && Number.isFinite(nested)) {
+    return nested;
+  }
+  return null;
+}
 
 export async function submitParticipation(input: {
   locationCode: string;
@@ -66,7 +92,17 @@ export async function submitParticipation(input: {
     };
   }
 
-  if (!tryClaimSubmitTicket(ticket.jti)) {
+  const { c: ticketLoc, wid, winIat, jti } = ticket;
+
+  if (!tryBeginWindowSubmit(ticketLoc, wid, winIat)) {
+    return {
+      ok: false,
+      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+    };
+  }
+
+  if (!tryClaimSubmitTicket(jti)) {
+    releaseWindowSubmit(ticketLoc, wid, winIat);
     return {
       ok: false,
       message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
@@ -77,7 +113,8 @@ export async function submitParticipation(input: {
 
   const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
-    releaseSubmitTicket(ticket.jti);
+    releaseSubmitTicket(jti);
+    releaseWindowSubmit(ticketLoc, wid, winIat);
     return { ok: false, message: "Nomor HP tidak valid" };
   }
 
@@ -96,9 +133,12 @@ export async function submitParticipation(input: {
       },
     );
     cookieStore.delete(micrositeSubmitTicketCookie);
-    return { ok: true, submissionId: submission.id };
+    markWindowSubmitSucceeded(ticketLoc, wid, winIat);
+    const submissionId = resolveSubmissionId(submission) ?? 0;
+    return { ok: true, submissionId };
   } catch (error) {
-    releaseSubmitTicket(ticket.jti);
+    releaseSubmitTicket(jti);
+    releaseWindowSubmit(ticketLoc, wid, winIat);
     return {
       ok: false,
       message:

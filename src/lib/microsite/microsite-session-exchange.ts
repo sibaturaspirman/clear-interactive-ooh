@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 
 import { MICROSITE_SCAN_QR_AGAIN_MESSAGE } from "@/lib/microsite/microsite-session-user-message";
+import { isWindowSubmitConsumed } from "@/lib/microsite/session-consumed";
 import {
   micrositeSubmitTicketCookie,
   mintSubmitTicket,
@@ -35,7 +36,14 @@ export async function exchangeMicrositeSession(
     };
   }
 
-  const ticket = mintSubmitTicket(payload.c, payload.wid);
+  if (isWindowSubmitConsumed(payload.c, payload.wid, payload.iat)) {
+    return {
+      ok: false,
+      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+    };
+  }
+
+  const ticket = mintSubmitTicket(payload.c, payload.wid, payload.iat);
   const cookieStore = await cookies();
   cookieStore.set(micrositeSubmitTicketCookie, ticket, {
     httpOnly: true,

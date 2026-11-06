@@ -154,21 +154,29 @@ export function MicrositeParticipationFlow({
       type: photoBlob.type || "image/jpeg",
     });
 
-    const result = await submitParticipation({
-      locationCode: location.code,
-      fullName: form.fullName.trim(),
-      photo: file,
-      testBypass,
-    });
+    try {
+      const result = await submitParticipation({
+        locationCode: location.code,
+        fullName: form.fullName.trim(),
+        photo: file,
+        testBypass,
+      });
 
-    setSubmitting(false);
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
 
-    if (!result.ok) {
-      setError(result.message);
-      return;
+      setStep("success");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error && err.message.trim()
+          ? err.message
+          : "Gagal menyelesaikan pengiriman. Coba lagi.";
+      setError(message);
+    } finally {
+      setSubmitting(false);
     }
-
-    setStep("success");
   }
 
   if (!sessionReady) {
