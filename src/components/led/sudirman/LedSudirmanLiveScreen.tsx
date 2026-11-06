@@ -3,13 +3,12 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
+import { LedMicrositeQr } from "@/components/led/LedMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedSudirmanLayerImage } from "@/components/led/sudirman/LedSudirmanLayerImage";
 import { LedSudirmanLiveAnimatedLayer } from "@/components/led/sudirman/LedSudirmanLiveAnimatedLayer";
 import { LedSudirmanTalentCrossfade } from "@/components/led/sudirman/LedSudirmanTalentCrossfade";
-import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   SUDIRMAN_ASSETS,
   SUDIRMAN_LAYOUT_LIVE,
@@ -223,8 +222,9 @@ export function LedSudirmanLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedDynamicMicrositeQr
-                baseUrl={micrositeLedQrImageUrl(locationCode)}
+              <LedMicrositeQr
+                locationCode={locationCode}
+                staticSrc={SUDIRMAN_ASSETS.qrCode}
                 alt="QR microsite"
                 className="absolute inset-0 size-full object-contain"
               />

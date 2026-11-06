@@ -3,13 +3,12 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
+import { LedMicrositeQr } from "@/components/led/LedMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedBeiLayerImage } from "@/components/led/bei/LedBeiLayerImage";
 import { LedBeiLiveAnimatedLayer } from "@/components/led/bei/LedBeiLiveAnimatedLayer";
 import { LedBeiTalentCrossfade } from "@/components/led/bei/LedBeiTalentCrossfade";
-import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   BEI_ASSETS,
   BEI_LAYOUT_LIVE,
@@ -214,8 +213,9 @@ export function LedBeiLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedDynamicMicrositeQr
-                baseUrl={micrositeLedQrImageUrl(locationCode)}
+              <LedMicrositeQr
+                locationCode={locationCode}
+                staticSrc={BEI_ASSETS.qrCode}
                 alt="QR microsite"
                 className="absolute inset-0 size-full object-contain"
               />

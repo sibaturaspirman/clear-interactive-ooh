@@ -16,6 +16,7 @@ import {
   micrositeSubmitTicketCookie,
   parseSubmitTicket,
 } from "@/lib/microsite/session-tokens";
+import { micrositeRequiresSessionFromQrMode } from "@/lib/microsite/microsite-qr-mode";
 import { MICROSITE_SCAN_QR_AGAIN_MESSAGE } from "@/lib/microsite/microsite-session-user-message";
 import {
   MICROSITE_TEST_RESULT_URL,
@@ -80,41 +81,58 @@ export async function submitParticipation(input: {
     return { ok: false, message: "Lokasi tidak ditemukan." };
   }
 
-  const rawTicket = (await cookies()).get(micrositeSubmitTicketCookie)?.value;
-  const ticket = parseSubmitTicket(rawTicket);
-  if (
-    !ticket ||
-    ticket.c.toLowerCase() !== input.locationCode.toLowerCase()
-  ) {
-    return {
-      ok: false,
-      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
-    };
-  }
-
-  const { c: ticketLoc, wid, winIat, jti } = ticket;
-
-  if (!tryBeginWindowSubmit(ticketLoc, wid, winIat)) {
-    return {
-      ok: false,
-      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
-    };
-  }
-
-  if (!tryClaimSubmitTicket(jti)) {
-    releaseWindowSubmit(ticketLoc, wid, winIat);
-    return {
-      ok: false,
-      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
-    };
-  }
+  const sessionBypassEnv =
+    process.env.MICROSITE_SESSION_BYPASS === "1" ||
+    process.env.MICROSITE_SESSION_BYPASS === "true";
+  const requireSubmitTicket =
+    micrositeRequiresSessionFromQrMode() && !sessionBypassEnv;
 
   const cookieStore = await cookies();
+  let ticketLoc = "";
+  let wid = 0;
+  let winIat = 0;
+  let jti = "";
+
+  if (requireSubmitTicket) {
+    const rawTicket = cookieStore.get(micrositeSubmitTicketCookie)?.value;
+    const ticket = parseSubmitTicket(rawTicket);
+    if (
+      !ticket ||
+      ticket.c.toLowerCase() !== input.locationCode.toLowerCase()
+    ) {
+      return {
+        ok: false,
+        message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+      };
+    }
+
+    ticketLoc = ticket.c;
+    wid = ticket.wid;
+    winIat = ticket.winIat;
+    jti = ticket.jti;
+
+    if (!tryBeginWindowSubmit(ticketLoc, wid, winIat)) {
+      return {
+        ok: false,
+        message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+      };
+    }
+
+    if (!tryClaimSubmitTicket(jti)) {
+      releaseWindowSubmit(ticketLoc, wid, winIat);
+      return {
+        ok: false,
+        message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+      };
+    }
+  }
 
   const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
-    releaseSubmitTicket(jti);
-    releaseWindowSubmit(ticketLoc, wid, winIat);
+    if (requireSubmitTicket) {
+      releaseSubmitTicket(jti);
+      releaseWindowSubmit(ticketLoc, wid, winIat);
+    }
     return { ok: false, message: "Nomor HP tidak valid" };
   }
 
@@ -132,13 +150,17 @@ export async function submitParticipation(input: {
         location_id: location.id,
       },
     );
-    cookieStore.delete(micrositeSubmitTicketCookie);
-    markWindowSubmitSucceeded(ticketLoc, wid, winIat);
+    if (requireSubmitTicket) {
+      cookieStore.delete(micrositeSubmitTicketCookie);
+      markWindowSubmitSucceeded(ticketLoc, wid, winIat);
+    }
     const submissionId = resolveSubmissionId(submission) ?? 0;
     return { ok: true, submissionId };
   } catch (error) {
-    releaseSubmitTicket(jti);
-    releaseWindowSubmit(ticketLoc, wid, winIat);
+    if (requireSubmitTicket) {
+      releaseSubmitTicket(jti);
+      releaseWindowSubmit(ticketLoc, wid, winIat);
+    }
     return {
       ok: false,
       message:

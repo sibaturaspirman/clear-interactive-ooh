@@ -16,8 +16,11 @@ type MicrositeFlowProps = {
   fotoDebugAllowed?: boolean;
   /** Signed window token from `?w=` (QR URL). */
   windowToken?: string;
-  /** Server env — skip session when `MICROSITE_SESSION_BYPASS=true`. */
-  sessionBypass?: boolean;
+  /**
+   * When true (dynamic QR, no bypass): require `?w=` exchange before the flow.
+   * When false (static QR or `MICROSITE_SESSION_BYPASS`): no gate.
+   */
+  sessionGateEnabled?: boolean;
 };
 
 export function MicrositeFlow({
@@ -27,7 +30,7 @@ export function MicrositeFlow({
   fotoDebugMode = false,
   fotoDebugAllowed = false,
   windowToken,
-  sessionBypass = false,
+  sessionGateEnabled = true,
 }: MicrositeFlowProps) {
   if (overlayPreviewMode) {
     return <MicrositeOverlayDebug testBypass={testBypass} />;
@@ -44,7 +47,7 @@ export function MicrositeFlow({
       location={location}
       testBypass={testBypass}
       windowToken={windowToken}
-      sessionBypass={sessionBypass}
+      sessionGateEnabled={sessionGateEnabled}
     />
   );
 }

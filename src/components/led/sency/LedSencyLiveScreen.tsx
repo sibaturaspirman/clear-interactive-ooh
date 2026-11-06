@@ -3,13 +3,12 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
+import { LedMicrositeQr } from "@/components/led/LedMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedSencyLayerImage } from "@/components/led/sency/LedSencyLayerImage";
 import { LedSencyLiveAnimatedLayer } from "@/components/led/sency/LedSencyLiveAnimatedLayer";
 import { LedSencyTalentCrossfade } from "@/components/led/sency/LedSencyTalentCrossfade";
-import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   SENCY_ASSETS,
   SENCY_LAYOUT_LIVE,
@@ -231,8 +230,9 @@ export function LedSencyLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedDynamicMicrositeQr
-                baseUrl={micrositeLedQrImageUrl(locationCode)}
+              <LedMicrositeQr
+                locationCode={locationCode}
+                staticSrc={SENCY_ASSETS.qrCode}
                 alt="QR microsite"
                 className="absolute inset-0 size-full object-contain"
               />

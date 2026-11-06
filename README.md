@@ -106,9 +106,32 @@ Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are d
 | **gbk** | MIB | 1680 × 840 |
 | **sency** | MIB | 1200 × 576 |
 
+## LED microsite QR mode (static vs dynamic)
+
+Next.js LED live layers and the **Broadsign** bundle read the same toggle:
+
+| Env | Values | Default |
+| --- | --- | --- |
+| **`NEXT_PUBLIC_MICROSITE_LED_QR_MODE`** | `dynamic` \| `static` | `dynamic` |
+| **`MICROSITE_LED_QR_MODE`** | same (server / build if `NEXT_PUBLIC_*` unset) | `dynamic` |
+
+- **`dynamic`**: QR image from **`GET /api/microsite/led-qr?code=…`** (PNG encodes fresh signed **`?w=`**); players refresh on a timer — same as the current flow.
+- **`static`**: QR is the pre-rendered PNG in **`public/images/led/*-qr.png`** (per location), like before dynamic QR; **Broadsign** omits `dynamicMicrositeQrUrl` and only cache-busts the static asset.
+
+Set **`NEXT_PUBLIC_MICROSITE_LED_QR_MODE`** and/or **`MICROSITE_LED_QR_MODE`** to the same value. **`NEXT_PUBLIC_*`** is inlined for any client bundle; **`MICROSITE_LED_QR_MODE`** alone is also applied on **Next.js `/led/*`** via an inline bootstrap (so LED players match Broadsign without duplicating the public var). Broadsign HTML is built with the server env.
+
+**Microsite vs mode**
+
+| QR mode | LED QR | Microsite gate (`?w=` + exchange) | Submit ticket |
+| --- | --- | --- | --- |
+| **`dynamic`** | `/api/microsite/led-qr?code=…` | **Required** (unless `MICROSITE_SESSION_BYPASS`) | **Required** (same rules) |
+| **`static`** | `public/images/led/*-qr.png` | **Off** — open `/microsite/{code}` directly | **Off** |
+
+Use **`MICROSITE_SESSION_BYPASS=true`** only for QA; it skips the gate and submit ticket even when **`dynamic`** is enabled.
+
 ## Microsite session (QR gate)
 
-Participation requires a signed **`?w=`** window token from the LED QR URL (not a bare `/microsite/sency` link).
+When **`NEXT_PUBLIC_MICROSITE_LED_QR_MODE=dynamic`** (default), participation expects a signed **`?w=`** window token from the LED QR URL (not a bare `/microsite/sency` link). In **`static`** mode the app does not require **`?w=`** or a submit cookie.
 
 - **`GET /api/microsite/led-qr?code=sency`**: PNG QR for LED — encodes fresh `/microsite/{code}?w=…` each request. Used by `/led/*` players; refresh every **3 minutes** in-app so the image tracks new `w` before the **5-minute** window rotates.
 - **`GET /api/microsite/preview-window?code=sency`** (development only): returns a current **`w`** and full **`micrositeUrl`** for testing.

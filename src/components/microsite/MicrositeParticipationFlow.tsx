@@ -24,14 +24,15 @@ type MicrositeParticipationFlowProps = {
   location: Location;
   testBypass?: boolean;
   windowToken?: string;
-  sessionBypass?: boolean;
+  /** False when static QR (or env bypass on server): skip `?w=` exchange. */
+  sessionGateEnabled?: boolean;
 };
 
 export function MicrositeParticipationFlow({
   location,
   testBypass = false,
   windowToken,
-  sessionBypass = false,
+  sessionGateEnabled = true,
 }: MicrositeParticipationFlowProps) {
   const [step, setStep] = useState<Step>("info");
   const [form, setForm] = useState<FormState>({
@@ -46,20 +47,20 @@ export function MicrositeParticipationFlow({
 
   const noWindowTokenMessage = MICROSITE_SCAN_QR_AGAIN_MESSAGE;
 
-  const [sessionReady, setSessionReady] = useState(() => sessionBypass);
+  const [sessionReady, setSessionReady] = useState(() => !sessionGateEnabled);
   const [sessionError, setSessionError] = useState<string | null>(() => {
-    if (sessionBypass) return null;
+    if (!sessionGateEnabled) return null;
     if (!windowToken?.trim()) return noWindowTokenMessage;
     return null;
   });
   const [sessionLoading, setSessionLoading] = useState(() => {
-    if (sessionBypass) return false;
+    if (!sessionGateEnabled) return false;
     if (!windowToken?.trim()) return false;
     return true;
   });
 
   useEffect(() => {
-    if (sessionBypass) {
+    if (!sessionGateEnabled) {
       setSessionReady(true);
       setSessionError(null);
       setSessionLoading(false);
@@ -117,7 +118,7 @@ export function MicrositeParticipationFlow({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [sessionBypass, windowToken, location.code]);
+  }, [sessionGateEnabled, windowToken, location.code]);
 
   const photoUrl = useMemo(
     () => photoPreview,

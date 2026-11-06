@@ -3,13 +3,12 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
+import { LedMicrositeQr } from "@/components/led/LedMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedDukuhAtasLayerImage } from "@/components/led/dukuh-atas/LedDukuhAtasLayerImage";
 import { LedDukuhAtasLiveAnimatedLayer } from "@/components/led/dukuh-atas/LedDukuhAtasLiveAnimatedLayer";
 import { LedDukuhAtasTalentCrossfade } from "@/components/led/dukuh-atas/LedDukuhAtasTalentCrossfade";
-import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   DUKUH_ATAS_ASSETS,
   DUKUH_ATAS_LAYOUT_LIVE,
@@ -246,8 +245,9 @@ export function LedDukuhAtasLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedDynamicMicrositeQr
-                baseUrl={micrositeLedQrImageUrl(locationCode)}
+              <LedMicrositeQr
+                locationCode={locationCode}
+                staticSrc={DUKUH_ATAS_ASSETS.qrCode}
                 alt="QR microsite"
                 className="absolute inset-0 size-full object-contain"
               />

@@ -3,13 +3,12 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
+import { LedMicrositeQr } from "@/components/led/LedMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import { LedGbkLiveAnimatedLayer } from "@/components/led/gbk/LedGbkLiveAnimatedLayer";
 import { LedGbkTalentCrossfade } from "@/components/led/gbk/LedGbkTalentCrossfade";
-import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   GBK_ASSETS,
   GBK_LAYOUT_LIVE,
@@ -230,8 +229,9 @@ export function LedGbkLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedDynamicMicrositeQr
-                baseUrl={micrositeLedQrImageUrl(locationCode)}
+              <LedMicrositeQr
+                locationCode={locationCode}
+                staticSrc={GBK_ASSETS.qrCode}
                 alt="QR microsite"
                 className="absolute inset-0 size-full object-contain"
               />

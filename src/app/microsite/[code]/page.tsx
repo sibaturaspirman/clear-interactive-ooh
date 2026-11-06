@@ -10,6 +10,7 @@ import {
   parseMicrositeFotoDebug,
 } from "@/lib/microsite/foto-debug";
 import { parseMicrositeOverlayPreview } from "@/lib/microsite/overlay-preview";
+import { micrositeRequiresSessionFromQrMode } from "@/lib/microsite/microsite-qr-mode";
 import { parseMicrositeTestBypass } from "@/lib/microsite/test-bypass";
 
 export const instant = false;
@@ -62,9 +63,12 @@ export default async function MicrositeLocationPage({
       : Array.isArray(rawW)
         ? rawW[0]
         : undefined;
-  const sessionBypass =
+  const sessionBypassEnv =
     process.env.MICROSITE_SESSION_BYPASS === "1" ||
     process.env.MICROSITE_SESSION_BYPASS === "true";
+  /** Dynamic QR: require `?w=` exchange unless bypass env. Static QR: open microsite without session gate. */
+  const sessionGateEnabled =
+    micrositeRequiresSessionFromQrMode() && !sessionBypassEnv;
 
   return (
     <MicrositeFlow
@@ -74,7 +78,7 @@ export default async function MicrositeLocationPage({
       fotoDebugMode={fotoDebugMode}
       fotoDebugAllowed={fotoDebugAllowed}
       windowToken={windowToken}
-      sessionBypass={sessionBypass}
+      sessionGateEnabled={sessionGateEnabled}
     />
   );
 }
