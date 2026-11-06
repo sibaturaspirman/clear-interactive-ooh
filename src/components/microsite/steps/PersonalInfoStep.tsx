@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 type PersonalInfoStepProps = {
   form: {
     fullName: string;
-    phone: string;
     gender: "male" | "female" | "";
     termsAccepted: boolean;
   };
@@ -31,8 +30,8 @@ function TextField({
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
-  type?: "text" | "tel";
-  inputMode?: "text" | "numeric" | "tel";
+  type?: "text";
+  inputMode?: "text";
   autoComplete?: string;
 }) {
   return (
@@ -64,22 +63,6 @@ export function PersonalInfoStep({
             placeholder="Enter your full name"
             autoComplete="name"
             onChange={(fullName) => onChange({ fullName })}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <FieldLabel>Number Phone</FieldLabel>
-        <div className="microsite-field flex items-center gap-2">
-          <span className="text-sm">+62</span>
-          <span className="h-4 w-px bg-white/60" aria-hidden />
-          <TextField
-            type="tel"
-            inputMode="numeric"
-            autoComplete="tel"
-            value={form.phone}
-            placeholder="Enter your phone number"
-            onChange={(phone) => onChange({ phone })}
           />
         </div>
       </div>

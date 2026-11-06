@@ -14,7 +14,6 @@ type Step = "info" | "camera" | "review" | "success";
 
 type FormState = {
   fullName: string;
-  phone: string;
   gender: "male" | "female" | "";
   termsAccepted: boolean;
 };
@@ -31,7 +30,6 @@ export function MicrositeParticipationFlow({
   const [step, setStep] = useState<Step>("info");
   const [form, setForm] = useState<FormState>({
     fullName: "",
-    phone: "",
     gender: "",
     termsAccepted: false,
   });
@@ -47,7 +45,6 @@ export function MicrositeParticipationFlow({
 
   const infoValid =
     form.fullName.trim().length >= 2 &&
-    form.phone.replace(/\D/g, "").length >= 9 &&
     (form.gender === "male" || form.gender === "female") &&
     form.termsAccepted;
 
@@ -79,7 +76,6 @@ export function MicrositeParticipationFlow({
     const result = await submitParticipation({
       locationCode: location.code,
       fullName: form.fullName.trim(),
-      phone: form.phone.trim(),
       photo: file,
       testBypass,
     });
@@ -137,7 +133,6 @@ export function MicrositeParticipationFlow({
           setStep("info");
           setForm({
             fullName: "",
-            phone: "",
             gender: "",
             termsAccepted: false,
           });

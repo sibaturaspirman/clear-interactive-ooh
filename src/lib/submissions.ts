@@ -12,6 +12,9 @@ export type SubmitResult =
   | { ok: true; submissionId: number }
   | { ok: false; message: string };
 
+/** Microsite no longer collects phone; API still requires `nohp`. */
+const PLACEHOLDER_NOHP = "000000000";
+
 /** Same rules as backend `assertPhone` / `cleanPhone`. */
 function formatNohp(input: string): string {
   const digits = String(input || "").replace(/[\s-]/g, "").replace(/\D/g, "");
@@ -32,7 +35,8 @@ type SubmissionResponse = {
 export async function submitParticipation(input: {
   locationCode: string;
   fullName: string;
-  phone: string;
+  /** Omit to send placeholder `000000000` (formatted as 62…). */
+  phone?: string;
   photo: File;
   /** Set when microsite was opened with `?test` (honored only if bypass is allowed). */
   testBypass?: boolean;
@@ -42,7 +46,7 @@ export async function submitParticipation(input: {
     return { ok: false, message: "Lokasi tidak ditemukan." };
   }
 
-  const nohp = formatNohp(input.phone);
+  const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
     return { ok: false, message: "Nomor HP tidak valid" };
   }
