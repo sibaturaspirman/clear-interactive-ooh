@@ -14,6 +14,7 @@ import {
 } from "@/lib/led/bei/bei-layout";
 
 type LedBeiScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -31,6 +32,7 @@ type LedBeiScreenProps = {
 };
 
 export function LedBeiScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -87,6 +89,7 @@ export function LedBeiScreen({
         >
           <LedBeiLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

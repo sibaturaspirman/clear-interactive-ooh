@@ -14,6 +14,10 @@ type MicrositeFlowProps = {
   /** From `?foto` — upload + nano → face-swap preview (no CMS). */
   fotoDebugMode?: boolean;
   fotoDebugAllowed?: boolean;
+  /** Signed window token from `?w=` (QR URL). */
+  windowToken?: string;
+  /** Server env — skip session when `MICROSITE_SESSION_BYPASS=true`. */
+  sessionBypass?: boolean;
 };
 
 export function MicrositeFlow({
@@ -22,6 +26,8 @@ export function MicrositeFlow({
   overlayPreviewMode = false,
   fotoDebugMode = false,
   fotoDebugAllowed = false,
+  windowToken,
+  sessionBypass = false,
 }: MicrositeFlowProps) {
   if (overlayPreviewMode) {
     return <MicrositeOverlayDebug testBypass={testBypass} />;
@@ -34,6 +40,11 @@ export function MicrositeFlow({
   }
 
   return (
-    <MicrositeParticipationFlow location={location} testBypass={testBypass} />
+    <MicrositeParticipationFlow
+      location={location}
+      testBypass={testBypass}
+      windowToken={windowToken}
+      sessionBypass={sessionBypass}
+    />
   );
 }

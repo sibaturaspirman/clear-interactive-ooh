@@ -13,6 +13,8 @@ import { getLedCanvas } from "@/lib/led/location-specs";
 export type InteractiveLedPlaybackPhase = "static" | "live" | "outro";
 
 export type InteractiveLedScreenProps = {
+  /** Location code — drives dynamic microsite QR (`?w=`). */
+  locationCode: string;
   phase: InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -91,6 +93,7 @@ export function InteractiveLedPlayerFrame({
       cityvision={cityvision}
     >
       {renderScreen({
+        locationCode: code,
         phase: queue.phase,
         disableAnimations,
         debugActive,

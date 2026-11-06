@@ -28,3 +28,6 @@ await QRCode.toFile(out, target, {
 });
 
 console.log(`sency-qr.png → ${target}`);
+console.log(
+  "(Production: QR must include signed ?w= — see README “Microsite session” / GET /api/microsite/preview-window in dev.)",
+);

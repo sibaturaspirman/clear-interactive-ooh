@@ -97,6 +97,8 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   var slotFrozen = false;
   var playTimer = 0;
   var pollTimer = 0;
+  var micrositeQrTimer = 0;
+  var micrositeQrImgEl = null;
   var introRunning = false;
   var talentExitTimer = 0;
   var talentSwapTimer = 0;
@@ -359,11 +361,25 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     inset.style.width = lv.qrInset.width * 100 + "%";
     inset.style.height = lv.qrInset.height * 100 + "%";
     var qrImg = document.createElement("img");
-    qrImg.src = site.assets.qrCode;
     qrImg.alt = "QR";
+    qrImg.style.cssText = "width:100%;height:100%;object-fit:contain;";
     inset.appendChild(qrImg);
     qrWrap.appendChild(inset);
     liveRoot.appendChild(qrWrap);
+
+    micrositeQrImgEl = qrImg;
+    function refreshMicrositeQr() {
+      if (!micrositeQrImgEl) return;
+      var base =
+        site.assets.dynamicMicrositeQrUrl || site.assets.qrCode;
+      var sep = String(base).indexOf("?") >= 0 ? "&" : "?";
+      micrositeQrImgEl.src = base + sep + "t=" + Date.now();
+    }
+    refreshMicrositeQr();
+    if (site.assets.dynamicMicrositeQrUrl) {
+      if (micrositeQrTimer) clearInterval(micrositeQrTimer);
+      micrositeQrTimer = setInterval(refreshMicrositeQr, 3 * 60 * 1000);
+    }
 
     talentPhotoEl = document.createElement("div");
     talentPhotoEl.className =

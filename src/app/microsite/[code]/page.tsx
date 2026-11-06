@@ -20,6 +20,7 @@ type PageProps = {
     test?: string | string[];
     overlay?: string | string[];
     foto?: string | string[];
+    w?: string | string[];
   }>;
 };
 
@@ -54,6 +55,16 @@ export default async function MicrositeLocationPage({
   const overlayPreviewMode = parseMicrositeOverlayPreview(query.overlay);
   const fotoDebugMode = parseMicrositeFotoDebug(query.foto);
   const fotoDebugAllowed = canRunMicrositeFotoDebug();
+  const rawW = query.w;
+  const windowToken =
+    typeof rawW === "string"
+      ? rawW
+      : Array.isArray(rawW)
+        ? rawW[0]
+        : undefined;
+  const sessionBypass =
+    process.env.MICROSITE_SESSION_BYPASS === "1" ||
+    process.env.MICROSITE_SESSION_BYPASS === "true";
 
   return (
     <MicrositeFlow
@@ -62,6 +73,8 @@ export default async function MicrositeLocationPage({
       overlayPreviewMode={overlayPreviewMode}
       fotoDebugMode={fotoDebugMode}
       fotoDebugAllowed={fotoDebugAllowed}
+      windowToken={windowToken}
+      sessionBypass={sessionBypass}
     />
   );
 }

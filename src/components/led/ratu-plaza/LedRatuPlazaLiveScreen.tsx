@@ -3,11 +3,13 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedRatuPlazaLayerImage } from "@/components/led/ratu-plaza/LedRatuPlazaLayerImage";
 import { LedRatuPlazaLiveAnimatedLayer } from "@/components/led/ratu-plaza/LedRatuPlazaLiveAnimatedLayer";
 import { LedRatuPlazaTalentCrossfade } from "@/components/led/ratu-plaza/LedRatuPlazaTalentCrossfade";
+import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   RATU_PLAZA_ASSETS,
   RATU_PLAZA_LAYOUT_LIVE,
@@ -17,6 +19,7 @@ import {
 } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 
 type LedRatuPlazaLiveScreenProps = {
+  locationCode: string;
   /** Pack handoff + full live layers (intro→live). */
   liveActive?: boolean;
   /** Tagline + QR (may start under intro fade). */
@@ -37,6 +40,7 @@ type LedRatuPlazaLiveScreenProps = {
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
 export function LedRatuPlazaLiveScreen({
+  locationCode,
   liveActive = true,
   chromeRevealed = true,
   talentRevealed = true,
@@ -226,13 +230,10 @@ export function LedRatuPlazaLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedPublicImage
-                src={RATU_PLAZA_ASSETS.qrCode}
+              <LedDynamicMicrositeQr
+                baseUrl={micrositeLedQrImageUrl(locationCode)}
                 alt="QR microsite"
-                fill
-                className="object-contain"
-                sizes="447px"
-                priority
+                className="absolute inset-0 size-full object-contain"
               />
             </div>
           </div>

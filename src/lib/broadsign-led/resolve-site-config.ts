@@ -32,6 +32,7 @@ import {
   BEI_CANVAS,
 } from "@/lib/led/bei/bei-layout";
 import { isCityvisionLedLocation } from "@/lib/led/led-vendors";
+import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import type { BroadsignSitePayload } from "@/lib/broadsign-led/types";
 
 function sequenceTiming() {
@@ -64,6 +65,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       tagline: DUKUH_ATAS_ASSETS.tagline,
       qrFrame: DUKUH_ATAS_ASSETS.qrFrame,
       qrCode: DUKUH_ATAS_ASSETS.qrCode,
+      dynamicMicrositeQrUrl: micrositeLedQrImageUrl("dukuh-atas"),
       dummyTalent: DUKUH_ATAS_ASSETS.layoutTalentDummy,
       end: DUKUH_ATAS_ASSETS.end,
     },
@@ -105,6 +107,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       tagline: RATU_PLAZA_ASSETS.tagline,
       qrFrame: RATU_PLAZA_ASSETS.qrFrame,
       qrCode: RATU_PLAZA_ASSETS.qrCode,
+      dynamicMicrositeQrUrl: micrositeLedQrImageUrl("ratu-plaza"),
       dummyTalent: RATU_PLAZA_ASSETS.layoutTalentDummy,
       end: RATU_PLAZA_ASSETS.end,
     },
@@ -143,6 +146,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       tagline: SUDIRMAN_ASSETS.tagline,
       qrFrame: SUDIRMAN_ASSETS.qrFrame,
       qrCode: SUDIRMAN_ASSETS.qrCode,
+      dynamicMicrositeQrUrl: micrositeLedQrImageUrl("sudirman"),
       dummyTalent: SUDIRMAN_ASSETS.layoutTalentDummy,
       end: SUDIRMAN_ASSETS.end,
     },
@@ -179,6 +183,7 @@ const PAYLOADS: Record<string, BroadsignSitePayload> = {
       tagline: BEI_ASSETS.tagline,
       qrFrame: BEI_ASSETS.qrFrame,
       qrCode: BEI_ASSETS.qrCode,
+      dynamicMicrositeQrUrl: micrositeLedQrImageUrl("bei"),
       dummyTalent: BEI_ASSETS.layoutTalentDummy,
       end: BEI_ASSETS.end,
     },

@@ -14,6 +14,7 @@ import {
 } from "@/lib/led/sudirman/sudirman-layout";
 
 type LedSudirmanScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -31,6 +32,7 @@ type LedSudirmanScreenProps = {
 };
 
 export function LedSudirmanScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -87,6 +89,7 @@ export function LedSudirmanScreen({
         >
           <LedSudirmanLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

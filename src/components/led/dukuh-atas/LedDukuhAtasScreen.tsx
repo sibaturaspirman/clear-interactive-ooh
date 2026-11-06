@@ -14,6 +14,7 @@ import {
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
 
 type LedDukuhAtasScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -31,6 +32,7 @@ type LedDukuhAtasScreenProps = {
 };
 
 export function LedDukuhAtasScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -88,6 +90,7 @@ export function LedDukuhAtasScreen({
         >
           <LedDukuhAtasLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

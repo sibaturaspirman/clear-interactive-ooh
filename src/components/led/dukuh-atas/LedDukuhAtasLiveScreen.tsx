@@ -3,11 +3,13 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedDukuhAtasLayerImage } from "@/components/led/dukuh-atas/LedDukuhAtasLayerImage";
 import { LedDukuhAtasLiveAnimatedLayer } from "@/components/led/dukuh-atas/LedDukuhAtasLiveAnimatedLayer";
 import { LedDukuhAtasTalentCrossfade } from "@/components/led/dukuh-atas/LedDukuhAtasTalentCrossfade";
+import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   DUKUH_ATAS_ASSETS,
   DUKUH_ATAS_LAYOUT_LIVE,
@@ -17,6 +19,7 @@ import {
 } from "@/lib/led/dukuh-atas/dukuh-atas-layout";
 
 type LedDukuhAtasLiveScreenProps = {
+  locationCode: string;
   /** Pack handoff + full live layers (intro→live). */
   liveActive?: boolean;
   /** Tagline + QR (may start under intro fade). */
@@ -37,6 +40,7 @@ type LedDukuhAtasLiveScreenProps = {
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
 export function LedDukuhAtasLiveScreen({
+  locationCode,
   liveActive = true,
   chromeRevealed = true,
   talentRevealed = true,
@@ -242,13 +246,10 @@ export function LedDukuhAtasLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedPublicImage
-                src={DUKUH_ATAS_ASSETS.qrCode}
+              <LedDynamicMicrositeQr
+                baseUrl={micrositeLedQrImageUrl(locationCode)}
                 alt="QR microsite"
-                fill
-                className="object-contain"
-                sizes="447px"
-                priority
+                className="absolute inset-0 size-full object-contain"
               />
             </div>
           </div>

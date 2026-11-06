@@ -32,7 +32,10 @@ export type BroadsignSitePayload = {
     text: string;
     tagline: string;
     qrFrame: string;
+    /** Legacy static PNG; live player prefers `dynamicMicrositeQrUrl` when set. */
     qrCode: string;
+    /** Same-origin path: PNG QR with fresh signed `?w=` (e.g. `/api/microsite/led-qr?code=sency`). */
+    dynamicMicrositeQrUrl?: string;
     dummyTalent: string;
     /** Single clear (static + live). */
     clear?: string;

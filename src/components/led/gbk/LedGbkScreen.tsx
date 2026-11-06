@@ -12,6 +12,7 @@ import {
 } from "@/lib/led/gbk/gbk-layout";
 
 type LedGbkScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -29,6 +30,7 @@ type LedGbkScreenProps = {
 };
 
 export function LedGbkScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -86,6 +88,7 @@ export function LedGbkScreen({
         >
           <LedGbkLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

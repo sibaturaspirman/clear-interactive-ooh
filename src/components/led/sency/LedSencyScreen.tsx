@@ -12,6 +12,7 @@ import {
 } from "@/lib/led/sency/sency-layout";
 
 type LedSencyScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -29,6 +30,7 @@ type LedSencyScreenProps = {
 };
 
 export function LedSencyScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -86,6 +88,7 @@ export function LedSencyScreen({
         >
           <LedSencyLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

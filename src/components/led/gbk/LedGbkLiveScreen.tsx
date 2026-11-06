@@ -3,11 +3,13 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LedDynamicMicrositeQr } from "@/components/led/LedDynamicMicrositeQr";
 import { LedParticipantNameCrossfade } from "@/components/led/LedParticipantNameCrossfade";
 import { LedPublicImage } from "@/components/led/LedPublicImage";
 import { LedGbkLayerImage } from "@/components/led/gbk/LedGbkLayerImage";
 import { LedGbkLiveAnimatedLayer } from "@/components/led/gbk/LedGbkLiveAnimatedLayer";
 import { LedGbkTalentCrossfade } from "@/components/led/gbk/LedGbkTalentCrossfade";
+import { micrositeLedQrImageUrl } from "@/lib/microsite/microsite-led-qr";
 import {
   GBK_ASSETS,
   GBK_LAYOUT_LIVE,
@@ -17,6 +19,7 @@ import {
 } from "@/lib/led/gbk/gbk-layout";
 
 type LedGbkLiveScreenProps = {
+  locationCode: string;
   /** Pack handoff + full live layers (intro→live). */
   liveActive?: boolean;
   /** Tagline + QR (may start under intro fade). */
@@ -37,6 +40,7 @@ type LedGbkLiveScreenProps = {
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
 export function LedGbkLiveScreen({
+  locationCode,
   liveActive = true,
   chromeRevealed = true,
   talentRevealed = true,
@@ -226,13 +230,10 @@ export function LedGbkLiveScreen({
             }}
           >
             <div className="relative size-full">
-              <LedPublicImage
-                src={GBK_ASSETS.qrCode}
+              <LedDynamicMicrositeQr
+                baseUrl={micrositeLedQrImageUrl(locationCode)}
                 alt="QR microsite"
-                fill
-                className="object-contain"
-                sizes="447px"
-                priority
+                className="absolute inset-0 size-full object-contain"
               />
             </div>
           </div>

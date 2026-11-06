@@ -1,8 +1,16 @@
 "use server";
 
+import { cookies } from "next/headers";
+
 import { publicApiPostJson } from "@/lib/api";
 import { generatePortraitAssetUrl } from "@/lib/fal/portrait";
 import { getLocationByCode } from "@/lib/locations";
+import { releaseSubmitTicket, tryClaimSubmitTicket } from "@/lib/microsite/session-consumed";
+import {
+  micrositeSubmitTicketCookie,
+  parseSubmitTicket,
+} from "@/lib/microsite/session-tokens";
+import { MICROSITE_SCAN_QR_AGAIN_MESSAGE } from "@/lib/microsite/microsite-session-user-message";
 import {
   MICROSITE_TEST_RESULT_URL,
   canBypassFalGeneration,
@@ -46,8 +54,30 @@ export async function submitParticipation(input: {
     return { ok: false, message: "Lokasi tidak ditemukan." };
   }
 
+  const rawTicket = (await cookies()).get(micrositeSubmitTicketCookie)?.value;
+  const ticket = parseSubmitTicket(rawTicket);
+  if (
+    !ticket ||
+    ticket.c.toLowerCase() !== input.locationCode.toLowerCase()
+  ) {
+    return {
+      ok: false,
+      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+    };
+  }
+
+  if (!tryClaimSubmitTicket(ticket.jti)) {
+    return {
+      ok: false,
+      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
+    };
+  }
+
+  const cookieStore = await cookies();
+
   const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
+    releaseSubmitTicket(ticket.jti);
     return { ok: false, message: "Nomor HP tidak valid" };
   }
 
@@ -65,8 +95,10 @@ export async function submitParticipation(input: {
         location_id: location.id,
       },
     );
+    cookieStore.delete(micrositeSubmitTicketCookie);
     return { ok: true, submissionId: submission.id };
   } catch (error) {
+    releaseSubmitTicket(ticket.jti);
     return {
       ok: false,
       message:

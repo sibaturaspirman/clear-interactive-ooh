@@ -16,6 +16,7 @@ import {
 } from "@/lib/led/ratu-plaza/ratu-plaza-layout";
 
 type LedRatuPlazaScreenProps = {
+  locationCode: string;
   phase: import("@/components/led/interactive-led-player-shared").InteractiveLedPlaybackPhase;
   disableAnimations?: boolean;
   debugActive?: boolean;
@@ -33,6 +34,7 @@ type LedRatuPlazaScreenProps = {
 };
 
 export function LedRatuPlazaScreen({
+  locationCode,
   phase,
   disableAnimations = false,
   debugActive = false,
@@ -90,6 +92,7 @@ export function LedRatuPlazaScreen({
         >
           <LedRatuPlazaLiveScreen
             key={`live-${introCycleKey}`}
+            locationCode={locationCode}
             liveActive={liveVisible}
             chromeRevealed={liveVisible}
             talentRevealed={liveVisible}

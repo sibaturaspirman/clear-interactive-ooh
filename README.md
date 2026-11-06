@@ -106,6 +106,18 @@ Each LED page renders a fixed pixel canvas (scaled to the viewport). Sizes are d
 | **gbk** | MIB | 1680 × 840 |
 | **sency** | MIB | 1200 × 576 |
 
+## Microsite session (QR gate)
+
+Participation requires a signed **`?w=`** window token from the LED QR URL (not a bare `/microsite/sency` link).
+
+- **`GET /api/microsite/led-qr?code=sency`**: PNG QR for LED — encodes fresh `/microsite/{code}?w=…` each request. Used by `/led/*` players; refresh every **3 minutes** in-app so the image tracks new `w` before the **5-minute** window rotates.
+- **`GET /api/microsite/preview-window?code=sency`** (development only): returns a current **`w`** and full **`micrositeUrl`** for testing.
+- On load, the client **`POST /api/microsite/session`** with `{ w, code }` sets an **httpOnly** submit cookie (per device). **One successful submit consumes** the ticket; failed submit releases it for retry.
+- Set **`MICROSITE_SESSION_SECRET`** (≥16 chars) in production. Local dev falls back to a fixed dev secret if unset.
+- **`MICROSITE_SESSION_BYPASS=true`**: skip `?w=` (local QA only; do not use in production).
+
+Rotate the QR URL every **5 minutes** by issuing a new `w` (`mintWindowToken` in `src/lib/microsite/session-tokens.ts`). One-time submit state is kept **in memory** in this app — use **Redis** (or similar) if you run **multiple server instances**.
+
 ## Microsite test mode (skip fal.ai)
 
 To submit without calling fal.ai (fixed result image, saves FAL tokens):
