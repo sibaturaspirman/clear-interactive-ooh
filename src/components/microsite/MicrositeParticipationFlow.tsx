@@ -45,12 +45,12 @@ export function MicrositeParticipationFlow({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const noWindowTokenMessage = MICROSITE_SCAN_QR_AGAIN_MESSAGE;
-
-  const [sessionReady, setSessionReady] = useState(() => !sessionGateEnabled);
+  /** When gate is on, becomes true only after successful `exchangeMicrositeSession`. */
+  const [internalSessionReady, setInternalSessionReady] = useState(false);
+  const sessionReady = !sessionGateEnabled || internalSessionReady;
   const [sessionError, setSessionError] = useState<string | null>(() => {
     if (!sessionGateEnabled) return null;
-    if (!windowToken?.trim()) return noWindowTokenMessage;
+    if (!windowToken?.trim()) return MICROSITE_SCAN_QR_AGAIN_MESSAGE;
     return null;
   });
   const [sessionLoading, setSessionLoading] = useState(() => {
@@ -61,11 +61,10 @@ export function MicrositeParticipationFlow({
 
   useEffect(() => {
     if (!sessionGateEnabled) {
-      setSessionReady(true);
-      setSessionError(null);
-      setSessionLoading(false);
       return;
     }
+
+    let cancelled = false;
 
     const fromUrl =
       typeof window !== "undefined"
@@ -73,22 +72,29 @@ export function MicrositeParticipationFlow({
         : "";
     const w = (fromUrl || windowToken?.trim() || "").trim();
     if (!w) {
-      setSessionReady(false);
-      setSessionError(noWindowTokenMessage);
-      setSessionLoading(false);
-      return;
+      queueMicrotask(() => {
+        if (cancelled) return;
+        setInternalSessionReady(false);
+        setSessionError(MICROSITE_SCAN_QR_AGAIN_MESSAGE);
+        setSessionLoading(false);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
 
-    let cancelled = false;
-    setSessionError(null);
-    setSessionReady(false);
-    setSessionLoading(true);
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setSessionError(null);
+      setInternalSessionReady(false);
+      setSessionLoading(true);
+    });
 
     const timeoutMs = 20000;
     const timer = window.setTimeout(() => {
       if (cancelled) return;
       setSessionError(MICROSITE_SCAN_QR_AGAIN_MESSAGE);
-      setSessionReady(false);
+      setInternalSessionReady(false);
       setSessionLoading(false);
     }, timeoutMs);
 
@@ -98,17 +104,17 @@ export function MicrositeParticipationFlow({
         window.clearTimeout(timer);
         if (!result.ok) {
           setSessionError(result.message);
-          setSessionReady(false);
+          setInternalSessionReady(false);
         } else {
           setSessionError(null);
-          setSessionReady(true);
+          setInternalSessionReady(true);
         }
       })
-      .catch((err: unknown) => {
+      .catch(() => {
         if (cancelled) return;
         window.clearTimeout(timer);
         setSessionError(MICROSITE_SCAN_QR_AGAIN_MESSAGE);
-        setSessionReady(false);
+        setInternalSessionReady(false);
       })
       .finally(() => {
         if (!cancelled) setSessionLoading(false);

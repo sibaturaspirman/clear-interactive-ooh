@@ -19,6 +19,7 @@ npm run dev
 | `FAL_KEY` | fal.ai (microsite portrait pipeline only) |
 | `NEXT_PUBLIC_APP_URL` | Public origin for QR codes & uploads (e.g. `https://www.clearxorbr.id`) |
 | `MICROSITE_TEST_BYPASS` | Optional: `true` to allow `?test` bypass on non-dev deploys |
+| `MICROSITE_PLACEHOLDER_NOHP` | Optional: override default placeholder `nohp` when the form has no phone field (default `000000000` → formatted `628000000000`) |
 
 Open [http://localhost:3000/list](http://localhost:3000/list) for the location index (`/` shows the logo only).
 

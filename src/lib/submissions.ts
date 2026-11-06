@@ -27,8 +27,18 @@ export type SubmitResult =
   | { ok: true; submissionId: number }
   | { ok: false; message: string };
 
-/** Microsite no longer collects phone; API still requires `nohp`. */
-const PLACEHOLDER_NOHP = "000000000";
+/**
+ * Microsite no longer collects phone; API still requires `nohp`.
+ * Default `000000000` → `628000000000` (legacy behavior that matched working CMS).
+ * Override with `MICROSITE_PLACEHOLDER_NOHP` if your CMS rejects that dummy.
+ */
+function getPlaceholderNohp(): string {
+  const fromEnv = process.env.MICROSITE_PLACEHOLDER_NOHP?.trim();
+  if (fromEnv && /^[\d\s+-]{9,20}$/.test(fromEnv)) {
+    return fromEnv.replace(/[\s-]/g, "");
+  }
+  return "000000000";
+}
 
 /** Same rules as backend `assertPhone` / `cleanPhone`. */
 function formatNohp(input: string): string {
@@ -70,7 +80,7 @@ function resolveSubmissionId(payload: unknown): number | null {
 export async function submitParticipation(input: {
   locationCode: string;
   fullName: string;
-  /** Omit to send placeholder `000000000` (formatted as 62…). */
+  /** Omit to send placeholder dummy (formatted as 62…). */
   phone?: string;
   photo: File;
   /** Set when microsite was opened with `?test` (honored only if bypass is allowed). */
@@ -127,7 +137,7 @@ export async function submitParticipation(input: {
     }
   }
 
-  const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
+  const nohp = formatNohp(input.phone ?? getPlaceholderNohp());
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
     if (requireSubmitTicket) {
       releaseSubmitTicket(jti);
@@ -141,6 +151,16 @@ export async function submitParticipation(input: {
     const url = bypassFal
       ? MICROSITE_TEST_RESULT_URL
       : await generatePortraitAssetUrl(input.photo);
+    /** Local/debug: see exact `url` + ids sent to CMS when normal submit fails with 422. */
+    if (process.env.MICROSITE_DEBUG_SUBMIT === "1") {
+      console.log("[microsite submit → CMS]", {
+        bypassFal,
+        location_id: location.id,
+        locationCode: input.locationCode,
+        nohp,
+        urlPreview: url.slice(0, 120),
+      });
+    }
     const submission = await publicApiPostJson<SubmissionResponse>(
       "/api/submissions",
       {
@@ -161,12 +181,31 @@ export async function submitParticipation(input: {
       releaseSubmitTicket(jti);
       releaseWindowSubmit(ticketLoc, wid, winIat);
     }
+    const base =
+      error instanceof Error
+        ? error.message
+        : "Gagal memproses foto atau mengirim submission.";
+    if (process.env.MICROSITE_DEBUG_SUBMIT === "1") {
+      const errRecord =
+        error && typeof error === "object"
+          ? (error as Record<string, unknown>)
+          : null;
+      const body =
+        errRecord && "body" in errRecord ? errRecord.body : undefined;
+      console.error("[microsite submit failed]", {
+        locationCode: input.locationCode,
+        locationId: location.id,
+        message: error instanceof Error ? error.message : String(error),
+        status: errRecord?.status,
+        body:
+          body !== undefined
+            ? JSON.stringify(body, null, 0).slice(0, 2000)
+            : undefined,
+      });
+    }
     return {
       ok: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Gagal memproses foto atau mengirim submission.",
+      message: base,
     };
   }
 }
