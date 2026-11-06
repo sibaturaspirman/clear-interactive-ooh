@@ -29,6 +29,7 @@ type LedSudirmanScreenProps = {
   showQr?: boolean;
   holdLiveLayout?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 export function LedSudirmanScreen({
@@ -47,6 +48,7 @@ export function LedSudirmanScreen({
   showQr = true,
   holdLiveLayout = false,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedSudirmanScreenProps) {
   const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
@@ -62,7 +64,7 @@ export function LedSudirmanScreen({
     setSuppressLiveTalent(true);
     const delay = disableAnimations ? 0 : SUDIRMAN_LIVE_HANDOFF_MS + 450;
     const timer = window.setTimeout(() => {
-      setSuppressLiveTalent(!photoUrl);
+      setSuppressLiveTalent(false);
     }, delay);
     return () => clearTimeout(timer);
   }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
@@ -103,6 +105,7 @@ export function LedSudirmanScreen({
             playMs={playMs}
             showQr={liveVisible && showQr}
             idleTalentSrc={idleTalentSrc}
+            nameLayoutDebug={nameLayoutDebug}
           />
         </div>
       ) : null}

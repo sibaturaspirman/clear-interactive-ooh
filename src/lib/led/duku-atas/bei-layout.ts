@@ -1,3 +1,4 @@
+import { LED_LAYOUT_TALENT_DUMMY_URL } from "@/lib/led/led-dummy";
 import { ledStaticImage } from "@/lib/led/led-static-image";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 
@@ -55,7 +56,7 @@ export const BEI_ASSETS = {
   pack: "/images/led/bei-clear-pack.png",
   talent: "/images/led/bei-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
-  layoutTalentDummy: "/images/led/talent-dummy.png",
+  layoutTalentDummy: LED_LAYOUT_TALENT_DUMMY_URL,
   tagline: "/images/led/bei-tagline.png",
   text: "/images/led/bei-text.png",
   qrFrame: "/images/led/bei-qr-frame.png",

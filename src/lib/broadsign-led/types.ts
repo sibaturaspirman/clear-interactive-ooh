@@ -36,7 +36,10 @@ export type BroadsignSitePayload = {
     qrCode: string;
     /** Same-origin path: PNG QR with fresh signed `?w=` (e.g. `/api/microsite/led-qr?code=sency`). */
     dynamicMicrositeQrUrl?: string;
-    dummyTalent: string;
+    /** Legacy single dummy image (prefer `dummyTalents`). */
+    dummyTalent?: string;
+    /** Empty-queue filler: Natasha / Fado / Dimas — 3s each (queue_id -1..-3). */
+    dummyTalents: Array<{ url: string; nama: string; queue_id: number }>;
     /** Single clear (static + live). */
     clear?: string;
     clearLeft?: string;

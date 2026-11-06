@@ -1,3 +1,4 @@
+import { LED_LAYOUT_TALENT_DUMMY_URL } from "@/lib/led/led-dummy";
 import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
@@ -57,7 +58,7 @@ export const DUKUH_ATAS_ASSETS = {
   pack: "/images/led/dukuh-atas-clear-pack.png",
   talent: "/images/led/dukuh-atas-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
-  layoutTalentDummy: "/images/led/talent-dummy.png",
+  layoutTalentDummy: LED_LAYOUT_TALENT_DUMMY_URL,
   tagline: ledStaticImage("/images/led/dukuh-atas-tagline.png"),
   text: "/images/led/dukuh-atas-text.png",
   qrFrame: "/images/led/dukuh-atas-qr-frame.png",
@@ -91,7 +92,7 @@ export const DUKUH_ATAS_LAYOUT_LIVE = {
     top: 85,
     width: 451,
     height: 67,
-    fontSize: 103,
+    fontSize: 92,
     rotate: -6,
   }),
   qrFrame: { left: 3873, top: 23, width: 410, height: 397 },

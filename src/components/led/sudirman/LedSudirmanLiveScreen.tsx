@@ -35,6 +35,7 @@ type LedSudirmanLiveScreenProps = {
   /** QR frame + static code (default on for live layout). */
   showQr?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
@@ -51,6 +52,7 @@ export function LedSudirmanLiveScreen({
   playMs = 3000,
   showQr = true,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedSudirmanLiveScreenProps) {
   const showQrBlock = showQr;
   const qrBox = SUDIRMAN_LAYOUT_LIVE.qrFrame;
@@ -190,7 +192,8 @@ export function LedSudirmanLiveScreen({
           playMs={playMs}
           disableAnimations={disableAnimations}
           layoutDebug={
-            Boolean(participantName?.trim()) && playbackQueueId == null
+            nameLayoutDebug ??
+            (Boolean(participantName?.trim()) && playbackQueueId == null)
           }
         />
       ) : null}

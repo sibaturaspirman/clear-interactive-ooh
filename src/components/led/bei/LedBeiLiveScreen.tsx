@@ -35,6 +35,8 @@ type LedBeiLiveScreenProps = {
   /** QR frame + static code (default on for live layout). */
   showQr?: boolean;
   idleTalentSrc?: string;
+  /** Dummy filler — hold name visible for full slot. */
+  nameLayoutDebug?: boolean;
 };
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
@@ -51,6 +53,7 @@ export function LedBeiLiveScreen({
   playMs = 3000,
   showQr = true,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedBeiLiveScreenProps) {
   const showQrBlock = showQr;
   const qrBox = BEI_LAYOUT_LIVE.qrFrame;
@@ -181,7 +184,8 @@ export function LedBeiLiveScreen({
           playMs={playMs}
           disableAnimations={disableAnimations}
           layoutDebug={
-            Boolean(participantName?.trim()) && playbackQueueId == null
+            nameLayoutDebug ??
+            (Boolean(participantName?.trim()) && playbackQueueId == null)
           }
         />
       ) : null}

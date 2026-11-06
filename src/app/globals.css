@@ -57,6 +57,32 @@ body {
   backdrop-filter: blur(4px);
 }
 
+/**
+ * Gender / choice rows — same idea as text fields: skip backdrop-filter so layers
+ * don't interfere with taps on iOS Safari.
+ */
+.microsite-field--choice {
+  backdrop-filter: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  /* Match checkbox row ergonomics — ≥44pt hit height */
+  min-height: 52px;
+  align-items: center;
+}
+
+/* Native radio — wrapper is 24×24 (same as leading-6); centers WebKit control with label text. */
+.microsite-gender-radio {
+  margin: 0;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  /* Selected dot — blue (iOS uses accent-color; was #fff / gray on some themes). */
+  accent-color: #2563eb;
+}
+
 .microsite-input {
   color: #fff;
   /* ≥16px stops iOS Safari from zooming when an input is focused */

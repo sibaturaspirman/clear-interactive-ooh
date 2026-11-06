@@ -29,6 +29,7 @@ type LedDukuhAtasScreenProps = {
   showQr?: boolean;
   holdLiveLayout?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 export function LedDukuhAtasScreen({
@@ -47,6 +48,7 @@ export function LedDukuhAtasScreen({
   showQr = true,
   holdLiveLayout = false,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedDukuhAtasScreenProps) {
   const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
@@ -63,7 +65,7 @@ export function LedDukuhAtasScreen({
     setSuppressLiveTalent(true);
     const delay = disableAnimations ? 0 : DUKUH_ATAS_LIVE_HANDOFF_MS + 450;
     const timer = window.setTimeout(() => {
-      setSuppressLiveTalent(!photoUrl);
+      setSuppressLiveTalent(false);
     }, delay);
     return () => clearTimeout(timer);
   }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
@@ -104,6 +106,7 @@ export function LedDukuhAtasScreen({
             playMs={playMs}
             showQr={liveVisible && showQr}
             idleTalentSrc={idleTalentSrc}
+            nameLayoutDebug={nameLayoutDebug}
           />
         </div>
       ) : null}

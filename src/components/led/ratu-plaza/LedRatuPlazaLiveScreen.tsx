@@ -35,6 +35,7 @@ type LedRatuPlazaLiveScreenProps = {
   /** QR frame + static code (default on for live layout). */
   showQr?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
@@ -51,6 +52,7 @@ export function LedRatuPlazaLiveScreen({
   playMs = 3000,
   showQr = true,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedRatuPlazaLiveScreenProps) {
   const showQrBlock = showQr;
   const qrBox = RATU_PLAZA_LAYOUT_LIVE.qrFrame;
@@ -197,7 +199,8 @@ export function LedRatuPlazaLiveScreen({
           playMs={playMs}
           disableAnimations={disableAnimations}
           layoutDebug={
-            Boolean(participantName?.trim()) && playbackQueueId == null
+            nameLayoutDebug ??
+            (Boolean(participantName?.trim()) && playbackQueueId == null)
           }
         />
       ) : null}

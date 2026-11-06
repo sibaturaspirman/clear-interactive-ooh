@@ -1,3 +1,4 @@
+import { LED_LAYOUT_TALENT_DUMMY_URL } from "@/lib/led/led-dummy";
 import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
@@ -57,7 +58,7 @@ export const RATU_PLAZA_ASSETS = {
   pack: "/images/led/ratu-plaza-clear-pack.png",
   talent: "/images/led/ratu-plaza-talent.png",
   /** Empty-queue filler + `?debug=live` relayout placeholder. */
-  layoutTalentDummy: "/images/led/talent-dummy.png",
+  layoutTalentDummy: LED_LAYOUT_TALENT_DUMMY_URL,
   tagline: ledStaticImage("/images/led/ratu-plaza-tagline.png"),
   text: "/images/led/ratu-plaza-text.png",
   qrFrame: "/images/led/ratu-plaza-qr-frame.png",

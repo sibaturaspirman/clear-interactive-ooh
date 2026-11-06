@@ -36,6 +36,7 @@ type LedSencyLiveScreenProps = {
   /** QR frame + static code (default on for live layout). */
   showQr?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 /** BEI idle + playback — staggered enter after intro; talent crossfade on API changes. */
@@ -52,6 +53,7 @@ export function LedSencyLiveScreen({
   playMs = 3000,
   showQr = true,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedSencyLiveScreenProps) {
   const showQrBlock = showQr;
   const qrBox = SENCY_LAYOUT_LIVE.qrFrame;
@@ -198,7 +200,8 @@ export function LedSencyLiveScreen({
           playMs={playMs}
           disableAnimations={disableAnimations}
           layoutDebug={
-            Boolean(participantName?.trim()) && playbackQueueId == null
+            nameLayoutDebug ??
+            (Boolean(participantName?.trim()) && playbackQueueId == null)
           }
         />
       ) : null}

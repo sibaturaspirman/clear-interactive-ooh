@@ -156,6 +156,78 @@ function formatPayloadForErrorHint(payload: unknown): string {
   }
 }
 
+/**
+ * CMS / proxies sometimes append bytes after the JSON object. `response.json()` and
+ * `JSON.parse(fullBody)` then throw "Unexpected non-whitespace character after JSON".
+ * Parse the first complete `{...}` or `[...]` slice instead.
+ */
+function parseJsonLenient(raw: string): unknown {
+  const trimmed = raw.replace(/^\uFEFF/, "").trim();
+  if (!trimmed) {
+    throw new SyntaxError("Empty body");
+  }
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    /* fall through */
+  }
+  const extracted = extractFirstJsonValue(trimmed);
+  if (extracted == null) {
+    throw new SyntaxError("No JSON object or array in body");
+  }
+  return JSON.parse(extracted);
+}
+
+function extractFirstJsonValue(raw: string): string | null {
+  const startObj = raw.indexOf("{");
+  const startArr = raw.indexOf("[");
+  let start = -1;
+  if (startObj === -1) start = startArr;
+  else if (startArr === -1) start = startObj;
+  else start = Math.min(startObj, startArr);
+  if (start < 0) return null;
+
+  const open = raw[start];
+  const close = open === "{" ? "}" : "]";
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+
+  for (let i = start; i < raw.length; i++) {
+    const ch = raw[i]!;
+
+    if (inString) {
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (ch === "\\") {
+        escape = true;
+        continue;
+      }
+      if (ch === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (ch === open) depth++;
+    else if (ch === close) {
+      depth--;
+      if (depth === 0) {
+        return raw.slice(start, i + 1);
+      }
+    }
+  }
+
+  return null;
+}
+
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const fallback = `Clear API ${response.status} ${response.statusText}`;
@@ -165,7 +237,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
     }
     let payload: unknown;
     try {
-      payload = JSON.parse(raw) as unknown;
+      payload = parseJsonLenient(raw) as unknown;
     } catch {
       throw new Error(raw.slice(0, 400));
     }
@@ -194,11 +266,18 @@ async function parseResponse<T>(response: Response): Promise<T> {
   }
 
   const contentType = response.headers.get("content-type") ?? "";
+  const raw = await response.text();
+
   if (!contentType.includes("application/json")) {
-    return (await response.text()) as T;
+    return raw as T;
   }
 
-  return response.json() as Promise<T>;
+  try {
+    return parseJsonLenient(raw) as T;
+  } catch {
+    /** Declared JSON but body is HTML/plain — return text so callers can surface it. */
+    return raw as T;
+  }
 }
 
 /** Public CMS routes (`/api/locations`, `/api/submissions`) — no auth header. */

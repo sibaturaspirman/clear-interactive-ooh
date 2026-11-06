@@ -1,3 +1,4 @@
+import { LED_LAYOUT_TALENT_DUMMY_URL } from "@/lib/led/led-dummy";
 import { ledStaticImage } from "@/lib/led/led-static-image";
 import { participantNameSlot } from "@/lib/led/participant-name-layout";
 import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";

@@ -2,7 +2,6 @@
  * Broadsign / Chromium 87 LED player (vanilla). Bundled to /public/broadsign/player.js
  * Queue + motion aligned with `useInteractiveLedQueue` + `led-player.css`.
  */
-import { LED_DUMMY_PARTICIPANT_NAME } from "../lib/led/led-dummy.ts";
 import { ledParticipantDisplayName } from "../lib/led/led-participant-display-name.ts";
 
 (function () {
@@ -57,6 +56,35 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   if (!boot || !boot.site) return;
 
   var site = boot.site;
+
+  /** Natasha → Fado → Dimas (see `LED_DUMMY_ROTATION` / `dummyTalents` in site config). */
+  function resolveDummyTalents() {
+    var a = site.assets;
+    if (a.dummyTalents && a.dummyTalents.length) {
+      return a.dummyTalents;
+    }
+    if (a.dummyTalent) {
+      return [
+        {
+          url: a.dummyTalent,
+          nama: "Natasha",
+          queue_id: -1,
+        },
+      ];
+    }
+    return [];
+  }
+
+  var dummyTalents = resolveDummyTalents();
+
+  function isDummyQueueId(queueId) {
+    if (queueId == null || queueId >= 0) return false;
+    for (var i = 0; i < dummyTalents.length; i++) {
+      if (dummyTalents[i].queue_id === queueId) return true;
+    }
+    return false;
+  }
+
   var apiBase = boot.apiBaseUrl;
   var ledKey = boot.ledKey;
   var useLedProxy = Boolean(boot.useLedProxy);
@@ -111,8 +139,11 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   var liveHadPlayback = false;
   var dummyPlayed = false;
   var pulling = false;
+  /** While we are async-loading the next queue item, block tryStartPlayback to avoid double-dequeue. */
+  var playbackAdvancing = false;
   var prevPlaybackQueueId = null;
   var talentShowGen = 0;
+  /** url -> Promise\<boolean\> — true only when media actually loads (errors delete cache entry for retry). */
   var preloadCache = {};
 
   var stageEl = null;
@@ -515,8 +546,14 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
       a.tagline,
       a.qrFrame,
       a.qrCode,
-      a.dummyTalent,
     );
+    if (dummyTalents.length) {
+      for (var d = 0; d < dummyTalents.length; d++) {
+        if (dummyTalents[d].url) urls.push(dummyTalents[d].url);
+      }
+    } else if (a.dummyTalent) {
+      urls.push(a.dummyTalent);
+    }
     if (a.clear) urls.push(a.clear);
     if (a.clearStatic) urls.push(a.clearStatic);
     if (a.clearLive) urls.push(a.clearLive);
@@ -678,7 +715,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   }
 
   function isDummyPlayback(url, queueId) {
-    return Boolean(url && queueId === -1);
+    return Boolean(url && isDummyQueueId(queueId));
   }
 
   function isQueueSubmission(url, queueId) {
@@ -689,56 +726,161 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url || "");
   }
 
-  function preloadMediaUrl(url, done) {
+  function sleepMs(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  /**
+   * One attempt: resolve(true) when bytes are usable, false on error (entry removed so retries work).
+   * Do not treat error as success — avoids empty talent slot on bad OOH links.
+   */
+  function preloadMediaUrlOnce(url) {
     var trimmed = (url || "").trim();
     if (!trimmed) {
-      if (done) done();
-      return;
+      return Promise.resolve(false);
     }
-    if (Object.hasOwn(preloadCache, trimmed)) {
-      preloadCache[trimmed].then(function () {
-        if (done) done();
-      });
-      return;
+    var existing = preloadCache[trimmed];
+    if (existing) {
+      return existing;
     }
-    preloadCache[trimmed] = new Promise(function (resolve) {
+    var task = new Promise(function (resolve) {
       if (isVideoMediaUrl(trimmed)) {
         var video = document.createElement("video");
         video.preload = "auto";
         video.muted = true;
         video.playsInline = true;
-        var finish = function () {
-          resolve();
-        };
-        video.addEventListener("loadeddata", finish, { once: true });
-        video.addEventListener("error", finish, { once: true });
+        video.addEventListener("loadeddata", function () {
+          resolve(true);
+        }, { once: true });
+        video.addEventListener("error", function () {
+          delete preloadCache[trimmed];
+          resolve(false);
+        }, { once: true });
         video.src = trimmed;
         video.load();
         return;
       }
       var img = new Image();
       if (img.decoding) img.decoding = "async";
-      var finish = function () {
-        resolve();
-      };
-      img.addEventListener("load", finish, { once: true });
-      img.addEventListener("error", finish, { once: true });
+      function onImgLoad() {
+        if (typeof img.decode === "function") {
+          img.decode().then(
+            function () {
+              resolve(true);
+            },
+            function () {
+              resolve(true);
+            },
+          );
+          return;
+        }
+        resolve(true);
+      }
+      img.addEventListener("load", onImgLoad, { once: true });
+      img.addEventListener("error", function () {
+        delete preloadCache[trimmed];
+        resolve(false);
+      }, { once: true });
       img.src = trimmed;
     });
-    preloadCache[trimmed].then(function () {
-      if (done) done();
-    });
+    preloadCache[trimmed] = task;
+    return task;
+  }
+
+  /** Background warm-cache: failures are ignored (no callback contract). */
+  function preloadMediaUrl(url) {
+    void preloadMediaUrlOnce(url);
+  }
+
+  function waitUntilMediaReady(url, maxWaitMs) {
+    var trimmed = (url || "").trim();
+    if (!trimmed) {
+      return Promise.resolve(false);
+    }
+    var cap = typeof maxWaitMs === "number" ? maxWaitMs : 90000;
+    var started = Date.now();
+    var gap = 250;
+    return (function tryLoad() {
+      return preloadMediaUrlOnce(trimmed).then(function (ok) {
+        if (ok) {
+          return true;
+        }
+        if (Date.now() - started >= cap) {
+          return false;
+        }
+        return sleepMs(gap).then(function () {
+          gap = Math.min(Math.floor(gap * 1.4), 3000);
+          return tryLoad();
+        });
+      });
+    })();
   }
 
   function preloadQueueItems(items) {
     if (!items || !items.length) return;
     for (var i = 0; i < items.length; i++) {
-      if (items[i] && items[i].url) preloadMediaUrl(items[i].url, null);
+      if (items[i] && items[i].url) preloadMediaUrl(items[i].url);
     }
   }
 
+  function isQueueSubmissionItem(item) {
+    return Boolean(
+      item &&
+        item.url &&
+        item.queue_id != null &&
+        item.queue_id > 0,
+    );
+  }
+
+  /**
+   * Pop the next playable item once its media is ready. On failure, rotate to back (same as web player).
+   */
+  function takeNextReadyQueueItem(maxWaitMs) {
+    var maxAttempts = Math.max(upcoming.length * 3, 3);
+    var attempt = 0;
+
+    function step() {
+      if (upcoming.length === 0) {
+        return Promise.resolve(null);
+      }
+      if (attempt >= maxAttempts) {
+        return Promise.resolve(upcoming.shift());
+      }
+      attempt += 1;
+      var next = upcoming[0];
+      if (!next || !next.url || !String(next.url).trim()) {
+        return Promise.resolve(upcoming.shift());
+      }
+      if (isDummyQueueId(next.queue_id)) {
+        return Promise.resolve(upcoming.shift());
+      }
+      if (!isQueueSubmissionItem(next)) {
+        return Promise.resolve(upcoming.shift());
+      }
+      return waitUntilMediaReady(next.url, maxWaitMs).then(function (ok) {
+        if (ok) {
+          return upcoming.shift();
+        }
+        var failed = upcoming.shift();
+        if (failed) {
+          upcoming.push(failed);
+        }
+        return step();
+      });
+    }
+
+    return step();
+  }
+
+  function maybeScheduleIntroAfterIdle() {
+    scheduleIntroAfterIdle();
+  }
+
   function mountTalentImgWhenReady(url, whenReady) {
-    preloadMediaUrl(url, function () {
+    if (!talentPhotoImg) return;
+    waitUntilMediaReady(url, 60000).then(function () {
       if (!talentPhotoImg) return;
 
       function ready() {
@@ -881,14 +1023,28 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
       return;
     }
 
+    /** Dummy slots use the same enter→hold→exit fade as real submissions (not static "show"). */
     if (isDummyPlayback(url, queueId)) {
-      prevPlaybackQueueId = -1;
+      var prevDummyId = prevPlaybackQueueId;
+      prevPlaybackQueueId = queueId;
       talentPhotoEl.style.visibility = "visible";
-      mountTalentImgWhenReady(url, function () {
-        if (showGen !== talentShowGen) return;
-        applyTalentFadeClass("show");
-        if (whenShown) whenShown();
-      });
+
+      function beginDummyEnter() {
+        mountTalentImgWhenReady(url, function () {
+          if (showGen !== talentShowGen) return;
+          applyTalentFadeClass("in");
+          talentExitTimer = setTimeout(function () {
+            applyTalentFadeClass("out");
+          }, Math.max(0, durationMs - timing.fadeOutMs));
+          if (whenShown) whenShown();
+        });
+      }
+
+      if (prevDummyId != null && prevDummyId !== queueId) {
+        beginDummyEnter();
+        return;
+      }
+      beginDummyEnter();
       return;
     }
 
@@ -1044,7 +1200,40 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     if (done && done.queue_id > 0 && !replaying) {
       ackQueue(done.queue_id);
     }
-    if (done && done.queue_id === -1) {
+    if (done && isDummyQueueId(done.queue_id)) {
+      if (upcoming.length > 0) {
+        playbackAdvancing = true;
+        takeNextReadyQueueItem(60000).then(function (next) {
+          playbackAdvancing = false;
+          if (!introDone || slotFrozen) return;
+          if (!next) {
+            currentItem = null;
+            tryStartPlayback();
+            return;
+          }
+          if (playTimer) clearTimeout(playTimer);
+          playTimer = 0;
+          currentItem = next;
+          liveHadPlayback = true;
+          hideParticipantName();
+          showTalentPhoto(
+            next.url,
+            next.queue_id,
+            itemPlayMs(next),
+            function () {
+              if (currentItem !== next) return;
+              if (!introDone || slotFrozen) return;
+              setParticipantName(
+                next.nama || "",
+                next.queue_id,
+                itemPlayMs(next),
+              );
+              armCurrent(itemPlayMs(next));
+            },
+          );
+        });
+        return;
+      }
       currentItem = null;
       if (playTimer) clearTimeout(playTimer);
       hideLiveTalentSlot();
@@ -1058,28 +1247,36 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
       introDone &&
       upcoming.length > 0
     ) {
-      if (playTimer) clearTimeout(playTimer);
-      playTimer = 0;
-      var next = upcoming.shift();
-      currentItem = next;
-      liveHadPlayback = true;
-      hideLiveTalentSlot();
-      hideParticipantName();
-      showTalentPhoto(
-        next.url,
-        next.queue_id,
-        itemPlayMs(next),
-        function () {
-          if (currentItem !== next) return;
-          if (!introDone || slotFrozen) return;
-          setParticipantName(
-            next.nama || "",
-            next.queue_id,
-            itemPlayMs(next),
-          );
-          armCurrent(itemPlayMs(next));
-        },
-      );
+      playbackAdvancing = true;
+      takeNextReadyQueueItem(60000).then(function (next) {
+        playbackAdvancing = false;
+        if (!introDone || slotFrozen) return;
+        if (!next) {
+          currentItem = null;
+          tryStartPlayback();
+          return;
+        }
+        if (playTimer) clearTimeout(playTimer);
+        playTimer = 0;
+        currentItem = next;
+        liveHadPlayback = true;
+        hideParticipantName();
+        showTalentPhoto(
+          next.url,
+          next.queue_id,
+          itemPlayMs(next),
+          function () {
+            if (currentItem !== next) return;
+            if (!introDone || slotFrozen) return;
+            setParticipantName(
+              next.nama || "",
+              next.queue_id,
+              itemPlayMs(next),
+            );
+            armCurrent(itemPlayMs(next));
+          },
+        );
+      });
       return;
     }
     currentItem = null;
@@ -1103,8 +1300,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   }
 
   function itemPlayMs(item) {
-    if (item && item.queue_id === -1) {
-      if (isSequenceLoop) return timing.liveDurationMs || 9000;
+    if (item && isDummyQueueId(item.queue_id)) {
       return timing.dummyPlayMs;
     }
     if (isSequenceLoop) return liveSegmentPlayMs;
@@ -1114,6 +1310,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   function tryStartPlayback() {
     if (!introDone) return;
     if (currentItem) return;
+    if (playbackAdvancing) return;
     if (slotFrozen) {
       if (upcoming.length === 0 && liveHadPlayback) {
         scheduleIntroAfterIdle();
@@ -1122,26 +1319,33 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     }
 
     if (upcoming.length > 0) {
-      var playing = upcoming.shift();
-      currentItem = playing;
-      liveHadPlayback = true;
-      hideLiveTalentSlot();
-      hideParticipantName();
-      showTalentPhoto(
-        playing.url,
-        playing.queue_id,
-        itemPlayMs(playing),
-        function () {
-          if (currentItem !== playing) return;
-          if (!introDone || slotFrozen) return;
-          setParticipantName(
-            playing.nama || "",
-            playing.queue_id,
-            itemPlayMs(playing),
-          );
-          armCurrent(itemPlayMs(playing));
-        },
-      );
+      playbackAdvancing = true;
+      takeNextReadyQueueItem(60000).then(function (playing) {
+        playbackAdvancing = false;
+        if (!introDone || slotFrozen) return;
+        if (!playing) {
+          tryStartPlayback();
+          return;
+        }
+        currentItem = playing;
+        liveHadPlayback = true;
+        hideParticipantName();
+        showTalentPhoto(
+          playing.url,
+          playing.queue_id,
+          itemPlayMs(playing),
+          function () {
+            if (currentItem !== playing) return;
+            if (!introDone || slotFrozen) return;
+            setParticipantName(
+              playing.nama || "",
+              playing.queue_id,
+              itemPlayMs(playing),
+            );
+            armCurrent(itemPlayMs(playing));
+          },
+        );
+      });
       return;
     }
 
@@ -1149,58 +1353,46 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     hideLiveTalentSlot();
 
     if (
-      isSequenceLoop &&
       !dummyPlayed &&
-      upcoming.length === 0
+      upcoming.length === 0 &&
+      dummyTalents.length > 0 &&
+      (isSequenceLoop || !liveHadPlayback)
     ) {
       dummyPlayed = true;
       liveHadPlayback = true;
+      var firstDummy = dummyTalents[0];
+      for (var qi = 1; qi < dummyTalents.length; qi++) {
+        var row = dummyTalents[qi];
+        upcoming.push({
+          queue_id: row.queue_id,
+          submission_id: 0,
+          url: row.url,
+          nama: row.nama || "",
+        });
+      }
       currentItem = {
-        queue_id: -1,
+        queue_id: firstDummy.queue_id,
         submission_id: 0,
-        url: site.assets.dummyTalent,
-        nama: LED_DUMMY_PARTICIPANT_NAME,
+        url: firstDummy.url,
+        nama: firstDummy.nama || "",
       };
-      var dummyMs = itemPlayMs(currentItem);
+      var dummySlotMs = itemPlayMs(currentItem);
       showTalentPhoto(
-        site.assets.dummyTalent,
-        -1,
-        dummyMs,
+        firstDummy.url,
+        firstDummy.queue_id,
+        dummySlotMs,
         function () {
-          if (currentItem && currentItem.queue_id === -1) {
+          if (
+            currentItem &&
+            currentItem.queue_id === firstDummy.queue_id &&
+            isDummyQueueId(firstDummy.queue_id)
+          ) {
             setParticipantName(
-              LED_DUMMY_PARTICIPANT_NAME,
-              -1,
-              dummyMs,
+              firstDummy.nama || "",
+              firstDummy.queue_id,
+              dummySlotMs,
             );
-            armCurrent(dummyMs);
-          }
-        },
-      );
-      return;
-    }
-
-    if (!isSequenceLoop && !dummyPlayed && !liveHadPlayback) {
-      dummyPlayed = true;
-      liveHadPlayback = true;
-      currentItem = {
-        queue_id: -1,
-        submission_id: 0,
-        url: site.assets.dummyTalent,
-        nama: LED_DUMMY_PARTICIPANT_NAME,
-      };
-      showTalentPhoto(
-        site.assets.dummyTalent,
-        -1,
-        timing.dummyPlayMs,
-        function () {
-          if (currentItem && currentItem.queue_id === -1) {
-            setParticipantName(
-              LED_DUMMY_PARTICIPANT_NAME,
-              -1,
-              timing.dummyPlayMs,
-            );
-            armCurrent(timing.dummyPlayMs);
+            armCurrent(dummySlotMs);
           }
         },
       );

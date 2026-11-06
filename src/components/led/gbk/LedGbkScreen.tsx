@@ -27,6 +27,7 @@ type LedGbkScreenProps = {
   showQr?: boolean;
   holdLiveLayout?: boolean;
   idleTalentSrc?: string;
+  nameLayoutDebug?: boolean;
 };
 
 export function LedGbkScreen({
@@ -45,6 +46,7 @@ export function LedGbkScreen({
   showQr = true,
   holdLiveLayout = false,
   idleTalentSrc,
+  nameLayoutDebug,
 }: LedGbkScreenProps) {
   const liveMounted = !holdStatic && phase !== "outro";
   const liveVisible = !holdStatic && phase === "live" && liveReady;
@@ -61,7 +63,7 @@ export function LedGbkScreen({
     setSuppressLiveTalent(true);
     const delay = disableAnimations ? 0 : GBK_LIVE_HANDOFF_MS + 450;
     const timer = window.setTimeout(() => {
-      setSuppressLiveTalent(!photoUrl);
+      setSuppressLiveTalent(false);
     }, delay);
     return () => clearTimeout(timer);
   }, [liveVisible, introCycleKey, disableAnimations, holdLiveLayout]);
@@ -102,6 +104,7 @@ export function LedGbkScreen({
             playMs={playMs}
             showQr={liveVisible && showQr}
             idleTalentSrc={idleTalentSrc}
+            nameLayoutDebug={nameLayoutDebug}
           />
         </div>
       ) : null}

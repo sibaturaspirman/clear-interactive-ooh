@@ -131,8 +131,10 @@ export function MicrositeParticipationFlow({
     [photoPreview],
   );
 
+  const normalizedName = form.fullName.replace(/\u200B/g, "").trim();
+  /** Single-char names are valid; strip zero-width / whitespace-only. */
   const infoValid =
-    form.fullName.trim().length >= 2 &&
+    normalizedName.length > 0 &&
     (form.gender === "male" || form.gender === "female") &&
     form.termsAccepted;
 
@@ -164,7 +166,7 @@ export function MicrositeParticipationFlow({
     try {
       const result = await submitParticipation({
         locationCode: location.code,
-        fullName: form.fullName.trim(),
+        fullName: normalizedName,
         photo: file,
         testBypass,
       });
@@ -204,7 +206,6 @@ export function MicrositeParticipationFlow({
           form={form}
           onChange={updateForm}
           onContinue={() => setStep("camera")}
-          canContinue={infoValid}
         />
       </MicrositeShell>
     );
