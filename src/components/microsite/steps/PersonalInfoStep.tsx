@@ -126,8 +126,7 @@ export function PersonalInfoStep({
           }
         />
         <span>
-          Saya setuju dan mematuhi{" "}
-          <span className="text-[#1f8bff] underline">persyaratan dan ketentuan</span>
+          Saya setuju foto saya diolah menggunakan AI dan ditampilkan bersama nama saya di billboard
         </span>
       </label>
 
