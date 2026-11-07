@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /** Phones on LAN: without this, dev JS/HMR is blocked and the page never hydrates. */
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.local"],
   async headers() {
     return [
       {

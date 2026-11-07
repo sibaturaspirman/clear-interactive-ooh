@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:lan": "next dev --hostname 0.0.0.0",
+    "dev:https": "next dev --hostname 0.0.0.0 --experimental-https",
     "broadsign:build": "node scripts/build-broadsign-player.mjs",
     "build": "npm run broadsign:build && next build",
     "start": "next start",

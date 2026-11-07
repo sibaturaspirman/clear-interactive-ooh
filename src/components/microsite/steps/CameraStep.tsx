@@ -20,6 +20,14 @@ export function CameraStep({ onCapture }: CameraStepProps) {
     let stream: MediaStream | null = null;
 
     async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStreamError(
+          window.isSecureContext
+            ? "Browser ini tidak mendukung akses kamera."
+            : "Kamera hanya bisa dibuka lewat HTTPS. Buka microsite dengan alamat https://.",
+        );
+        return;
+      }
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
