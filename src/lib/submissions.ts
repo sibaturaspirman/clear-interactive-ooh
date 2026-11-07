@@ -66,6 +66,56 @@ function resolveSubmissionId(payload: unknown): number | null {
   return null;
 }
 
+type SubmitTicketClaim = {
+  release: () => void;
+  succeed: () => Promise<void>;
+};
+
+const NO_TICKET_CLAIM: SubmitTicketClaim = {
+  release: () => {},
+  succeed: async () => {},
+};
+
+function isEnvSessionBypass(): boolean {
+  const flag = process.env.MICROSITE_SESSION_BYPASS?.trim().toLowerCase();
+  return flag === "1" || flag === "true";
+}
+
+/** Claims the one-shot ticket issued by the `?w=` exchange; null when missing or already used. */
+async function claimSubmitTicket(
+  locationCode: string,
+): Promise<SubmitTicketClaim | null> {
+  const cookieStore = await cookies();
+  const ticket = parseSubmitTicket(
+    cookieStore.get(micrositeSubmitTicketCookie)?.value,
+  );
+  if (!ticket || ticket.c.toLowerCase() !== locationCode.toLowerCase()) {
+    return null;
+  }
+
+  const { c: ticketLoc, wid, winIat, jti } = ticket;
+
+  if (!tryBeginWindowSubmit(ticketLoc, wid, winIat)) {
+    return null;
+  }
+
+  if (!tryClaimSubmitTicket(jti)) {
+    releaseWindowSubmit(ticketLoc, wid, winIat);
+    return null;
+  }
+
+  return {
+    release: () => {
+      releaseSubmitTicket(jti);
+      releaseWindowSubmit(ticketLoc, wid, winIat);
+    },
+    succeed: async () => {
+      cookieStore.delete(micrositeSubmitTicketCookie);
+      markWindowSubmitSucceeded(ticketLoc, wid, winIat);
+    },
+  };
+}
+
 export async function submitParticipation(input: {
   locationCode: string;
   fullName: string;
@@ -74,47 +124,28 @@ export async function submitParticipation(input: {
   photo: File;
   /** Set when microsite was opened with `?test` (honored only if bypass is allowed). */
   testBypass?: boolean;
+  /** Set when microsite was opened with `?kol` — submit without a `?w=` QR session. */
+  kolBypass?: boolean;
 }): Promise<SubmitResult> {
   const location = await getLocationByCode(input.locationCode);
   if (!location) {
     return { ok: false, message: "Lokasi tidak ditemukan." };
   }
 
-  const rawTicket = (await cookies()).get(micrositeSubmitTicketCookie)?.value;
-  const ticket = parseSubmitTicket(rawTicket);
-  if (
-    !ticket ||
-    ticket.c.toLowerCase() !== input.locationCode.toLowerCase()
-  ) {
+  const claim =
+    input.kolBypass || isEnvSessionBypass()
+      ? NO_TICKET_CLAIM
+      : await claimSubmitTicket(input.locationCode);
+  if (!claim) {
     return {
       ok: false,
       message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
     };
   }
-
-  const { c: ticketLoc, wid, winIat, jti } = ticket;
-
-  if (!tryBeginWindowSubmit(ticketLoc, wid, winIat)) {
-    return {
-      ok: false,
-      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
-    };
-  }
-
-  if (!tryClaimSubmitTicket(jti)) {
-    releaseWindowSubmit(ticketLoc, wid, winIat);
-    return {
-      ok: false,
-      message: MICROSITE_SCAN_QR_AGAIN_MESSAGE,
-    };
-  }
-
-  const cookieStore = await cookies();
 
   const nohp = formatNohp(input.phone ?? PLACEHOLDER_NOHP);
   if (!/^\+?[0-9]{10,16}$/.test(nohp)) {
-    releaseSubmitTicket(jti);
-    releaseWindowSubmit(ticketLoc, wid, winIat);
+    claim.release();
     return { ok: false, message: "Nomor HP tidak valid" };
   }
 
@@ -132,13 +163,11 @@ export async function submitParticipation(input: {
         location_id: location.id,
       },
     );
-    cookieStore.delete(micrositeSubmitTicketCookie);
-    markWindowSubmitSucceeded(ticketLoc, wid, winIat);
+    await claim.succeed();
     const submissionId = resolveSubmissionId(submission) ?? 0;
     return { ok: true, submissionId };
   } catch (error) {
-    releaseSubmitTicket(jti);
-    releaseWindowSubmit(ticketLoc, wid, winIat);
+    claim.release();
     return {
       ok: false,
       message:

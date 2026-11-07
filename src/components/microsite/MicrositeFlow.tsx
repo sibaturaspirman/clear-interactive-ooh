@@ -18,6 +18,8 @@ type MicrositeFlowProps = {
   windowToken?: string;
   /** Server env — skip session when `MICROSITE_SESSION_BYPASS=true`. */
   sessionBypass?: boolean;
+  /** From `?kol` — skip the `?w=` QR session for KOL / manual submits. */
+  kolBypass?: boolean;
 };
 
 export function MicrositeFlow({
@@ -28,6 +30,7 @@ export function MicrositeFlow({
   fotoDebugAllowed = false,
   windowToken,
   sessionBypass = false,
+  kolBypass = false,
 }: MicrositeFlowProps) {
   if (overlayPreviewMode) {
     return <MicrositeOverlayDebug testBypass={testBypass} />;
@@ -44,7 +47,8 @@ export function MicrositeFlow({
       location={location}
       testBypass={testBypass}
       windowToken={windowToken}
-      sessionBypass={sessionBypass}
+      sessionBypass={sessionBypass || kolBypass}
+      kolBypass={kolBypass}
     />
   );
 }

@@ -25,6 +25,7 @@ type MicrositeParticipationFlowProps = {
   testBypass?: boolean;
   windowToken?: string;
   sessionBypass?: boolean;
+  kolBypass?: boolean;
 };
 
 export function MicrositeParticipationFlow({
@@ -32,6 +33,7 @@ export function MicrositeParticipationFlow({
   testBypass = false,
   windowToken,
   sessionBypass = false,
+  kolBypass = false,
 }: MicrositeParticipationFlowProps) {
   const [step, setStep] = useState<Step>("info");
   const [form, setForm] = useState<FormState>({
@@ -160,6 +162,7 @@ export function MicrositeParticipationFlow({
         fullName: form.fullName.trim(),
         photo: file,
         testBypass,
+        kolBypass,
       });
 
       if (!result.ok) {

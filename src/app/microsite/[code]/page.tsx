@@ -21,6 +21,7 @@ type PageProps = {
     overlay?: string | string[];
     foto?: string | string[];
     w?: string | string[];
+    kol?: string | string[];
   }>;
 };
 
@@ -65,6 +66,7 @@ export default async function MicrositeLocationPage({
   const sessionBypass =
     process.env.MICROSITE_SESSION_BYPASS === "1" ||
     process.env.MICROSITE_SESSION_BYPASS === "true";
+  const kolBypass = query.kol !== undefined;
 
   return (
     <MicrositeFlow
@@ -75,6 +77,7 @@ export default async function MicrositeLocationPage({
       fotoDebugAllowed={fotoDebugAllowed}
       windowToken={windowToken}
       sessionBypass={sessionBypass}
+      kolBypass={kolBypass}
     />
   );
 }

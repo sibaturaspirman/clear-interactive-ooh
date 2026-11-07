@@ -10,6 +10,10 @@ export function micrositeTestPath(code: string): string {
   return `${micrositePath(code)}?test`;
 }
 
+export function micrositeKolPath(code: string): string {
+  return `${micrositePath(code)}?kol`;
+}
+
 export function micrositeOverlayPreviewPath(code: string): string {
   return `${micrositePath(code)}?overlay`;
 }
