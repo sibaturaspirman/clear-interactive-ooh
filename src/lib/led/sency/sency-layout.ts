@@ -100,7 +100,7 @@ export const SENCY_LAYOUT_LIVE = {
     top: 71,
     width: 251,
     height: 35,
-    fontSize: 50,
+    fontSize: 41,
     rotate: -6,
   }),
   qrFrame: { left: 814, top: 244, width: 299, height: 290 },
