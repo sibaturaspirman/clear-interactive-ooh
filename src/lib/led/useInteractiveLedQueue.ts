@@ -74,7 +74,7 @@ export type UseInteractiveLedQueueParams = {
   ledDebug?: LedDebugOptions;
   /** Cityvision Broadsign — 15s slot, no intro loop between idle segments. */
   cityvisionMode?: boolean;
-  /** Sency — 4s intro / 9s live (3×3s) / 4s outro loop. */
+  /** Sequence loop — 3s intro / 9s live (3×3s) / 3s outro. */
   sencySequenceMode?: boolean;
   /** When false, hold first static frame until BroadSignPlay / ?autoplay=1. */
   playbackEnabled?: boolean;

@@ -5,16 +5,16 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** GBK LED canvas — matches `gbk-bg.jpg` (1680×840). */
 export const GBK_CANVAS = LED_CANVAS_BY_CODE.gbk;
 
-/** Intro hold — loop: 4s intro → 9s live → 4s outro. */
-export const GBK_STATIC_DURATION_MS = 4000;
+/** Intro hold — loop: 3s intro → 9s live → 3s outro. */
+export const GBK_STATIC_DURATION_MS = 3000;
 /** Live filler when API queue is empty (non-sequence / legacy). */
 export const GBK_DUMMY_PLAY_MS = 5000;
 export const GBK_SEQUENCE = {
-  introMs: 4000,
+  introMs: 3000,
   liveMs: 9000,
-  outroMs: 4000,
+  outroMs: 3000,
   submissionMs: 3000,
-  slotMs: 17000,
+  slotMs: 15000,
 } as const;
 export const GBK_OUTRO_FADE_IN_MS = 800;
 export const GBK_STATIC_FADE_IN_MS = 800;

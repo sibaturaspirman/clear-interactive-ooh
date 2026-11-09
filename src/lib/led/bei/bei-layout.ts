@@ -5,7 +5,7 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** BEI LED canvas — matches `bei-bg.jpg`. */
 export const BEI_CANVAS = LED_CANVAS_BY_CODE.bei;
 
-export const BEI_STATIC_DURATION_MS = 4000;
+export const BEI_STATIC_DURATION_MS = 3000;
 /** Live filler when API queue is empty (legacy). */
 export const BEI_DUMMY_PLAY_MS = 5000;
 export const BEI_STATIC_FADE_IN_MS = 800;

@@ -5,7 +5,7 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Sudirman LED canvas — matches `sudirman-bg.jpg` (4200×1200). */
 export const SUDIRMAN_CANVAS = LED_CANVAS_BY_CODE.sudirman;
 
-export const SUDIRMAN_STATIC_DURATION_MS = 4000;
+export const SUDIRMAN_STATIC_DURATION_MS = 3000;
 /** Live filler when API queue is empty (legacy). */
 export const SUDIRMAN_DUMMY_PLAY_MS = 5000;
 export const SUDIRMAN_STATIC_FADE_IN_MS = 800;

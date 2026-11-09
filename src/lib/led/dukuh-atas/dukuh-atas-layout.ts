@@ -5,7 +5,7 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Dukuh Atas LED canvas — matches `dukuh-atas-bg.jpg` (6000×432). */
 export const DUKUH_ATAS_CANVAS = LED_CANVAS_BY_CODE["dukuh-atas"];
 
-export const DUKUH_ATAS_STATIC_DURATION_MS = 4000;
+export const DUKUH_ATAS_STATIC_DURATION_MS = 3000;
 /** Live filler when API queue is empty (legacy). */
 export const DUKUH_ATAS_DUMMY_PLAY_MS = 5000;
 export const DUKUH_ATAS_STATIC_FADE_IN_MS = 800;

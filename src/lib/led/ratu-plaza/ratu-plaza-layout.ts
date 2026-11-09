@@ -5,7 +5,7 @@ import { LED_CANVAS_BY_CODE } from "@/lib/led/location-specs";
 /** Ratu Plaza LED canvas — matches `ratu-plaza-bg.jpg` (2880×660). */
 export const RATU_PLAZA_CANVAS = LED_CANVAS_BY_CODE["ratu-plaza"];
 
-export const RATU_PLAZA_STATIC_DURATION_MS = 4000;
+export const RATU_PLAZA_STATIC_DURATION_MS = 3000;
 /** Live filler when API queue is empty (legacy). */
 export const RATU_PLAZA_DUMMY_PLAY_MS = 5000;
 export const RATU_PLAZA_STATIC_FADE_IN_MS = 800;

@@ -1,15 +1,15 @@
 import { isCityvisionLedLocation } from "@/lib/led/led-vendors";
 
 /**
- * Intro 4s → live 9s → outro 4s — all sequence-loop LED sites.
+ * Intro 3s → live 9s → outro 3s — all sequence-loop LED sites.
  * Live fill: 0 items → dummy 9s; 1 → 9s; 2 → 4.5s×2; 3+ → 3s×3.
  */
 export const LED_SEQUENCE = {
-  introMs: 4000,
+  introMs: 3000,
   liveMs: 9000,
-  outroMs: 4000,
+  outroMs: 3000,
   submissionMs: 3000,
-  slotMs: 17000,
+  slotMs: 15000,
 } as const;
 
 export const LED_OUTRO_FADE_IN_MS = 800;
