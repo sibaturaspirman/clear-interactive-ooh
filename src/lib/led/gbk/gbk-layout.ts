@@ -100,7 +100,7 @@ export const GBK_LAYOUT_LIVE = {
     top: 99,
     width: 402,
     height: 56,
-    fontSize: 80,
+    fontSize: 56,
     rotate: -6,
   }),
   qrFrame: { left: 1125, top: 375, width: 420, height: 408 },
