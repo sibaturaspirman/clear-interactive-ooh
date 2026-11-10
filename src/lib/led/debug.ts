@@ -1,5 +1,19 @@
 /** LED layout/debug helpers (query params on `/led/[code]`). */
 
+/** `?timer` — show sequence phase HUD (intro / live / end wall clock). */
+export function parseLedTimerFlag(
+  timerParam: string | string[] | undefined,
+): boolean {
+  if (timerParam === undefined) {
+    return false;
+  }
+  const raw = Array.isArray(timerParam) ? timerParam[0] : timerParam;
+  if (raw === "0" || raw === "false") {
+    return false;
+  }
+  return true;
+}
+
 function readQueryFlag(value: string | string[] | undefined): boolean {
   const raw = Array.isArray(value) ? value[0] : value;
   if (raw === undefined) {

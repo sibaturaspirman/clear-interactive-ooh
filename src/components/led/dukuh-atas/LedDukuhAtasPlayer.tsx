@@ -17,6 +17,7 @@ export type LedLocationPlayerProps = {
   locationName: string;
   micrositeUrl: string;
   ledDebug?: import("@/lib/led/debug").LedDebugOptions;
+  showSequenceTimer?: boolean;
 };
 
 export function LedDukuhAtasPlayer(props: LedLocationPlayerProps) {
@@ -32,6 +33,7 @@ export function LedDukuhAtasPlayer(props: LedLocationPlayerProps) {
       ledKey={props.ledKey}
       locationName={props.locationName}
       ledDebug={props.ledDebug}
+      showSequenceTimer={props.showSequenceTimer}
       dummyTalentUrl={DUKUH_ATAS_ASSETS.layoutTalentDummy}
       layoutTalentDummy={DUKUH_ATAS_ASSETS.layoutTalentDummy}
       stageClassName="led-player-stage--dukuh-atas"

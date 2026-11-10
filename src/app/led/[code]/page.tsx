@@ -6,14 +6,20 @@ import {
   getLocationByCode,
   getLocationStaticParams,
 } from "@/lib/locations";
-import { parseLedDebugOptions } from "@/lib/led/debug";
+import {
+  parseLedDebugOptions,
+  parseLedTimerFlag,
+} from "@/lib/led/debug";
 import { getMicrositeUrl } from "@/lib/urls";
 
 export const instant = false;
 
 type PageProps = {
   params: Promise<{ code: string }>;
-  searchParams: Promise<{ debug?: string | string[] }>;
+  searchParams: Promise<{
+    debug?: string | string[];
+    timer?: string | string[];
+  }>;
 };
 
 export async function generateStaticParams() {
@@ -37,6 +43,7 @@ export default async function LedLocationPage({
   const query = await searchParams;
   const location = await getLocationByCode(code);
   const ledDebug = parseLedDebugOptions(query.debug);
+  const showSequenceTimer = parseLedTimerFlag(query.timer);
 
   if (!location) {
     notFound();
@@ -53,6 +60,7 @@ export default async function LedLocationPage({
       locationName={location.name}
       micrositeUrl={micrositeUrl}
       ledDebug={ledDebug}
+      showSequenceTimer={showSequenceTimer}
     />
   );
 }

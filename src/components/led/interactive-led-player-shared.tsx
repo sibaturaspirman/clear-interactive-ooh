@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { InteractiveLedPlayerShell } from "@/components/led/InteractiveLedPlayerShell";
+import { LedSequenceTimerHud } from "@/components/led/LedSequenceTimerHud";
 import {
   LED_DEBUG_PARTICIPANT_NAME,
   type LedDebugOptions,
@@ -37,6 +38,8 @@ type InteractiveLedPlayerFrameProps = {
   ledKey: string;
   locationName: string;
   ledDebug?: LedDebugOptions;
+  /** `/led/[code]?timer` — wall-clock HUD for intro / live / end. */
+  showSequenceTimer?: boolean;
   dummyTalentUrl: string;
   stageClassName: string;
   layoutTalentDummy: string;
@@ -49,6 +52,7 @@ export function InteractiveLedPlayerFrame({
   ledKey,
   locationName,
   ledDebug,
+  showSequenceTimer = false,
   dummyTalentUrl,
   stageClassName,
   layoutTalentDummy,
@@ -109,6 +113,12 @@ export function InteractiveLedPlayerFrame({
         playMs: queue.ui.playMs,
         showQr: true,
       })}
+      {showSequenceTimer ? (
+        <LedSequenceTimerHud
+          phase={queue.phase}
+          introCycleKey={queue.introCycleKey}
+        />
+      ) : null}
     </InteractiveLedPlayerShell>
   );
 }

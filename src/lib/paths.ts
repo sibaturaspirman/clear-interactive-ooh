@@ -38,6 +38,14 @@ export function ledDebugPath(code: string): string {
   return `${ledPath(code)}?debug`;
 }
 
+export function ledTimerPath(code: string): string {
+  return `${ledPath(code)}?timer`;
+}
+
+export function ledBroadsignTimerPath(code: string): string {
+  return `${ledBroadsignPath(code)}?autoplay=1&timer`;
+}
+
 export function ledStaticDebugPath(code: string): string {
   return `${ledPath(code)}?debug=static`;
 }

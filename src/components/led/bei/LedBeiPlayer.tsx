@@ -17,6 +17,7 @@ export type LedLocationPlayerProps = {
   locationName: string;
   micrositeUrl: string;
   ledDebug?: import("@/lib/led/debug").LedDebugOptions;
+  showSequenceTimer?: boolean;
 };
 
 export function LedBeiPlayer(props: LedLocationPlayerProps) {
@@ -31,6 +32,7 @@ export function LedBeiPlayer(props: LedLocationPlayerProps) {
       ledKey={props.ledKey}
       locationName={props.locationName}
       ledDebug={props.ledDebug}
+      showSequenceTimer={props.showSequenceTimer}
       dummyTalentUrl={BEI_ASSETS.layoutTalentDummy}
       layoutTalentDummy={BEI_ASSETS.layoutTalentDummy}
       stageClassName="led-player-stage--bei"

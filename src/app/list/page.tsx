@@ -13,9 +13,11 @@ import { getBroadsignSitePayload } from "@/lib/broadsign-led/resolve-site-config
 import {
   ledBroadsignAutoplayPath,
   ledBroadsignPath,
+  ledBroadsignTimerPath,
   ledDebugPath,
   ledLiveLayoutDebugPath,
   ledStaticDebugPath,
+  ledTimerPath,
   ledPath,
   micrositePath,
   micrositeFotoDebugPath,
@@ -119,6 +121,13 @@ function LocationLinks({
           >
             LED (?debug)
           </Link>
+          <Link
+            href={ledTimerPath(location.code)}
+            className="rounded-full border border-lime-400/60 px-4 py-2 text-lime-950 hover:bg-lime-50 dark:border-lime-600/50 dark:text-lime-200 dark:hover:bg-lime-950/40"
+            title="HUD durasi intro / live / end (3s / 9s / 3s)"
+          >
+            LED (?timer)
+          </Link>
           {showBroadsignLink ? (
             <Link
               href={ledBroadsignAutoplayPath(location.code)}
@@ -126,6 +135,15 @@ function LocationLinks({
               title="Broadsign + autoplay (preview lab)"
             >
               Broadsign (?autoplay=1)
+            </Link>
+          ) : null}
+          {showBroadsignLink ? (
+            <Link
+              href={ledBroadsignTimerPath(location.code)}
+              className="rounded-full border border-lime-400/60 px-4 py-2 text-lime-950 hover:bg-lime-50 dark:border-lime-600/50 dark:text-lime-200 dark:hover:bg-lime-950/40"
+              title="Broadsign + autoplay + HUD timer sequence"
+            >
+              Broadsign (?timer)
             </Link>
           ) : null}
         </>

@@ -11,6 +11,7 @@ export type LedPlayerProps = {
   locationName: string;
   micrositeUrl: string;
   ledDebug?: LedDebugOptions;
+  showSequenceTimer?: boolean;
 };
 
 /** Routes to per-location interactive player (layout duplicated per site, queue logic shared). */

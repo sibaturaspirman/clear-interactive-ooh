@@ -129,3 +129,68 @@ body {
 .bs-frozen {
   pointer-events: none;
 }
+
+/* `?timer` — sequence phase proof (intro / live / end). */
+.led-sequence-timer {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 9999;
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #f4fbfc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  pointer-events: none;
+  cursor: default;
+}
+
+.led-sequence-timer__title {
+  margin-bottom: 4px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.led-sequence-timer__phase {
+  margin-bottom: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.led-sequence-timer--static .led-sequence-timer__phase {
+  color: #7dd3fc;
+}
+
+.led-sequence-timer--live .led-sequence-timer__phase {
+  color: #86efac;
+}
+
+.led-sequence-timer--outro .led-sequence-timer__phase {
+  color: #fcd34d;
+}
+
+.led-sequence-timer--over .led-sequence-timer__phase {
+  color: #fb7185;
+}
+
+.led-sequence-timer__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.led-sequence-timer__row span {
+  opacity: 0.65;
+}
+
+.led-sequence-timer__expect {
+  margin-top: 6px;
+  font-size: 10px;
+  opacity: 0.55;
+}

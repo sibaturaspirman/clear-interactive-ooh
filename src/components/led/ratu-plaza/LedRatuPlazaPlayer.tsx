@@ -17,6 +17,7 @@ export type LedLocationPlayerProps = {
   locationName: string;
   micrositeUrl: string;
   ledDebug?: import("@/lib/led/debug").LedDebugOptions;
+  showSequenceTimer?: boolean;
 };
 
 export function LedRatuPlazaPlayer(props: LedLocationPlayerProps) {
@@ -32,6 +33,7 @@ export function LedRatuPlazaPlayer(props: LedLocationPlayerProps) {
       ledKey={props.ledKey}
       locationName={props.locationName}
       ledDebug={props.ledDebug}
+      showSequenceTimer={props.showSequenceTimer}
       dummyTalentUrl={RATU_PLAZA_ASSETS.layoutTalentDummy}
       layoutTalentDummy={RATU_PLAZA_ASSETS.layoutTalentDummy}
       stageClassName="led-player-stage--ratu-plaza"

@@ -17,6 +17,7 @@ export type LedLocationPlayerProps = {
   locationName: string;
   micrositeUrl: string;
   ledDebug?: import("@/lib/led/debug").LedDebugOptions;
+  showSequenceTimer?: boolean;
 };
 
 export function LedGbkPlayer(props: LedLocationPlayerProps) {
@@ -32,6 +33,7 @@ export function LedGbkPlayer(props: LedLocationPlayerProps) {
       ledKey={props.ledKey}
       locationName={props.locationName}
       ledDebug={props.ledDebug}
+      showSequenceTimer={props.showSequenceTimer}
       dummyTalentUrl={GBK_ASSETS.layoutTalentDummy}
       layoutTalentDummy={GBK_ASSETS.layoutTalentDummy}
       stageClassName="led-player-stage--gbk"

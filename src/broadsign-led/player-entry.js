@@ -629,6 +629,93 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     else outroRoot.classList.add("bs-static-hidden");
   }
 
+  /** `?timer` — wall-clock HUD for intro / live / end. */
+  var timerEnabled = (function () {
+    var search = window.location.search || "";
+    if (search.indexOf("timer=0") !== -1 || search.indexOf("timer=false") !== -1) {
+      return false;
+    }
+    return (
+      search.indexOf("?timer") !== -1 ||
+      search.indexOf("&timer") !== -1
+    );
+  })();
+  var timerHud = null;
+  var timerPhase = "static";
+  var timerPhaseAt = 0;
+  var timerCycleAt = 0;
+  var timerTick = 0;
+
+  function timerExpectedMs(phase) {
+    if (phase === "live") return timing.liveDurationMs || 9000;
+    if (phase === "outro") return timing.outroDurationMs || 3000;
+    return timing.staticDurationMs || 3000;
+  }
+
+  function formatTimerSec(ms) {
+    var n = Math.max(0, ms) / 1000;
+    return n.toFixed(2);
+  }
+
+  function markTimerPhase(phase, resetCycle) {
+    if (!timerEnabled) return;
+    timerPhase = phase;
+    timerPhaseAt = Date.now();
+    if (resetCycle) timerCycleAt = Date.now();
+  }
+
+  function updateTimerHud() {
+    if (!timerHud) return;
+    var now = Date.now();
+    var expect = timerExpectedMs(timerPhase);
+    var elapsed = now - timerPhaseAt;
+    var remain = expect - elapsed;
+    var cycleMs = timing.slotPlayableMs || 15000;
+    var cycleElapsed = now - timerCycleAt;
+    var label =
+      timerPhase === "live" ? "LIVE" : timerPhase === "outro" ? "END" : "INTRO";
+    timerHud.className =
+      "led-sequence-timer led-sequence-timer--" +
+      timerPhase +
+      (elapsed > expect + 80 ? " led-sequence-timer--over" : "");
+    timerHud.innerHTML =
+      '<div class="led-sequence-timer__title">SEQUENCE TIMER</div>' +
+      '<div class="led-sequence-timer__phase">' +
+      label +
+      "</div>" +
+      '<div class="led-sequence-timer__row"><span>phase</span><strong>' +
+      formatTimerSec(elapsed) +
+      " / " +
+      formatTimerSec(expect) +
+      "s</strong></div>" +
+      '<div class="led-sequence-timer__row"><span>remain</span><strong>' +
+      formatTimerSec(remain) +
+      "s</strong></div>" +
+      '<div class="led-sequence-timer__row"><span>cycle</span><strong>' +
+      formatTimerSec(cycleElapsed) +
+      " / " +
+      formatTimerSec(cycleMs) +
+      "s</strong></div>" +
+      '<div class="led-sequence-timer__expect">expect ' +
+      formatTimerSec(timing.staticDurationMs || 3000) +
+      "/" +
+      formatTimerSec(timing.liveDurationMs || 9000) +
+      "/" +
+      formatTimerSec(timing.outroDurationMs || 3000) +
+      "s</div>";
+  }
+
+  function ensureTimerHud() {
+    if (!timerEnabled || timerHud) return;
+    timerHud = document.createElement("div");
+    timerHud.setAttribute("role", "status");
+    document.body.appendChild(timerHud);
+    timerPhaseAt = Date.now();
+    timerCycleAt = Date.now();
+    updateTimerHud();
+    timerTick = setInterval(updateTimerHud, 50);
+  }
+
   function clearSequencePhaseTimers() {
     if (liveSegmentTimer) clearTimeout(liveSegmentTimer);
     liveSegmentTimer = 0;
@@ -1240,12 +1327,13 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     showLive(false);
     showStatic(false);
     showOutro(true);
+    markTimerPhase("outro", false);
     if (outroTimer) clearTimeout(outroTimer);
     outroTimer = setTimeout(function () {
       outroTimer = 0;
       showOutro(false);
       runIntroCycle();
-    }, timing.outroDurationMs || 4000);
+    }, timing.outroDurationMs || 3000);
   }
 
   function scheduleIntroAfterIdle() {
@@ -1277,6 +1365,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     hideLiveTalentSlot();
     showLive(false);
     showStatic(true);
+    markTimerPhase("static", true);
     resetStaticMotion();
 
     var exitAt = Math.max(0, timing.staticDurationMs - timing.fadeOutMs);
@@ -1304,6 +1393,7 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
     showStatic(false);
     showOutro(false);
     showLive(true);
+    markTimerPhase("live", false);
     if (isSequenceLoop) {
       planLiveSegmentPlayback();
       var liveMs = timing.liveDurationMs || 9000;
@@ -1340,5 +1430,6 @@ import { ledParticipantDisplayName } from "../lib/led/led-participant-display-na
   }
 
   buildDom();
+  ensureTimerHud();
   waitForStart();
 })();
